@@ -6,8 +6,10 @@ Private multi-harness skill package for phased, evidence-first task execution.
 
 Keep this as a package, not one large skill.
 
-The master `swarm-verify` skill orchestrates the workflow. Focused sub-skills own the repeatable parts:
+The `swarm-verify-one-shot` skill is the single-command entrypoint that invokes the whole suite. The master `swarm-verify` skill orchestrates the workflow. Focused sub-skills own the repeatable parts:
 
+- `swarm-verify-one-shot`: one command that loads the master skill, every subskill, and the full dependency set.
+- `swarm-verify`: master orchestration and parity reference routing.
 - `swarm-verify-setup`: Phase 0 artifact setup, `user-task.md`, ledgers, tasks, subtasks.
 - `swarm-verify-investigate`: Phase 1 orientation audit/maps plus Phase 2 source-truth investigation and baseline evidence.
 - `swarm-verify-tdd-qa`: TDD, edge cases, unit/integration/smoke/runtime QA, Playwright.
@@ -182,6 +184,12 @@ Skip Kimi `config.toml` mutation:
 ## Use
 
 Codex, Claude Code, Kimi, OpenCode, and Agent Skills harnesses:
+
+```text
+/swarm-verify-one-shot complete this task: ...
+```
+
+Manual suite entrypoint:
 
 ```text
 /swarm-verify complete this task: ...

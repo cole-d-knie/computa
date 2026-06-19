@@ -1,5 +1,5 @@
 ---
-description: "Use when the user asks for swarm verification, phased TDD execution, adversarial review, judge/verifier review, runtime QA, or audit-ready implementation."
+description: "Use when the user asks for /swarm-verify-one-shot, swarm verification, phased TDD execution, adversarial review, judge/verifier review, runtime QA, or audit-ready implementation."
 globs:
 alwaysApply: false
 ---
@@ -10,6 +10,7 @@ When this rule applies, execute the task with a phased, evidence-first verificat
 
 Core rules:
 
+- Treat `/swarm-verify-one-shot <task>` as a request to invoke the full suite: `swarm-verify`, `swarm-verify-setup`, `swarm-verify-investigate`, `swarm-verify-tdd-qa`, `swarm-verify-swarms`, and `swarm-verify-closeout`.
 - Save the raw user request immediately to an external `user-task.md` before rewriting or planning from memory.
 - Create all plan, phase, task, subtask, issue, blocker, evidence, and final report artifacts outside the repo unless the user explicitly asks otherwise.
 - When any swarm-verify phase or subworkflow is run independently, use the same available dependency capabilities: terse communication, planning, TDD, investigation, parallel agents, adversarial review, completion verification, Playwright/browser QA, and Context7/current docs.

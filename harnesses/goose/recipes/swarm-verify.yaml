@@ -1,6 +1,6 @@
 version: "1.0.0"
 title: "Swarm Verify"
-description: "Execute a task with phased planning, TDD, runtime QA, audit ledgers, and adversarial plus judge verification loops."
+description: "One-shot execution of the full swarm-verify suite with phased planning, TDD, runtime QA, audit ledgers, and adversarial plus judge verification loops."
 parameters:
   - key: task
     input_type: string
@@ -35,6 +35,7 @@ instructions: |
   {{ task }}
 
   Rules:
+  - Treat this recipe as the one-shot entrypoint that invokes the full suite: swarm-verify, swarm-verify-setup, swarm-verify-investigate, swarm-verify-tdd-qa, swarm-verify-swarms, and swarm-verify-closeout.
   - Immediately save the raw task to an external user-task.md before summarizing or planning from memory.
   - Create all plan, phase, task, subtask, issue, blocker, evidence, and report artifacts outside the repo.
   - When any swarm-verify phase or subworkflow is run independently, use the same available dependency capabilities: terse communication, planning, TDD, investigation, parallel agents, adversarial review, completion verification, Playwright/browser QA, and Context7/current docs.

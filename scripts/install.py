@@ -60,6 +60,7 @@ PROJECT_HARNESSES = {"cursor", "generic"}
 RECIPE_HARNESSES = {"goose"}
 
 SUITE_SKILLS = [
+    "swarm-verify-one-shot",
     "swarm-verify",
     "swarm-verify-setup",
     "swarm-verify-investigate",
