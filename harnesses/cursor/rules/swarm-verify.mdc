@@ -13,7 +13,8 @@ Core rules:
 - Save the raw user request immediately to an external `user-task.md` before rewriting or planning from memory.
 - Create all plan, phase, task, subtask, issue, blocker, evidence, and final report artifacts outside the repo unless the user explicitly asks otherwise.
 - Phase 0: create the plan directory, `plan.md`, `master-task-ledger.csv`, `issues-and-blockers.md/csv`, phase directories, task directories, subtask ledgers, and `reports/`.
-- Phase 1: investigate before implementation. Read source truth, verify current and expected behavior, identify edge cases and coverage gaps, run baseline commands, reproduce the issue or prove the gap, and create failing evidence where possible.
+- Phase 1: run an orientation audit before implementation. Create `maps/map-index.md`, `task-scope-map.md`, `codebase-map.md`, `flow-map.md`, `test-and-command-map.md`, and `risk-map.md` so later phases can reference the working model.
+- Phase 2: investigate before implementation. Read source truth, reference and update the maps, verify current and expected behavior, identify edge cases and coverage gaps, run baseline commands, reproduce the issue or prove the gap, and create failing evidence where possible.
 - Use TDD for behavior changes: failing test first, smallest fix, passing test after.
 - Run unit, integration, smoke, runtime, and browser-visible QA as relevant. Use the available browser automation tools for real UI checks.
 - Run swarms only on independent work. Never parallelize overlapping files, shared servers, browser sessions, databases, dashboards, queues, deployments, migrations, or dependent subtasks.
@@ -34,5 +35,7 @@ Final reports required under `reports/`:
 Reports may be combined only when clearer, but every category must remain present as an explicit heading.
 
 Do not claim completion unless the final response includes exact verification commands, failing-before evidence or documented exception, passing-after evidence, runtime QA, edge cases, report paths, remaining risks, gaps, blockers, new issues fixed, and new issues not fixed.
+
+Also include the map artifacts created and any important map updates made during the work.
 
 Golden rule: evidence before assertions. Never say "it works" without verification command output and runtime proof.

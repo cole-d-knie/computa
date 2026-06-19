@@ -31,11 +31,27 @@ Create a plan directory with:
 - `master-task-ledger.csv`: every phase, task, and subtask in execution order with status, dependencies, owner/agent, evidence path, and next action.
 - `issues-and-blockers.md`: narrative log of issues, blockers, assumptions, edge cases, decisions, and plan changes.
 - `issues-and-blockers.csv`: structured tracker with issue ID, severity, owner, status, dependency, and resolution.
+- `maps/`: living codebase/task maps created during Phase 1 and updated whenever later evidence changes the working model.
 - `reports/`: final report directory for closeout.
+
+## Map Directory
+
+Initialize `maps/` during Phase 0 so Phase 1 can fill it before implementation.
+
+Expected map artifacts:
+
+- `map-index.md`: what maps exist, when they were last updated, and which phase/task last relied on them.
+- `task-scope-map.md`: original request, explicit constraints, in-scope/out-of-scope areas, acceptance criteria, and unknowns.
+- `codebase-map.md`: repo layout, important packages/modules, ownership boundaries, entrypoints, relevant files, generated files, and do-not-edit/reference-only areas.
+- `flow-map.md`: runtime/user/data/control flows related to the task, with source files and external systems.
+- `test-and-command-map.md`: package manager, test/build/lint commands, smoke/runtime commands, existing tests, gaps, and expected verification order.
+- `risk-map.md`: risky areas, edge cases, dependencies, migrations, dashboards, credentials, production-touching surfaces, and assumptions to challenge.
+
+Keep maps concise but complete enough that a fresh agent can resume without guessing from chat context.
 
 ## Phase Directories
 
-Split the work into multiple phases. Phase 0 is setup. Phase 1 is investigation and baseline. Later phases should reflect the task.
+Split the work into multiple phases. Phase 0 is setup. Phase 1 is orientation audit and map creation. Phase 2 is investigation and baseline. Later phases should reflect the task.
 
 For each phase directory, create:
 

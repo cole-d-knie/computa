@@ -9,7 +9,7 @@ Keep this as a package, not one large skill.
 The master `swarm-verify` skill orchestrates the workflow. Focused sub-skills own the repeatable parts:
 
 - `swarm-verify-setup`: Phase 0 artifact setup, `user-task.md`, ledgers, tasks, subtasks.
-- `swarm-verify-investigate`: Phase 1 source-truth investigation and baseline evidence.
+- `swarm-verify-investigate`: Phase 1 orientation audit/maps plus Phase 2 source-truth investigation and baseline evidence.
 - `swarm-verify-tdd-qa`: TDD, edge cases, unit/integration/smoke/runtime QA, Playwright.
 - `swarm-verify-swarms`: task and phase adversarial plus judge/verifier swarms.
 - `swarm-verify-closeout`: final reports, gap analysis, blockers, verification needs, commits.
@@ -206,13 +206,14 @@ The workflow must:
 - save the raw request to `user-task.md` immediately
 - create external artifacts outside the repo
 - use phased planning
+- run an initial orientation audit of the task/codebase and save living maps under `maps/`
 - run investigation before implementation
 - use TDD for behavior changes
 - run runtime QA and Playwright/browser checks when relevant
 - run adversarial and judge/verifier swarms after each task and phase
 - keep ledgers current
 - make one commit per verified task when commits are allowed
-- finish with concise Markdown reports for summary, verification needed, blockers/open issues, task gaps, and new issues found fixed/not fixed
+- finish with concise Markdown reports for summary, verification needed, blockers/open issues, task gaps, map artifacts, and new issues found fixed/not fixed
 
 ## Validation
 

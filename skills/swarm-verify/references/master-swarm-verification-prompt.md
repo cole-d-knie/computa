@@ -21,6 +21,7 @@ Create a plan directory with:
 - `master-task-ledger.csv`: all phases/tasks/subtasks in execution order, with status, owner/agent, dependencies, evidence path, and next action.
 - `issues-and-blockers.md`: narrative log of issues, blockers, assumptions, edge cases, and decisions.
 - `issues-and-blockers.csv`: structured tracker for issue ID, severity, owner, status, dependency, and resolution.
+- `maps/`: living codebase/task maps that future phases can reference instead of guessing from chat context.
 
 For each phase directory, create:
 - `phase.md`: phase goal, instructions, acceptance criteria, edge cases, and verification required.
@@ -53,12 +54,31 @@ For every phase, task, and subtask:
 - Mark ledger rows done only after evidence exists.
 - Keep artifacts auditable and current.
 
-# Phase 1: Investigation And Baseline
+# Phase 1: Orientation Audit And Map
 
 After Phase 0, run Phase 1 before implementation.
 
 Phase 1 must:
+- Audit the task and working codebase broadly enough to understand where you are working.
+- Create `maps/map-index.md` with every map file, what it covers, last update time, evidence paths, and where later phases should look first.
+- Create `maps/task-scope-map.md` with the original request, acceptance criteria, explicit constraints, in-scope/out-of-scope areas, assumptions, and unresolved questions.
+- Create `maps/codebase-map.md` with repo roots, package/app boundaries, key modules, entrypoints, route/API surfaces, config files, generated/reference-only files, and relevant ownership boundaries.
+- Create `maps/flow-map.md` with user, runtime, data, analytics, queue, network, database, deployment, or dashboard flows relevant to the task.
+- Create `maps/test-and-command-map.md` with package manager, install/build/lint/test commands, existing tests, missing coverage, smoke/runtime commands, and Playwright/browser routes if relevant.
+- Create `maps/risk-map.md` with risky files/systems, edge cases, migrations, external consoles, credentials/secrets boundaries, production-touching surfaces, race conditions, and assumptions to challenge.
+- Use fast structural reads first: branch/remotes, file inventory, package manifests, config files, routes, tests, docs, PR/ticket references, and runtime entrypoints.
+- If the repo is huge, make the audit task-focused, but map adjacent systems that could regress and explicitly mark unexplored areas as unknown or likely irrelevant.
+- Update maps whenever later evidence changes the working model.
+- Update the phase, task, subtask, issue, and blocker ledgers with map evidence.
+- Run the phase-level adversarial swarm and phase-level judge/verifier swarm before moving to the next phase.
+
+# Phase 2: Investigation And Baseline
+
+After the orientation map exists, run targeted investigation before implementation.
+
+Phase 2 must:
 - Read the relevant files, docs, tickets, PRs, logs, dashboards, or other source-of-truth materials.
+- Reference the maps created in Phase 1 and update them when new evidence changes the working model.
 - Identify the existing behavior.
 - Identify the expected behavior.
 - Identify likely edge cases.
@@ -71,7 +91,7 @@ Phase 1 must:
 
 # Phase Execution Rules
 
-After Phase 1, execute the remaining phases, tasks, and subtasks you created.
+After Phase 2, execute the remaining phases, tasks, and subtasks you created.
 
 Follow the ledgers as the source of truth:
 - Do phases in dependency order.
@@ -188,6 +208,7 @@ Use this loop for every code change. Do not skip steps.
 
 ## 1. Understand Before Changing
 
+- Read `maps/map-index.md` and the task-relevant map files.
 - Read the relevant files.
 - Identify the existing tests for the area you are changing.
 - Identify likely edge cases before coding.
@@ -241,6 +262,7 @@ For every phase, task, and subtask, record:
 - what `/playwright` checks you ran
 - what you learned
 - what assumptions changed
+- what map files you referenced or updated
 - what remains blocked or risky
 - links or paths to evidence
 
@@ -256,6 +278,7 @@ You must provide:
 - The smoke tests and runtime/manual QA performed.
 - The `/playwright` verification performed, if applicable.
 - The edge cases covered.
+- The map artifacts created and any important map updates made during implementation.
 - A brief summary of what changed and why.
 - Any remaining risks, blockers, or unverified assumptions.
 - Paths to the plan, phase, task, subtask, issue, and evidence artifacts.

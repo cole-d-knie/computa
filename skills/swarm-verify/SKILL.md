@@ -1,6 +1,6 @@
 ---
 name: swarm-verify
-description: Execute a task with phased planning, raw task capture, external audit ledgers, TDD, investigation, runtime QA, Playwright checks, and two-round adversarial plus judge/verifier swarms after every task and phase. Use for requests like swarm verification loop, phase/task swarms, audit-ready implementation, or getting work ready to merge with strict evidence.
+description: Execute a task with phased planning, raw task capture, an initial codebase/task orientation audit with reusable maps, external audit ledgers, TDD, investigation, runtime QA, Playwright checks, and two-round adversarial plus judge/verifier swarms after every task and phase. Use for requests like swarm verification loop, phase/task swarms, audit-ready implementation, or getting work ready to merge with strict evidence.
 ---
 
 # Swarm Verify
@@ -44,6 +44,7 @@ Also read `references/master-swarm-verification-prompt.md` when present. It is t
 - Do not assume. Verify from source files, docs, PRs, tests, logs, dashboards, or runtime behavior.
 - Save the raw user request to `user-task.md` before rewriting, summarizing, or planning from memory.
 - Keep all plan, phase, task, subtask, issue, blocker, evidence, and report artifacts outside the repo.
+- Before targeted implementation work, create and maintain a reusable codebase/task map so later phases can reference known entrypoints, flows, files, commands, risks, and unknowns.
 - Use ledgers as the source of truth for order, dependencies, status, and evidence.
 - Do phases, tasks, and subtasks only after prerequisites are complete.
 - Use swarms for safe parallelism only. Do not parallelize overlapping files, systems, data, migrations, dashboards, deployment state, browsers, databases, queues, or test environments.
@@ -58,10 +59,11 @@ Also read `references/master-swarm-verification-prompt.md` when present. It is t
 ## Execution Flow
 
 1. Phase 0: use `swarm-verify-setup` to create artifacts, preserve the raw request, split phases/tasks/subtasks, and initialize ledgers.
-2. Phase 1: use `swarm-verify-investigate` to establish baseline truth, reproduce the issue or prove the gap, identify expected behavior, and create failing evidence.
-3. Implementation phases: use `swarm-verify-tdd-qa` for test-first changes, smallest fixes, edge cases, unit/integration/smoke/runtime QA, and Playwright verification.
-4. After every task and phase: use `swarm-verify-swarms` for adversarial review followed by judge/verifier review. Do not implement adversarial recommendations unless the matching judge/verifier approves.
-5. Closeout: use `swarm-verify-closeout` to reconcile ledgers, create final reports, compare against `user-task.md`, record new fixed/unfixed issues, verify evidence, and state remaining gaps.
+2. Phase 1: use `swarm-verify-investigate` to run an orientation audit of the task and working codebase before implementation. Create a living `maps/` directory that later phases can reference.
+3. Phase 2: continue `swarm-verify-investigate` to establish baseline truth, reproduce the issue or prove the gap, identify expected behavior, and create failing evidence.
+4. Implementation phases: use `swarm-verify-tdd-qa` for test-first changes, smallest fixes, edge cases, unit/integration/smoke/runtime QA, and Playwright verification.
+5. After every task and phase: use `swarm-verify-swarms` for adversarial review followed by judge/verifier review. Do not implement adversarial recommendations unless the matching judge/verifier approves.
+6. Closeout: use `swarm-verify-closeout` to reconcile ledgers, create final reports, compare against `user-task.md`, record new fixed/unfixed issues, verify evidence, and state remaining gaps.
 
 ## Plan Changes
 
@@ -82,6 +84,7 @@ If a previous pass was wrong, state what was wrong, preserve the old evidence, a
 Do not claim completion unless there is evidence for:
 
 - original user request captured in `user-task.md`
+- current task/codebase map exists, is referenced by later work, and records entrypoints, relevant files, commands, tests, flows, risks, unknowns, and out-of-scope areas
 - phases/tasks/subtasks completed or explicitly deferred with rationale
 - failing-before evidence or documented reason it was impossible
 - passing-after evidence
