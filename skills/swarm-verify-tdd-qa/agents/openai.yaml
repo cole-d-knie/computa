@@ -1,0 +1,4 @@
+interface:
+  display_name: "Swarm Verify TDD QA"
+  short_description: "TDD, smoke tests, runtime QA, and Playwright."
+  default_prompt: "Use /swarm-verify-tdd-qa to drive failing tests, fixes, passing tests, and runtime QA."
