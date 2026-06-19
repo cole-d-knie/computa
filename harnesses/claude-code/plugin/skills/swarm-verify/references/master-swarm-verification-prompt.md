@@ -8,6 +8,24 @@ compelete the task following the rules Rules: /caveman
 
 <insert here>
 
+# Dependency Invocation
+
+Before starting the master workflow or any standalone phase/subskill, invoke or apply all available dependency capabilities:
+
+- /caveman
+- /superpowers or `using-superpowers`
+- `writing-plans` and `executing-plans`
+- /test-driven-development
+- /investigate or `systematic-debugging`
+- `dispatching-parallel-agents`
+- `subagent-driven-development` where compatible, or native agent swarm/delegation where not
+- `requesting-code-review`
+- `verification-before-completion`
+- /playwright for browser-visible runtime QA
+- `context7` for current library, framework, API, CLI, or harness docs
+
+If any dependency is unavailable, continue with equivalent behavior and record the missing dependency in the artifact ledger.
+
 # Phase 0: Setup And Planning
 
 First, create a plan to solve the problem in multiple phases.

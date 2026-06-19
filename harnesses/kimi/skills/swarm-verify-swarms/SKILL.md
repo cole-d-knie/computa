@@ -7,6 +7,23 @@ description: "Run required swarm reviews for swarm-verified work: after every ta
 
 Use this after every task and every phase, and after material plan changes.
 
+## Required Dependency Skills
+
+When this subskill is invoked directly, use or trigger all Kimi-compatible swarm-verify dependencies when available:
+
+- `caveman`: terse, concrete communication.
+- `using-superpowers`: start-of-task planning discipline.
+- `writing-plans` and `executing-plans`: plan creation and execution.
+- `test-driven-development`: fail-first implementation.
+- `systematic-debugging` or `investigate`: root-cause investigation.
+- `dispatching-parallel-agents` or Kimi agent swarm/delegation: safe swarm parallelism.
+- `requesting-code-review`: adversarial review.
+- `verification-before-completion`: completion proof.
+- `playwright`: browser-visible runtime QA.
+- `context7`: current, version-specific docs for libraries, frameworks, APIs, CLIs, and harness behavior.
+
+If any dependency is missing, continue with equivalent behavior and record the missing dependency in the artifact ledger.
+
 Use Kimi agent swarm/delegation, parallel agent dispatch, and adversarial review when available.
 
 ## Parallelism Guard

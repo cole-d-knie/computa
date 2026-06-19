@@ -206,6 +206,7 @@ The workflow must:
 - save the raw request to `user-task.md` immediately
 - create external artifacts outside the repo
 - use phased planning
+- invoke the full dependency set from every swarm-verify skill/subskill when run independently
 - run an initial orientation audit of the task/codebase and save living maps under `maps/`
 - allow maps to change at any time when evidence changes, tracking each material map update in both `maps/map-change-log.md` and `maps/map-change-ledger.csv`
 - run investigation before implementation

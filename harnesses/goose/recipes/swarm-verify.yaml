@@ -37,6 +37,7 @@ instructions: |
   Rules:
   - Immediately save the raw task to an external user-task.md before summarizing or planning from memory.
   - Create all plan, phase, task, subtask, issue, blocker, evidence, and report artifacts outside the repo.
+  - When any swarm-verify phase or subworkflow is run independently, use the same available dependency capabilities: terse communication, planning, TDD, investigation, parallel agents, adversarial review, completion verification, Playwright/browser QA, and Context7/current docs.
   - Phase 0: create plan.md, master-task-ledger.csv, issue/blocker ledgers, phase directories, task directories, subtask ledgers, maps/, and reports/.
   - Phase 1: run an orientation audit before implementation. Create maps/map-index.md, task-scope-map.md, codebase-map.md, flow-map.md, test-and-command-map.md, risk-map.md, map-change-log.md, and map-change-ledger.csv.
   - Phase 2: investigate before implementation. Reference and update maps; verify source truth, current behavior, expected behavior, issue origin, edge cases, coverage gaps, baseline commands, and failing evidence.

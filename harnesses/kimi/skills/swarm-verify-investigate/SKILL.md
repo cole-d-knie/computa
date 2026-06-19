@@ -7,6 +7,23 @@ description: "Run Phase 1 orientation audit and Phase 2 investigation/baseline f
 
 Use this for Phase 1 orientation audit and Phase 2 investigation before implementation.
 
+## Required Dependency Skills
+
+When this subskill is invoked directly, use or trigger all Kimi-compatible swarm-verify dependencies when available:
+
+- `caveman`: terse, concrete communication.
+- `using-superpowers`: start-of-task planning discipline.
+- `writing-plans` and `executing-plans`: plan creation and execution.
+- `test-driven-development`: fail-first implementation.
+- `systematic-debugging` or `investigate`: root-cause investigation.
+- `dispatching-parallel-agents` or Kimi agent swarm/delegation: safe swarm parallelism.
+- `requesting-code-review`: adversarial review.
+- `verification-before-completion`: completion proof.
+- `playwright`: browser-visible runtime QA.
+- `context7`: current, version-specific docs for libraries, frameworks, APIs, CLIs, and harness behavior.
+
+If any dependency is missing, continue with equivalent behavior and record the missing dependency in the artifact ledger.
+
 ## Required Discipline
 
 Use `investigate` or `systematic-debugging` when available. If not available, follow the same root-cause standard manually.

@@ -13,6 +13,8 @@ If the task is missing or too vague to test, ask only for the blocking objective
 
 Use or trigger these when available:
 
+This same dependency set applies when any `swarm-verify-*` subskill is invoked directly.
+
 - `caveman`: terse, concrete communication.
 - `using-superpowers`: start-of-task planning discipline.
 - `writing-plans` and `executing-plans`: plan creation and execution.

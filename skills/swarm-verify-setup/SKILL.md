@@ -7,6 +7,23 @@ description: "Create Phase 0 setup artifacts for swarm-verified work: external p
 
 Use this for Phase 0. Finish it before implementation.
 
+## Required Dependency Skills
+
+When this subskill is invoked directly, use or trigger all swarm-verify dependencies when available:
+
+- `caveman`: terse, concrete communication.
+- `using-superpowers`: start-of-task planning discipline.
+- `writing-plans` and `executing-plans`: plan creation and execution.
+- `test-driven-development`: fail-first implementation.
+- `systematic-debugging` or `investigate`: root-cause investigation.
+- `dispatching-parallel-agents` and `subagent-driven-development`: safe swarm parallelism.
+- `requesting-code-review`: adversarial review.
+- `verification-before-completion`: completion proof.
+- `playwright`: browser-visible runtime QA.
+- `context7`: current, version-specific docs for libraries, frameworks, APIs, CLIs, and harness behavior.
+
+If any dependency is missing, continue with equivalent behavior and record the missing dependency in the artifact ledger.
+
 ## Artifact Root
 
 Create an artifact root outside the repo. Use a stable, timestamped path that names the task.
