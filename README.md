@@ -33,6 +33,8 @@ The full parity prompt remains available at:
 
 ## Dependencies
 
+See [`DEPENDENCIES.md`](DEPENDENCIES.md) for upstream GitHub/npm provenance and per-harness compatibility notes.
+
 Vendored lightweight dependency skills:
 
 - `caveman`
@@ -51,12 +53,12 @@ Vendored lightweight dependency skills:
 
 Dependency handling is harness-specific:
 
-- Codex installs the Codex-compatible dependency folders.
-- Claude Code prefers the existing Claude-compatible `~/.claude/skills/investigate` when present.
-- Kimi skips `subagent-driven-development` and uses Kimi agent swarm/delegation wording.
-- OpenCode installs standard `SKILL.md` folders into its native global skills directory.
-- Cursor uses an `.mdc` rule because Cursor rules are project-scoped instructions, not the same skill runtime.
-- Goose uses a recipe because Goose packages reusable workflows as recipes.
+- Codex installs the Codex-compatible dependency folders into `${CODEX_HOME:-~/.codex}/skills`.
+- Claude Code installs dependency folders into `~/.claude/skills`; the plugin adapter also includes dependency skills and `.mcp.json`.
+- Kimi installs Kimi-compatible skills, updates `~/.kimi-code/config.toml`, and adds missing Context7/Playwright entries to `~/.kimi-code/mcp.json`.
+- OpenCode installs skills, then merges `~/.config/opencode/opencode.json` with instruction paths and Context7/Playwright MCP entries.
+- Cursor installs a project/global `.mdc` rule and adds missing Context7/Playwright entries to project/global `mcp.json`.
+- Goose installs a recipe with developer, Context7, and Playwright extensions.
 
 Important: full `gstack` core is not vendored because it is large and machine-specific. The installer checks for it and can copy a local one with `--install-local-gstack`.
 
@@ -75,11 +77,15 @@ Codex:
 ./install.sh --harness codex
 ```
 
+Installs suite and dependencies to `${CODEX_HOME:-~/.codex}/skills`. Use `--install-local-gstack` if you want to copy a local full `gstack` core.
+
 Claude Code:
 
 ```bash
 ./install.sh --harness claude-code
 ```
+
+Installs suite and dependencies to `~/.claude/skills`. The Claude plugin-shaped package is available at `harnesses/claude-code/plugin` and includes `.mcp.json` for Context7 and Playwright.
 
 Kimi Code:
 
@@ -87,17 +93,23 @@ Kimi Code:
 ./install.sh --harness kimi
 ```
 
+Installs Kimi-specific skills, updates `~/.kimi-code/config.toml` `extra_skill_dirs`, and adds missing Context7/Playwright MCP servers to `~/.kimi-code/mcp.json`. Kimi wording uses agent swarm/delegation and does not require `subagent-driven-development`.
+
 OpenCode:
 
 ```bash
 ./install.sh --harness opencode
 ```
 
+Installs skills to `~/.config/opencode/skills` and merges `~/.config/opencode/opencode.json` with `instructions` entries and MCP servers. Reference template: `harnesses/opencode/opencode.swarm-verify.json`.
+
 Cursor for a project:
 
 ```bash
 ./install.sh --harness cursor --project /path/to/project
 ```
+
+Installs `/path/to/project/.cursor/rules/swarm-verify.mdc` and merges `/path/to/project/.cursor/mcp.json` with Context7 and Playwright. Without `--project`, the installer stages global files under `~/.cursor`.
 
 Goose:
 
@@ -106,17 +118,23 @@ Goose:
 goose run --recipe ~/.config/goose/recipes/swarm-verify.yaml --recipe-param task="audit PR 23 and 25"
 ```
 
+Installs a Goose recipe with the developer extension plus Context7 and Playwright stdio extensions.
+
 Shared Agent Skills folder:
 
 ```bash
 ./install.sh --harness agent-skills
 ```
 
+Installs suite and dependency skills to `~/.agents/skills`.
+
 Generic fallback file:
 
 ```bash
 ./install.sh --harness generic --project /path/to/project
 ```
+
+Installs `AGENTS.swarm-verify.md` for harnesses that do not support these skills directly.
 
 Install all supported local targets:
 
@@ -141,6 +159,24 @@ Use a custom gstack source:
 
 ```bash
 ./install.sh --harness codex --install-local-gstack --gstack-source /path/to/gstack
+```
+
+Skip dependency skills:
+
+```bash
+./install.sh --harness codex --skip-deps
+```
+
+Skip MCP config mutation while still installing skills:
+
+```bash
+./install.sh --harness all --project /path/to/project --no-mcp-config
+```
+
+Skip Kimi `config.toml` mutation:
+
+```bash
+./install.sh --harness kimi --no-kimi-config
 ```
 
 ## Use

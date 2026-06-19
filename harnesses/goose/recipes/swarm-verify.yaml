@@ -6,6 +6,28 @@ parameters:
     input_type: string
     description: "The task to execute."
     requirement: required
+extensions:
+  - type: builtin
+    name: developer
+    timeout: 600
+    bundled: true
+    description: "File system and shell access for implementation and verification."
+  - type: stdio
+    name: context7
+    cmd: npx
+    args:
+      - "-y"
+      - "@upstash/context7-mcp"
+    timeout: 300
+    description: "Current library, framework, API, CLI, and harness documentation."
+  - type: stdio
+    name: playwright
+    cmd: npx
+    args:
+      - "-y"
+      - "@playwright/mcp@latest"
+    timeout: 300
+    description: "Browser automation for runtime QA and UI verification."
 instructions: |
   Execute the user's task with strict evidence-first verification.
 

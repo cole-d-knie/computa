@@ -4,6 +4,7 @@
 from __future__ import annotations
 
 import argparse
+import json
 import os
 import shutil
 import sys
@@ -18,6 +19,41 @@ VENDOR_DIR = ROOT / "vendor" / "skills"
 CURSOR_RULE = ROOT / "harnesses" / "cursor" / "rules" / "swarm-verify.mdc"
 GOOSE_RECIPE = ROOT / "harnesses" / "goose" / "recipes" / "swarm-verify.yaml"
 GENERIC_AGENTS = ROOT / "harnesses" / "generic" / "AGENTS.swarm-verify.md"
+
+KIMI_MCP_SERVERS = {
+    "context7": {
+        "command": "npx",
+        "args": ["-y", "@upstash/context7-mcp"],
+    },
+    "playwright": {
+        "command": "npx",
+        "args": ["-y", "@playwright/mcp@latest"],
+    },
+}
+
+CURSOR_MCP_SERVERS = {
+    "context7": {
+        "command": "npx",
+        "args": ["-y", "@upstash/context7-mcp"],
+    },
+    "playwright": {
+        "command": "npx",
+        "args": ["-y", "@playwright/mcp@latest"],
+    },
+}
+
+OPENCODE_MCP_SERVERS = {
+    "context7": {
+        "type": "remote",
+        "url": "https://mcp.context7.com/mcp",
+        "enabled": True,
+    },
+    "playwright": {
+        "type": "local",
+        "command": ["npx", "-y", "@playwright/mcp@latest"],
+        "enabled": True,
+    },
+}
 
 SKILL_HARNESSES = {"codex", "claude-code", "kimi", "opencode", "agent-skills"}
 PROJECT_HARNESSES = {"cursor", "generic"}
@@ -139,6 +175,11 @@ def parse_args() -> argparse.Namespace:
         "--no-kimi-config",
         action="store_true",
         help="Do not update ~/.kimi-code/config.toml extra_skill_dirs.",
+    )
+    parser.add_argument(
+        "--no-mcp-config",
+        action="store_true",
+        help="Do not update harness MCP config files for Kimi, OpenCode, or Cursor.",
     )
     return parser.parse_args()
 
@@ -379,6 +420,122 @@ def append_kimi_extra_skill_dir(skill_dir: Path, dry_run: bool) -> bool:
     return True
 
 
+def load_json_object(path: Path) -> dict | None:
+    if not path.exists():
+        return {}
+    try:
+        data = json.loads(path.read_text())
+    except json.JSONDecodeError as exc:
+        log(f"warning: cannot parse JSON config {path}: {exc}")
+        return None
+    if not isinstance(data, dict):
+        log(f"warning: JSON config is not an object: {path}")
+        return None
+    return data
+
+
+def write_json_config(path: Path, data: dict, dry_run: bool) -> None:
+    log(f"update JSON config {path}")
+    if dry_run:
+        return
+    path.parent.mkdir(parents=True, exist_ok=True)
+    if path.exists():
+        backup_existing(path, dry_run=False)
+    path.write_text(json.dumps(data, indent=2) + "\n")
+
+
+def add_missing_mapping_entries(existing: dict, additions: dict, label: str) -> bool:
+    changed = False
+    for name, spec in additions.items():
+        if name in existing:
+            log(f"present: {label} {name}")
+            continue
+        existing[name] = spec
+        changed = True
+        log(f"add: {label} {name}")
+    return changed
+
+
+def ensure_kimi_mcp_config(dry_run: bool) -> bool:
+    config = Path.home() / ".kimi-code" / "mcp.json"
+    data = load_json_object(config)
+    if data is None:
+        return False
+    servers = data.setdefault("mcpServers", {})
+    if not isinstance(servers, dict):
+        log(f"warning: Kimi mcpServers is not an object: {config}")
+        return False
+    changed = add_missing_mapping_entries(servers, KIMI_MCP_SERVERS, "Kimi MCP server")
+    if changed or not config.exists():
+        write_json_config(config, data, dry_run)
+    else:
+        log(f"present: Kimi MCP config {config}")
+    return True
+
+
+def ensure_opencode_config(skill_target: Path, dry_run: bool) -> bool:
+    config = Path.home() / ".config" / "opencode" / "opencode.json"
+    data = load_json_object(config)
+    if data is None:
+        return False
+
+    changed = False
+    if "$schema" not in data:
+        data["$schema"] = "https://opencode.ai/config.json"
+        changed = True
+
+    instruction_paths = [str(skill_target / name / "SKILL.md") for name in SUITE_SKILLS]
+    existing_instructions = data.get("instructions", [])
+    if isinstance(existing_instructions, str):
+        existing_instructions = [existing_instructions]
+        data["instructions"] = existing_instructions
+        changed = True
+    update_instructions = True
+    if not isinstance(existing_instructions, list):
+        log(f"warning: OpenCode instructions is not a list: {config}")
+        update_instructions = False
+    if update_instructions:
+        for instruction in instruction_paths:
+            if instruction not in existing_instructions:
+                existing_instructions.append(instruction)
+                changed = True
+                log(f"add: OpenCode instruction {instruction}")
+        data["instructions"] = existing_instructions
+
+    mcp = data.setdefault("mcp", {})
+    if not isinstance(mcp, dict):
+        log(f"warning: OpenCode mcp is not an object: {config}")
+        return False
+    changed = add_missing_mapping_entries(mcp, OPENCODE_MCP_SERVERS, "OpenCode MCP server") or changed
+
+    if changed or not config.exists():
+        write_json_config(config, data, dry_run)
+    else:
+        log(f"present: OpenCode config {config}")
+    return True
+
+
+def ensure_cursor_mcp_config(args: argparse.Namespace) -> bool:
+    if args.project:
+        config = Path(args.project).expanduser().resolve() / ".cursor" / "mcp.json"
+    else:
+        config = Path.home() / ".cursor" / "mcp.json"
+
+    data = load_json_object(config)
+    if data is None:
+        return False
+    servers = data.setdefault("mcpServers", {})
+    if not isinstance(servers, dict):
+        log(f"warning: Cursor mcpServers is not an object: {config}")
+        return False
+    changed = add_missing_mapping_entries(servers, CURSOR_MCP_SERVERS, "Cursor MCP server")
+    if changed or not config.exists():
+        write_json_config(config, data, args.dry_run)
+    else:
+        log(f"present: Cursor MCP config {config}")
+    return True
+
+
 def install_skill_harness(args: argparse.Namespace, harness: str) -> bool:
     target = Path(args.target).expanduser() if args.target and args.harness != "all" else default_target(harness)
     target = target.resolve()
@@ -386,8 +543,13 @@ def install_skill_harness(args: argparse.Namespace, harness: str) -> bool:
     ok = install_suite(harness, target, args.dry_run)
     if not args.skip_deps:
         ok = install_dependencies(args, harness, target) and ok
-    if harness == "kimi" and not args.no_kimi_config:
-        ok = append_kimi_extra_skill_dir(target, args.dry_run) and ok
+    if harness == "kimi":
+        if not args.no_kimi_config:
+            ok = append_kimi_extra_skill_dir(target, args.dry_run) and ok
+        if not args.no_mcp_config:
+            ok = ensure_kimi_mcp_config(args.dry_run) and ok
+    if harness == "opencode" and not args.no_mcp_config:
+        ok = ensure_opencode_config(target, args.dry_run) and ok
     return ok
 
 
@@ -395,12 +557,15 @@ def install_cursor(args: argparse.Namespace) -> bool:
     if args.project:
         target = Path(args.project).expanduser().resolve() / ".cursor" / "rules" / "swarm-verify.mdc"
         log(f"[cursor] project rule: {target}")
-        return copy_file(CURSOR_RULE, target, args.dry_run)
+        ok = copy_file(CURSOR_RULE, target, args.dry_run)
+    else:
+        target = Path.home() / ".cursor" / "rules" / "swarm-verify.mdc"
+        log(f"[cursor] staging rule: {target}")
+        ok = copy_file(CURSOR_RULE, target, args.dry_run)
+        log("note: Cursor's reliable documented project install is <project>/.cursor/rules; rerun with --project for project-scoped rules.")
 
-    target = Path.home() / ".cursor" / "rules" / "swarm-verify.mdc"
-    log(f"[cursor] staging rule: {target}")
-    ok = copy_file(CURSOR_RULE, target, args.dry_run)
-    log("note: Cursor's reliable documented project install is <project>/.cursor/rules; rerun with --project for project-scoped rules.")
+    if not args.no_mcp_config:
+        ok = ensure_cursor_mcp_config(args) and ok
     return ok
 
 
