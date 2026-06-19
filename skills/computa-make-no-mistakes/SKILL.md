@@ -1,9 +1,9 @@
 ---
-name: swarm-verify-one-shot
+name: computa-make-no-mistakes
 description: One-command entrypoint that invokes the complete swarm-verify suite for a task, including all dependency skills, master orchestration, setup, investigation, TDD/runtime QA, swarms, and closeout. Use when the user wants the full swarm-verify workflow from one skill invocation.
 ---
 
-# Swarm Verify One Shot
+# Computa Make No Mistakes
 
 Use this as the single-command entrypoint. Treat the user's text after the skill name as the task.
 

@@ -1,10 +1,10 @@
-# Swarm Verify Agent Instructions
+# Computa Make No Mistakes Agent Instructions
 
 Use these instructions when the harness does not support native `SKILL.md` discovery.
 
-When the user asks for `/swarm-verify-one-shot`, swarm verification, phased TDD execution, adversarial review, judge/verifier review, runtime QA, or audit-ready implementation:
+When the user asks for `/computa-make-no-mistakes`, swarm verification, phased TDD execution, adversarial review, judge/verifier review, runtime QA, or audit-ready implementation:
 
-1. Treat `/swarm-verify-one-shot <task>` as a request to invoke the full suite: `swarm-verify`, `swarm-verify-setup`, `swarm-verify-investigate`, `swarm-verify-tdd-qa`, `swarm-verify-swarms`, and `swarm-verify-closeout`.
+1. Treat `/computa-make-no-mistakes <task>` as a request to invoke the full suite: `swarm-verify`, `swarm-verify-setup`, `swarm-verify-investigate`, `swarm-verify-tdd-qa`, `swarm-verify-swarms`, and `swarm-verify-closeout`.
 2. Immediately save the raw user request to an external `user-task.md`.
 3. Create an external artifact root with `plan.md`, `master-task-ledger.csv`, issue/blocker Markdown and CSV ledgers, phase directories, task directories, subtask ledgers, evidence logs, `maps/`, and `reports/`.
 4. When any swarm-verify phase or subworkflow is run independently, use the same available dependency capabilities: terse communication, planning, TDD, investigation, parallel agents, adversarial review, completion verification, Playwright/browser QA, and Context7/current docs.

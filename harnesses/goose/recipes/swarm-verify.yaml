@@ -1,5 +1,5 @@
 version: "1.0.0"
-title: "Swarm Verify"
+title: "Computa Make No Mistakes"
 description: "One-shot execution of the full swarm-verify suite with phased planning, TDD, runtime QA, audit ledgers, and adversarial plus judge verification loops."
 parameters:
   - key: task
@@ -54,4 +54,4 @@ instructions: |
 
   Golden rule: evidence before assertions. Never say "it works" without verification command output and runtime proof.
 prompt: |
-  Start Swarm Verify for: {{ task }}
+  Start Computa Make No Mistakes for: {{ task }}

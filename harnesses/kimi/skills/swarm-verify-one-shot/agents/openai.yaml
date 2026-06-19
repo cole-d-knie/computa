@@ -1,4 +1,0 @@
-interface:
-  display_name: "Swarm Verify One Shot"
-  short_description: "Run the full swarm-verify suite from one invocation."
-  default_prompt: "Use /swarm-verify-one-shot <task> to execute the full suite: dependencies, setup, investigation, TDD/runtime QA, swarms, and closeout."

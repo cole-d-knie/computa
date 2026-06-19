@@ -1,4 +1,4 @@
-# Swarm Verify Skills
+# Computa Make No Mistakes Skills
 
 Private multi-harness skill package for phased, evidence-first task execution.
 
@@ -6,9 +6,9 @@ Private multi-harness skill package for phased, evidence-first task execution.
 
 Keep this as a package, not one large skill.
 
-The `swarm-verify-one-shot` skill is the single-command entrypoint that invokes the whole suite. The master `swarm-verify` skill orchestrates the workflow. Focused sub-skills own the repeatable parts:
+The `computa-make-no-mistakes` skill is the single-command entrypoint that invokes the whole suite. The master `swarm-verify` skill orchestrates the workflow. Focused sub-skills own the repeatable parts:
 
-- `swarm-verify-one-shot`: one command that loads the master skill, every subskill, and the full dependency set.
+- `computa-make-no-mistakes`: one command that loads the master skill, every subskill, and the full dependency set.
 - `swarm-verify`: master orchestration and parity reference routing.
 - `swarm-verify-setup`: Phase 0 artifact setup, `user-task.md`, ledgers, tasks, subtasks.
 - `swarm-verify-investigate`: Phase 1 orientation audit/maps plus Phase 2 source-truth investigation and baseline evidence.
@@ -186,10 +186,10 @@ Skip Kimi `config.toml` mutation:
 Codex, Claude Code, Kimi, OpenCode, and Agent Skills harnesses:
 
 ```text
-/swarm-verify-one-shot complete this task: ...
+/computa-make-no-mistakes complete this task: ...
 ```
 
-Manual suite entrypoint:
+Advanced internal master skill:
 
 ```text
 /swarm-verify complete this task: ...
@@ -198,7 +198,7 @@ Manual suite entrypoint:
 Cursor:
 
 ```text
-Use the swarm-verify Cursor rule to complete this task: ...
+Use the computa-make-no-mistakes Cursor rule to complete this task: ...
 ```
 
 Goose:

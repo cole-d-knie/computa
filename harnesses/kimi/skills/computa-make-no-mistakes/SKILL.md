@@ -1,9 +1,9 @@
 ---
-name: swarm-verify-one-shot
-description: One-command entrypoint that invokes the complete swarm-verify suite for a task, including all dependency skills, master orchestration, setup, investigation, TDD/runtime QA, swarms, and closeout. Use when the user wants the full swarm-verify workflow from one skill invocation.
+name: computa-make-no-mistakes
+description: One-command entrypoint that invokes the complete swarm-verify suite for a task, including dependency skills, master orchestration, setup, investigation, TDD/runtime QA, swarms, and closeout. Use when the user wants the full workflow from one Kimi skill invocation.
 ---
 
-# Swarm Verify One Shot
+# Computa Make No Mistakes
 
 Use this as the single-command entrypoint. Treat the user's text after the skill name as the task.
 
@@ -18,7 +18,7 @@ Use or trigger these when available:
 - `writing-plans` and `executing-plans`: plan creation and execution.
 - `test-driven-development`: fail-first implementation.
 - `systematic-debugging` or `investigate`: root-cause investigation.
-- `dispatching-parallel-agents` and `subagent-driven-development`: safe swarm parallelism.
+- `dispatching-parallel-agents` or Kimi agent swarm/delegation: safe swarm parallelism.
 - `requesting-code-review`: adversarial review.
 - `verification-before-completion`: completion proof.
 - `playwright`: browser-visible runtime QA.

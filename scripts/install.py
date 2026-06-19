@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Install the swarm-verify suite for multiple coding-agent harnesses."""
+"""Install the computa-make-no-mistakes suite for multiple coding-agent harnesses."""
 
 from __future__ import annotations
 
@@ -60,13 +60,17 @@ PROJECT_HARNESSES = {"cursor", "generic"}
 RECIPE_HARNESSES = {"goose"}
 
 SUITE_SKILLS = [
-    "swarm-verify-one-shot",
+    "computa-make-no-mistakes",
     "swarm-verify",
     "swarm-verify-setup",
     "swarm-verify-investigate",
     "swarm-verify-tdd-qa",
     "swarm-verify-swarms",
     "swarm-verify-closeout",
+]
+
+LEGACY_SUITE_SKILLS = [
+    "swarm-verify-one-shot",
 ]
 
 CODEX_DEPS = [
@@ -119,7 +123,7 @@ KIMI_DEPS = [
 
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(
-        description="Install swarm-verify for Codex, Claude Code, Kimi, OpenCode, Cursor, Goose, and generic AGENTS.md harnesses."
+        description="Install computa-make-no-mistakes for Codex, Claude Code, Kimi, OpenCode, Cursor, Goose, and generic AGENTS.md harnesses."
     )
     parser.add_argument(
         "--harness",
@@ -155,7 +159,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument(
         "--skip-deps",
         action="store_true",
-        help="Install only swarm-verify suite skills, not dependency skills.",
+        help="Install only computa-make-no-mistakes suite skills, not dependency skills.",
     )
     parser.add_argument(
         "--force-deps",
@@ -290,6 +294,11 @@ def dependencies_for(harness: str) -> list[str]:
 def install_suite(harness: str, target: Path, dry_run: bool) -> bool:
     ok = True
     source_root = suite_dir_for(harness)
+    for name in LEGACY_SUITE_SKILLS:
+        legacy = target / name
+        if legacy.exists():
+            log(f"rename cleanup: backing up legacy skill {legacy}")
+            backup_existing(legacy, dry_run)
     for name in SUITE_SKILLS:
         ok = copy_tree(source_root / name, target / name, dry_run, overwrite=True) and ok
     return ok
@@ -496,6 +505,15 @@ def ensure_opencode_config(skill_target: Path, dry_run: bool) -> bool:
         log(f"warning: OpenCode instructions is not a list: {config}")
         update_instructions = False
     if update_instructions:
+        original_count = len(existing_instructions)
+        existing_instructions[:] = [
+            instruction
+            for instruction in existing_instructions
+            if not any(f"/{legacy}/SKILL.md" in str(instruction) for legacy in LEGACY_SUITE_SKILLS)
+        ]
+        if len(existing_instructions) != original_count:
+            changed = True
+            log("remove: legacy OpenCode swarm-verify-one-shot instruction")
         for instruction in instruction_paths:
             if instruction not in existing_instructions:
                 existing_instructions.append(instruction)
