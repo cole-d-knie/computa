@@ -22,6 +22,8 @@ Create a plan directory with:
 - `issues-and-blockers.md`: narrative log of issues, blockers, assumptions, edge cases, and decisions.
 - `issues-and-blockers.csv`: structured tracker for issue ID, severity, owner, status, dependency, and resolution.
 - `maps/`: living codebase/task maps that future phases can reference instead of guessing from chat context.
+  - `map-change-log.md`: narrative map update log.
+  - `map-change-ledger.csv`: structured tracker with change ID, timestamp, phase, task, subtask, map file, reason, evidence path, before/after summary, and status.
 
 For each phase directory, create:
 - `phase.md`: phase goal, instructions, acceptance criteria, edge cases, and verification required.
@@ -66,9 +68,11 @@ Phase 1 must:
 - Create `maps/flow-map.md` with user, runtime, data, analytics, queue, network, database, deployment, or dashboard flows relevant to the task.
 - Create `maps/test-and-command-map.md` with package manager, install/build/lint/test commands, existing tests, missing coverage, smoke/runtime commands, and Playwright/browser routes if relevant.
 - Create `maps/risk-map.md` with risky files/systems, edge cases, migrations, external consoles, credentials/secrets boundaries, production-touching surfaces, race conditions, and assumptions to challenge.
+- Create `maps/map-change-log.md` and `maps/map-change-ledger.csv` before leaving Phase 1.
 - Use fast structural reads first: branch/remotes, file inventory, package manifests, config files, routes, tests, docs, PR/ticket references, and runtime entrypoints.
 - If the repo is huge, make the audit task-focused, but map adjacent systems that could regress and explicitly mark unexplored areas as unknown or likely irrelevant.
-- Update maps whenever later evidence changes the working model.
+- Update maps whenever later evidence changes the working model. Maps may change at any time as implementation, tests, runtime QA, review swarms, or source-truth checks reveal new information.
+- Track every material map change in both `maps/map-change-log.md` and `maps/map-change-ledger.csv`, like phase/task changes are tracked in Markdown and CSV ledgers.
 - Update the phase, task, subtask, issue, and blocker ledgers with map evidence.
 - Run the phase-level adversarial swarm and phase-level judge/verifier swarm before moving to the next phase.
 
@@ -113,6 +117,7 @@ You may add, remove, split, merge, or reorder phases, tasks, or subtasks when ne
 - Justify the change briefly.
 - Record what changed in the relevant markdown log.
 - Update every affected CSV ledger.
+- If the change affects the working map, update the relevant map plus `maps/map-change-log.md` and `maps/map-change-ledger.csv`.
 - Update dependencies.
 - Mark superseded tasks clearly instead of deleting audit history.
 - Run adversarial review and judge/verifier review for material plan changes before implementing them.
@@ -263,6 +268,7 @@ For every phase, task, and subtask, record:
 - what you learned
 - what assumptions changed
 - what map files you referenced or updated
+- what `map-change-log.md` and `map-change-ledger.csv` entries were added
 - what remains blocked or risky
 - links or paths to evidence
 
@@ -279,6 +285,7 @@ You must provide:
 - The `/playwright` verification performed, if applicable.
 - The edge cases covered.
 - The map artifacts created and any important map updates made during implementation.
+- The map change log and map change ledger paths, with a statement that all material map changes were tracked.
 - A brief summary of what changed and why.
 - Any remaining risks, blockers, or unverified assumptions.
 - Paths to the plan, phase, task, subtask, issue, and evidence artifacts.

@@ -45,6 +45,7 @@ Also read `references/master-swarm-verification-prompt.md` when present. It is t
 - Save the raw user request to `user-task.md` before rewriting, summarizing, or planning from memory.
 - Keep all plan, phase, task, subtask, issue, blocker, evidence, and report artifacts outside the repo.
 - Before targeted implementation work, create and maintain a reusable codebase/task map so later phases can reference known entrypoints, flows, files, commands, risks, and unknowns.
+- Treat maps as living artifacts. They may change at any time when new evidence appears; track every map update in both Markdown and CSV under `maps/`.
 - Use ledgers as the source of truth for order, dependencies, status, and evidence.
 - Do phases, tasks, and subtasks only after prerequisites are complete.
 - Use swarms for safe parallelism only. Do not parallelize overlapping files, systems, data, migrations, dashboards, deployment state, browsers, databases, queues, or test environments.
@@ -85,6 +86,7 @@ Do not claim completion unless there is evidence for:
 
 - original user request captured in `user-task.md`
 - current task/codebase map exists, is referenced by later work, and records entrypoints, relevant files, commands, tests, flows, risks, unknowns, and out-of-scope areas
+- map change log and map change ledger exist and cover every material map update
 - phases/tasks/subtasks completed or explicitly deferred with rationale
 - failing-before evidence or documented reason it was impossible
 - passing-after evidence

@@ -207,6 +207,7 @@ The workflow must:
 - create external artifacts outside the repo
 - use phased planning
 - run an initial orientation audit of the task/codebase and save living maps under `maps/`
+- allow maps to change at any time when evidence changes, tracking each material map update in both `maps/map-change-log.md` and `maps/map-change-ledger.csv`
 - run investigation before implementation
 - use TDD for behavior changes
 - run runtime QA and Playwright/browser checks when relevant

@@ -29,7 +29,7 @@ Required report substance:
 - `verification-needed.md`: what still needs verification, who/what can verify it, and whether it blocks completion or merge.
 - `blockers-and-open-issues.md`: current blockers, unresolved open issues, risks, and next actions.
 - `task-gap-analysis.md`: compare `user-task.md` against completed work; list satisfied, partially satisfied, missing, deferred, and out-of-scope items.
-- `map-artifacts.md`: map files created, important updates, unresolved unknowns, map gaps, and which maps should be read first for follow-up work.
+- `map-artifacts.md`: map files created, map change ledger/log coverage, important updates, unresolved unknowns, map gaps, and which maps should be read first for follow-up work.
 - `new-issues-found.md`: all new issues discovered during the work, split into fixed and not fixed, with evidence and rationale.
 
 Reports may be combined only when that makes them clearer, but every category above must remain present as explicit headings.
@@ -46,6 +46,7 @@ Do not claim done unless you can provide:
 - edge cases covered
 - paths to plan, phase, task, subtask, issue, blocker, evidence, and report artifacts
 - paths to map artifacts and any map gaps or stale-map risks
+- paths to `maps/map-change-log.md` and `maps/map-change-ledger.csv`
 
 If verification could not be run, document why, what risk remains, and what command or manual check should be run next.
 
@@ -73,5 +74,6 @@ Include:
 - whether anything needs manual verification
 - artifact/report paths
 - map artifact paths and whether the map is current
+- map change log/ledger paths and whether all material map changes were tracked
 
 Golden rule: evidence before assertions. Never say "it works" without verification command output and runtime proof.

@@ -40,12 +40,14 @@ Create or update the artifact root `maps/` directory with:
 - `flow-map.md`: user, runtime, data, analytics, queue, network, database, deployment, or dashboard flows relevant to the task.
 - `test-and-command-map.md`: package manager, install/build/lint/test commands, existing test locations, missing test coverage, smoke/runtime commands, and Playwright/browser routes if relevant.
 - `risk-map.md`: high-risk files/systems, edge cases, migrations, external consoles, credentials/secrets boundaries, production-touching surfaces, race conditions, and assumptions to challenge.
+- `map-change-log.md`: narrative change log for map updates.
+- `map-change-ledger.csv`: structured change ledger for map updates.
 
 Use fast structural reads first: `git status`, branch/remotes, `rg --files`, package manifests, config files, routes, tests, docs, PR/ticket references, and runtime entrypoints. Then inspect only the files needed to make the map accurate.
 
 If the codebase is huge, make the audit task-focused but still map adjacent systems that could regress. Mark unexplored areas explicitly with why they appear irrelevant or why they remain unknown.
 
-Keep maps living. Whenever later work disproves a map entry or discovers a new flow/file/risk, update the relevant map and ledger before continuing.
+Keep maps living. Maps may change at any time when later work disproves a map entry or discovers a new file, flow, command, risk, edge case, dependency, or external system. Update the relevant map before continuing, and record the change in both `map-change-log.md` and `map-change-ledger.csv`.
 
 ## Baseline Work
 
@@ -60,6 +62,7 @@ Identify and log:
 - safe verification commands for the repo
 - runtime QA route or endpoint, if relevant
 - map artifacts used and any map updates made
+- map change ledger rows added during this investigation
 
 Run baseline verification before changing code. Capture command output and evidence paths.
 
@@ -85,6 +88,7 @@ Before moving past orientation or baseline investigation:
 
 - update phase, task, subtask, issue, and blocker ledgers
 - update `maps/map-index.md` and any stale map files
+- update `maps/map-change-log.md` and `maps/map-change-ledger.csv` for every map change
 - record evidence paths
 - list assumptions that changed
 - list open questions and whether they block work

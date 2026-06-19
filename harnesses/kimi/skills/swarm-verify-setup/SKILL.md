@@ -46,8 +46,12 @@ Expected map artifacts:
 - `flow-map.md`: runtime/user/data/control flows related to the task, with source files and external systems.
 - `test-and-command-map.md`: package manager, test/build/lint commands, smoke/runtime commands, existing tests, gaps, and expected verification order.
 - `risk-map.md`: risky areas, edge cases, dependencies, migrations, dashboards, credentials, production-touching surfaces, and assumptions to challenge.
+- `map-change-log.md`: narrative log of every map update, why it changed, what evidence caused it, and which task/phase used the updated map.
+- `map-change-ledger.csv`: structured tracker with change ID, timestamp, phase, task, subtask, map file, reason, evidence path, before/after summary, and status.
 
 Keep maps concise but complete enough that a fresh agent can resume without guessing from chat context.
+
+Maps are living artifacts. They may change at any time when implementation, tests, runtime QA, review swarms, or new source evidence changes the working model. Track every map change in both `map-change-log.md` and `map-change-ledger.csv`, the same way phase/task work is tracked in Markdown and CSV ledgers.
 
 ## Phase Directories
 
