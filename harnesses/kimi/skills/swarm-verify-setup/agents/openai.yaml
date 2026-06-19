@@ -1,0 +1,4 @@
+interface:
+  display_name: "Swarm Verify Setup"
+  short_description: "External plan, ledgers, and raw task capture."
+  default_prompt: "Use /swarm-verify-setup to create auditable external planning artifacts for this task."

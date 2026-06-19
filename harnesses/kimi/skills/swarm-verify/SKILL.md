@@ -18,7 +18,7 @@ Use or trigger these when available:
 - `writing-plans` and `executing-plans`: plan creation and execution.
 - `test-driven-development`: fail-first implementation.
 - `systematic-debugging` or `investigate`: root-cause investigation.
-- `dispatching-parallel-agents` and `subagent-driven-development`: safe swarm parallelism.
+- `dispatching-parallel-agents` or Kimi agent swarm/delegation: safe swarm parallelism.
 - `requesting-code-review`: adversarial review.
 - `verification-before-completion`: completion proof.
 - `playwright`: browser-visible runtime QA.

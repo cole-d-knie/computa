@@ -1,0 +1,20 @@
+{
+  "name": "swarm-verify",
+  "version": "0.1.0",
+  "description": "Phased TDD verification with audit ledgers, runtime QA, and adversarial plus judge swarms.",
+  "author": {
+    "name": "Cole Knie"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/cole-d-knie/swarm-verify-skills.git"
+  },
+  "license": "UNLICENSED",
+  "keywords": [
+    "skills",
+    "verification",
+    "tdd",
+    "qa",
+    "agent-swarm"
+  ]
+}

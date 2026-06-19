@@ -1,0 +1,32 @@
+version: "1.0.0"
+title: "Swarm Verify"
+description: "Execute a task with phased planning, TDD, runtime QA, audit ledgers, and adversarial plus judge verification loops."
+parameters:
+  - key: task
+    input_type: string
+    description: "The task to execute."
+    requirement: required
+instructions: |
+  Execute the user's task with strict evidence-first verification.
+
+  Task:
+  {{ task }}
+
+  Rules:
+  - Immediately save the raw task to an external user-task.md before summarizing or planning from memory.
+  - Create all plan, phase, task, subtask, issue, blocker, evidence, and report artifacts outside the repo.
+  - Phase 0: create plan.md, master-task-ledger.csv, issue/blocker ledgers, phase directories, task directories, subtask ledgers, and reports/.
+  - Phase 1: investigate before implementation. Verify source truth, current behavior, expected behavior, issue origin, edge cases, coverage gaps, baseline commands, and failing evidence.
+  - Use TDD for behavior changes: failing test first, smallest fix, passing test after.
+  - Run unit, integration, smoke, runtime, and browser-visible QA as relevant.
+  - Use Goose recipes, extensions, or independent sessions for safe parallel review only. Do not parallelize overlapping files, shared runtime state, dashboards, databases, deployments, migrations, or dependent subtasks.
+  - After every task, run one adversarial review per subtask and one judge/verifier review per subtask. Only implement approved recommendations.
+  - After every phase, run one adversarial review per task and one judge/verifier review per task. Do not close a phase until approved complete, approved deferred, or blocked with evidence.
+  - Keep ledgers current. Mark work done only after evidence exists.
+  - Create final reports: final-summary.md, verification-needed.md, blockers-and-open-issues.md, task-gap-analysis.md, and new-issues-found.md.
+  - Make one commit per completed task only after verification passes and commits are allowed.
+  - Do not push unless explicitly asked.
+
+  Golden rule: evidence before assertions. Never say "it works" without verification command output and runtime proof.
+prompt: |
+  Start Swarm Verify for: {{ task }}
