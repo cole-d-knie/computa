@@ -78,6 +78,7 @@ SUITE_SKILLS = [
     "computa-export-control-prior-art",
     "computa-export-control-skill-mcp-intake",
     "computa-export-control-technical-spec",
+    "computa-export-control-implementation-strategy",
     "computa-export-control-audit-suite",
     "computa-4d-chess",
     "computa-4d-chess-architect",

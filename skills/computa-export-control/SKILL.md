@@ -36,10 +36,13 @@ During design, use or trigger focused research subskills as needed:
 - `computa-export-control-prior-art`
 - `computa-export-control-skill-mcp-intake`
 - `computa-export-control-technical-spec`
+- `computa-export-control-implementation-strategy`
 - `computa-export-control-audit-suite`
 - `security-audit`
 - `performance-audit`
 - `ui-audit`
+
+During design, run `computa-export-control-implementation-strategy` after codebase/research/spec work and before final 4D campaign design when the work has complex engineering issues, provider integrations, missing keys, migrations, concurrency/state risks, unclear testability, or rollout hazards.
 
 During design, run `computa-export-control-audit-suite` after codebase/research/spec work and before final 4D campaign design when a codebase or app exists. The audit suite runs `security-audit`, `performance-audit`, and `ui-audit` in documentation mode, then produces the remediation backlog that 4D campaigns implement.
 
@@ -89,6 +92,7 @@ Inside the Export Control session, at minimum create:
 - `prior-art/`: similar projects, repos, examples, reusable patterns, license assessment.
 - `skills-and-tools/`: local/importable skills, MCPs, plugins, connectors, install notes, harness compatibility.
 - `technical-spec/`: execution-grade engineering specs: current/target state, module boundaries, component/API/data/integration design, security/privacy, rollout, test strategy, implementation slices, and acceptance contract.
+- `implementation-strategy/`: complex engineering challenges, solution approaches, keyless test strategy, integration risk plan, migration/rollout plan, and campaign-readiness analysis before 4D starts.
 - `secrets-needed-readout.md`: private config/API key requirements found during research and specs, with links to root `docs/computa-artifacts/secrets-needed/` entries.
 - `standalone-audits/`: security/performance/UI audit findings, evidence, recommendations, consolidated remediation backlog, and 4D implementation campaign map.
 - `docs-readout/`: whether `docs/architecture/` existed, what was read, stale/missing docs findings, and whether docs were updated or should be updated before execution. This is only a session readout, not the architecture docs themselves.
@@ -112,12 +116,14 @@ The root activity log is not a replacement for campaign ledgers. It is the crash
 - Prefer small, modular, readable components over giant files or monolithic plans.
 - Prefer existing patterns, packages, proven libraries, and reusable code when evidence supports them.
 - Do not add dependencies just because they exist; justify fit, maintenance, license, security, size, and integration cost.
-- When recommending or designing around an API, SaaS, model provider, OAuth app, webhook, dashboard, deployment platform, or private config requirement, invoke `computa-secrets-needed`. Still design/build as far as possible with named env vars, placeholders, mocks, and missing-secret tests; record what cannot be verified until credentials are configured.
+- When recommending or designing around an API, SaaS, model provider, OAuth app, webhook, dashboard, deployment platform, or private config requirement, invoke `computa-secrets-needed`. Still design/build as far as possible with named env vars, placeholders, mocks, fakes, provider adapters, contract tests, fixture payloads, dry-run modes, and missing-secret tests; record what cannot be verified until credentials are configured.
+- Missing keys should trigger keyless test design, not stalled execution. Do not block 4D campaign design or execution solely because a credential is absent unless that credential is required to make a safe architecture decision and no mock, fixture, docs, sandbox substitute, or owner decision can resolve it.
 - Never store actual secret values in Export Control artifacts. Store only names, target env paths, platform targets, code paths, owner actions, and safe `@Computer` handoff prompt paths.
 - Distinguish edit-code work from build-from-scratch work, and choose the lightest effective execution layer.
 - Keep code, product, design, data, infrastructure, analytics, security, privacy, docs, and release work separated when that reduces risk.
 - Record unknowns and blockers instead of smoothing them over.
 - Before 4D campaign design, create or explicitly defer a technical spec when the work needs concrete engineering contracts. Do not let broad 4D campaigns proceed from vague product prose.
+- Before 4D campaign design, run `computa-export-control-implementation-strategy` when hard engineering problems could affect architecture, sequencing, keyless testability, integration strategy, data model, migration plan, deployment order, or rollback. Do not make 4D improvise through unresolved engineering uncertainty.
 - Before 4D campaign design, run `computa-export-control-audit-suite` for existing codebases/apps unless explicitly N/A. Use its remediation backlog and implementation campaign map as source truth for audit-driven 4D work.
 - Do not execute 4D Chess campaigns until the export-control design has passed review or is explicitly accepted with documented risk.
 
@@ -148,6 +154,7 @@ Finish with reports that state:
 - what the codebase audit found
 - what requirements were added or clarified
 - what technical specs were produced, approved, deferred, or blocked
+- what implementation challenges were solved before 4D, what keyless test strategy was chosen, and what remains risky
 - what secrets/private config are needed, where they must be configured, and which verification remains blocked
 - what 4D Chess campaigns were executed or left pending
 - what remains unknown, risky, blocked, or owner-decision-dependent

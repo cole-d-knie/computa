@@ -38,13 +38,16 @@ Then invoke focused subskills as needed:
 4. `computa-export-control-prior-art`
 5. `computa-export-control-skill-mcp-intake`
 6. `computa-export-control-technical-spec` after enough research exists and before audit-suite/campaign design
-7. `computa-export-control-audit-suite` after enough source truth exists and before final campaign design
+7. `computa-export-control-implementation-strategy` after enough source truth/spec work exists and before final campaign design when complex engineering issues, provider integrations, missing keys, migrations, concurrency/state risks, unclear testability, or rollout hazards exist
+8. `computa-export-control-audit-suite` after enough source truth exists and before final campaign design
 
 For existing codebases, complete and read the codebase audit before finalizing requirements, technology choices, prior-art reuse, or 4D campaign sequence.
 
 If architecture docs exist, read them before the codebase audit and require the audit to verify, correct, or mark stale the relevant claims. If architecture docs are missing and the project is large enough that future agents would need them, add `computa-docs-architecture` to the design plan before execution or record why it is deferred.
 
 For work that needs concrete engineering direction, run `computa-export-control-technical-spec` before creating 4D campaigns. Technical specs should convert the research into current/target state, module boundaries, component/API/data/integration design, rollout/backcompat, observability, test strategy, implementation slices, and an acceptance contract. If a technical spec is not needed, record why in `decision-matrix.md` and `campaigns/campaign-sequence.md`.
+
+For work with hard implementation uncertainty, run `computa-export-control-implementation-strategy` before creating 4D campaigns. It must problem-solve complex engineering issues, define the implementation approach, define how to test without missing keys, and decide what 4D must prove. If it is not needed, record why in `decision-matrix.md` and `campaigns/campaign-sequence.md`.
 
 For existing codebases or apps, run `computa-export-control-audit-suite` after codebase/research/spec work and before final 4D campaign design. The audit suite runs `security-audit`, `performance-audit`, and `ui-audit` in documentation mode. If any category is not applicable, require a category no-op report with evidence. Do not create final 4D implementation campaigns until the audit suite has produced and reviewed `standalone-audits/remediation-backlog.csv`.
 
@@ -59,6 +62,7 @@ Produce:
 - `reuse-plan.md`: packages, code examples, patterns, assets, skills, and tools worth using.
 - `do-not-use.md`: rejected technologies, risky dependencies, stale examples, incompatible licenses, and why.
 - `technical-spec/`: execution-grade specs produced by `computa-export-control-technical-spec`, or a documented deferral/no-op rationale.
+- `implementation-strategy/`: engineering challenges, solution approaches, keyless test strategy, integration risk plan, migration/rollout plan, and campaign readiness produced by `computa-export-control-implementation-strategy`, or a documented deferral/no-op rationale.
 - `standalone-audits/`: security/performance/UI audit documentation, category findings, consolidated remediation backlog, implementation campaign map, and audit-suite reviews.
 - `campaigns/campaign-sequence.md`: sequential `computa-4d-chess` campaigns with objectives, prerequisites, outputs, risks, and expected prompts.
 - `campaigns/campaign-ledger.csv`: campaign ID, name, status, dependencies, evidence paths, 4D prompt path, owner, next action.
@@ -69,8 +73,10 @@ Produce:
 - Existing-codebase work starts with the codebase audit. Do not design as if starting from scratch unless the audit supports replacement or greenfield work.
 - Prefer using proven technology and reusable packages over custom implementation when it reduces risk.
 - Prefer small, modular, readable components over large files or monolithic subsystems.
-- When research, specs, recommended technologies, SaaS APIs, model providers, dashboards, OAuth apps, webhooks, or deployment targets require secrets/private config, invoke `computa-secrets-needed`. Keep design and build planning moving with named env vars and placeholders; mark only real credential-dependent verification as blocked.
+- When research, specs, recommended technologies, SaaS APIs, model providers, dashboards, OAuth apps, webhooks, or deployment targets require secrets/private config, invoke `computa-secrets-needed`. Keep design and build planning moving with named env vars, placeholders, fakes, provider adapters, contract tests, fixtures, dry-run modes, and missing-secret tests; mark only real credential-dependent verification as blocked.
+- Missing keys should create a keyless test strategy, not a stop. Do not block 4D campaign design solely for missing credentials unless the credential is required to choose a safe architecture and no mock, fixture, docs, sandbox substitute, or owner decision can resolve the choice.
 - Do not turn vague requirements directly into 4D campaigns when technical contracts are needed. Specify boundaries, contracts, data, flows, rollout, and tests first.
+- Do not launch 4D campaigns with unresolved complex engineering problems that could change the architecture, data model, integration design, migration plan, or test strategy. Run implementation strategy first.
 - Do not turn audit prompts directly into 4D implementation tasks. First convert the 300 standalone prompts into evidence-backed findings, deduplicated backlog items, dependencies, and campaign groups through `computa-export-control-audit-suite`.
 - Identify where existing code should be preserved, extended, replaced, or avoided.
 - Record edge cases, missing requirements, future-proofing opportunities, and owner decisions.
@@ -82,7 +88,7 @@ Produce:
 
 Before execution:
 
-1. Run adversarial review of research completeness, decision quality, package/tool choices, codebase assumptions, technical spec quality, audit-suite coverage, remediation-backlog quality, and campaign sequencing.
+1. Run adversarial review of research completeness, decision quality, package/tool choices, codebase assumptions, technical spec quality, implementation-strategy quality, keyless test strategy, audit-suite coverage, remediation-backlog quality, and campaign sequencing.
 2. Run judge/verifier review of the adversarial findings.
 3. Update artifacts only for judge-approved findings.
 4. Mark the design `approved_for_execution`, `approved_with_risks`, or `blocked`.

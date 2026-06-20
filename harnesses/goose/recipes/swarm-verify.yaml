@@ -35,7 +35,7 @@ instructions: |
   {{ task }}
 
   Rules:
-  - Treat `/computa-export-control` as the research/intelligence entrypoint for massive projects: research requirements, codebase, technologies, packages, prior art, skills/MCPs/tools, technical specs when needed, security/performance/UI audit-suite documentation when a codebase/app exists, then design and execute sequential `/computa-4d-chess` campaigns.
+  - Treat `/computa-export-control` as the research/intelligence entrypoint for massive projects: research requirements, codebase, technologies, packages, prior art, skills/MCPs/tools, technical specs when needed, implementation strategy when hard engineering issues or missing-key testability need resolution, security/performance/UI audit-suite documentation when a codebase/app exists, then design and execute sequential `/computa-4d-chess` campaigns.
   - Treat `/computa-4d-chess` as the Super-Phase one-shot entrypoint for ultra-long autonomous tasks, large edits, major system additions, and build-from-scratch projects: architect, build, review the Super-Phase plan, then execute approved Super-Phases through `/computa-make-no-mistakes`.
   - Every 4D Chess plan must include final `SP-999-post-run-security-audit`, executed through `/computa-make-no-mistakes` with a nested `/security-audit` task before appending 4D `session_completed`.
   - Treat `/computa-make-no-mistakes` and this recipe as the phase-level one-shot entrypoint for Jira tasks, code edits, bugfixes, system additions, and medium-scope scratch builds: swarm-verify, swarm-verify-setup, swarm-verify-investigate, swarm-verify-tdd-qa, swarm-verify-swarms, and swarm-verify-closeout.
@@ -52,13 +52,14 @@ instructions: |
   - If docs/architecture/ exists, read it first for orientation, then verify against source. If missing or stale and useful for handoff, use computa-docs-architecture.
   - For Export Control work, create requirements/, codebase-audit/, tech-radar/, prior-art/, skills-and-tools/, technical-spec/ when needed, standalone-audits/, campaigns/, 4d-chess/, reviews/, and reports/ inside the EC session.
   - In Export Control, create technical-spec/ before 4D campaign design when the work needs concrete engineering contracts. Include current/target state, module boundaries, component/API/data/integration design, security/privacy, rollout/backcompat, observability, test strategy, implementation slices, and acceptance contract.
+  - In Export Control, create implementation-strategy/ before 4D campaign design when hard engineering issues, provider integrations, missing keys, migrations, state/concurrency risks, unclear testability, or rollout hazards could affect implementation. Resolve strategy, keyless tests, integration risks, and campaign readiness before launching 4D.
   - In Export Control, run the standalone audit suite before final 4D campaign design for existing codebases/apps. Run security-audit, performance-audit, and ui-audit in documentation mode, produce category findings plus standalone-audits/remediation-backlog.csv, then make 4D campaigns implement the accepted backlog.
   - For 4D Chess work, create strategic-design/, super-phases/, security-audit/, computa/, maps/, ledgers/, reviews/, handoffs/, and reports/ inside the 4D session. Actual architecture docs remain in docs/architecture/.
   - When any Export Control, 4D Chess, or Computa subworkflow is run independently, use the same available dependency capabilities: terse communication, planning, TDD, investigation, parallel agents, adversarial review, completion verification, Playwright/browser QA, Context7/current docs, and web research when current external information matters.
   - Phase 0: create plan.md, master-task-ledger.csv, issue/blocker ledgers, phase directories, task directories, subtask ledgers, maps/, and reports/.
   - Phase 1: run an orientation audit before implementation. Create maps/map-index.md, architecture-docs-map.md, task-scope-map.md, codebase-map.md, flow-map.md, test-and-command-map.md, risk-map.md, secrets-map.md, modularity-map.md, map-change-log.md, and map-change-ledger.csv.
   - Phase 2: investigate before implementation. Reference and update maps; verify source truth, current behavior, expected behavior, issue origin, edge cases, coverage gaps, baseline commands, and failing evidence.
-  - Build/spec/test as far as possible when secrets are missing; use env var names, placeholders, mocks, runtime guards, and missing-secret tests. Mark only real credential-dependent runtime/deploy verification as blocked.
+  - Build/spec/test as far as possible when secrets are missing. Missing keys are a keyless-test-design problem, not a reason to stop. Use env var names, placeholders, mocks, fakes, provider adapters, contract tests, fixtures, dry-run modes, runtime guards, and missing-secret tests. Mark only real credential-dependent runtime/deploy verification as blocked.
   - Use TDD for behavior changes: failing test first, smallest fix, passing test after.
   - Prefer small, modular, readable components over giant files.
   - Run unit, integration, smoke, runtime, and browser-visible QA as relevant.
@@ -68,7 +69,7 @@ instructions: |
   - For 4D Chess, review each Super-Phase after creation and review the overall Super-Phase plan before execution. Use one adversarial reviewer per Super-Phase followed by one judge/verifier per Super-Phase.
   - For 4D Chess closeout, execute final SP-999-post-run-security-audit through /computa-make-no-mistakes, create security-audit/ artifacts, run the full /security-audit loop or document an explicit N/A/blocker, then adversarially review and judge/verify the security audit outcome.
   - Keep ledgers, maps, secrets-needed, and activity-log.csv current. Maps may change at any time as work reveals new information; track every material map update in both maps/map-change-log.md and maps/map-change-ledger.csv. Mark work done only after evidence exists.
-  - Create final reports: final-summary.md, verification-needed.md, blockers-and-open-issues.md, task-gap-analysis.md, map-artifacts.md, architecture-docs-status.md, secrets-needed.md, security-audit.md, and new-issues-found.md.
+  - Create final reports: final-summary.md, verification-needed.md, blockers-and-open-issues.md, task-gap-analysis.md, map-artifacts.md, architecture-docs-status.md, implementation-strategy.md, secrets-needed.md, security-audit.md, and new-issues-found.md.
   - Make one commit per completed task only after verification passes and commits are allowed.
   - Do not push unless explicitly asked.
 

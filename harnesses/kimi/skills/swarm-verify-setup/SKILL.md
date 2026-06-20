@@ -101,7 +101,7 @@ Create a plan directory with:
 
 When implementation is expected, include a modularity note in `plan.md`: which components/modules should exist, which existing modules should be reused, what files must not become catch-alls, and how the task will avoid giant files.
 
-When any planned work may need API keys, OAuth credentials, webhook secrets, model-provider tokens, deployment secrets, dashboard credentials, or private config, include a secrets note in `plan.md` and use `computa-secrets-needed` before implementation. Plan to build with env var names, placeholders, mocks, and missing-secret tests where reasonable, while clearly marking runtime/deploy verification blocked by missing private config.
+When any planned work may need API keys, OAuth credentials, webhook secrets, model-provider tokens, deployment secrets, dashboard credentials, or private config, include a secrets note in `plan.md` and use `computa-secrets-needed` before implementation. Plan to build with env var names, placeholders, mocks, fakes, provider adapters, contract tests, fixtures, dry-run modes, and missing-secret tests, while clearly marking only live-credential runtime/deploy verification blocked by missing private config.
 
 ## Map Directory
 

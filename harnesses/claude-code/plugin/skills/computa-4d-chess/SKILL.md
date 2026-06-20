@@ -69,7 +69,8 @@ If a dependency is missing, continue with equivalent behavior and record it in t
 - Use safe parallelism only for independent Super-Phases with non-overlapping files, systems, data, dashboards, databases, browsers, queues, environments, and deployment state.
 - Preserve superseded plans and decisions; never erase audit history.
 - Prefer small, modular, readable components over gigantic files. Super-Phases should preserve clear component boundaries and should not encourage monolithic implementation.
-- Build and execute Super-Phases as far as possible even when API keys, OAuth credentials, webhook secrets, model-provider tokens, deployment secrets, or dashboard/private config are missing. Use `computa-secrets-needed` to record the required secrets, target env/platform paths, code paths, blocked verification, and safe `@Computer` handoff prompts. Do not store actual secret values.
+- Build and execute Super-Phases as far as possible even when API keys, OAuth credentials, webhook secrets, model-provider tokens, deployment secrets, or dashboard/private config are missing. A missing key is not a valid reason to skip a Super-Phase unless the key is required to choose the architecture safely and no mock, fixture, docs, sandbox substitute, or owner decision can resolve the choice. Use `computa-secrets-needed` to record the required secrets, target env/platform paths, code paths, blocked verification, and safe `@Computer` handoff prompts. Do not store actual secret values.
+- Every secret-dependent Super-Phase must define keyless tests before execution: mocks/fakes, provider adapters, contract tests, fixture payloads, synthetic webhooks/events, dry-run paths, env-validation tests, and negative-path behavior for missing/invalid credentials. Only live provider calls and dashboard-side checks may remain blocked by the missing key.
 - Do not push unless explicitly asked.
 
 ## Closeout Bar

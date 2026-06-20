@@ -74,7 +74,7 @@ Before proposing Super-Phases:
 - call out alternate designs and why they were rejected
 - identify edge cases, rollback paths, migration risks, and observability needs
 - separate code work from dashboards, databases, infrastructure, deployment, documentation, and manual validation
-- identify private configuration early and invoke `computa-secrets-needed` for every API key, OAuth credential, webhook secret, model-provider token, deployment secret, or dashboard credential. Architecture should continue with named env vars/placeholders where safe and mark only real credential-dependent verification as blocked.
+- identify private configuration early and invoke `computa-secrets-needed` for every API key, OAuth credential, webhook secret, model-provider token, deployment secret, or dashboard credential. Architecture should continue with named env vars, mocks, fakes, provider adapters, contract tests, fixtures, dry-run modes, and placeholder-safe design, and mark only real live-credential verification as blocked.
 - distinguish required work from optional optimization
 - define evidence needed for each future Super-Phase
 - define what must be true before a Super-Phase can start

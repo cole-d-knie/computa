@@ -10,7 +10,7 @@ When this rule applies, execute the task with a phased, evidence-first verificat
 
 Core rules:
 
-- Treat `/computa-export-control <task>` as the research/intelligence entrypoint for massive projects: research requirements, codebase, technologies, packages, prior art, skills/MCPs/tools, technical specs when needed, security/performance/UI audit-suite documentation when a codebase/app exists, then design and execute sequential `/computa-4d-chess` campaigns.
+- Treat `/computa-export-control <task>` as the research/intelligence entrypoint for massive projects: research requirements, codebase, technologies, packages, prior art, skills/MCPs/tools, technical specs when needed, implementation strategy when hard engineering issues or missing-key testability need resolution, security/performance/UI audit-suite documentation when a codebase/app exists, then design and execute sequential `/computa-4d-chess` campaigns.
 - Treat `/computa-4d-chess <task>` as the Super-Phase one-shot entrypoint for ultra-long autonomous tasks, large edits, major system additions, and build-from-scratch projects. Run architect, build, Super-Phase adversarial review, Super-Phase judge/verifier review, then execute approved Super-Phases through `/computa-make-no-mistakes`.
 - Every 4D Chess plan must include final `SP-999-post-run-security-audit`, executed through `/computa-make-no-mistakes` with a nested `/security-audit` task before appending 4D `session_completed`.
 - Treat `/computa-make-no-mistakes <task>` as a request to invoke the phase-level suite for Jira tasks, code edits, bugfixes, system additions, and medium-scope scratch builds: `swarm-verify`, `swarm-verify-setup`, `swarm-verify-investigate`, `swarm-verify-tdd-qa`, `swarm-verify-swarms`, and `swarm-verify-closeout`.
@@ -27,13 +27,14 @@ Core rules:
 - Maintain `docs/computa-artifacts/activity-log.csv` with session, campaign, Super-Phase, phase, task, secret-needed, and 4D security-audit start/finish/block/defer events as they happen. Do not duplicate subtask rows there.
 - If `docs/architecture/` exists, read it first, then verify against source. If it is missing or stale and the task needs handoff docs, use `computa-docs-architecture`.
 - In Export Control, create `technical-spec/` before 4D campaign design when the work needs concrete engineering contracts. Include current/target state, module boundaries, component/API/data/integration design, security/privacy, rollout/backcompat, observability, test strategy, implementation slices, and acceptance contract.
+- In Export Control, create `implementation-strategy/` before 4D campaign design when hard engineering issues, provider integrations, missing keys, migrations, state/concurrency risks, unclear testability, or rollout hazards could affect implementation. Resolve strategy, keyless tests, integration risks, and campaign readiness before launching 4D.
 - In Export Control, run the standalone audit suite before final 4D campaign design for existing codebases/apps. Run `security-audit`, `performance-audit`, and `ui-audit` in documentation mode, produce category findings plus `standalone-audits/remediation-backlog.csv`, then make 4D campaigns implement the accepted backlog.
 - When any Export Control, 4D Chess, or Computa subworkflow is run independently, use the same available dependency capabilities: terse communication, planning, TDD, investigation, parallel agents, adversarial review, completion verification, Playwright/browser QA, Context7/current docs, and web research when current external information matters.
 - Phase 0: create the plan directory, `plan.md`, `master-task-ledger.csv`, `issues-and-blockers.md/csv`, phase directories, task directories, subtask ledgers, and `reports/`.
 - Phase 1: run an orientation audit before implementation. Create `maps/map-index.md`, `architecture-docs-map.md`, `task-scope-map.md`, `codebase-map.md`, `flow-map.md`, `test-and-command-map.md`, `risk-map.md`, `secrets-map.md`, `modularity-map.md`, `map-change-log.md`, and `map-change-ledger.csv` so later phases can reference the working model.
 - Phase 2: investigate before implementation. Read source truth, reference and update the maps, verify current and expected behavior, identify edge cases and coverage gaps, run baseline commands, reproduce the issue or prove the gap, and create failing evidence where possible.
 - Maps may change at any time as work reveals new information. Track every material map update in both `maps/map-change-log.md` and `maps/map-change-ledger.csv`.
-- Build/spec/test as far as possible when secrets are missing; use env var names, placeholders, mocks, runtime guards, and missing-secret tests. Mark only real credential-dependent runtime/deploy verification as blocked.
+- Build/spec/test as far as possible when secrets are missing. Missing keys are a keyless-test-design problem, not a reason to stop. Use env var names, placeholders, mocks, fakes, provider adapters, contract tests, fixtures, dry-run modes, runtime guards, and missing-secret tests. Mark only real credential-dependent runtime/deploy verification as blocked.
 - Use TDD for behavior changes: failing test first, smallest fix, passing test after.
 - Run unit, integration, smoke, runtime, and browser-visible QA as relevant. Use the available browser automation tools for real UI checks.
 - Prefer small, modular, readable components over giant files.
@@ -52,6 +53,7 @@ Final reports required under `reports/`:
 - `verification-needed.md`
 - `blockers-and-open-issues.md`
 - `task-gap-analysis.md`
+- `implementation-strategy.md`
 - `secrets-needed.md`
 - `new-issues-found.md`
 

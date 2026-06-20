@@ -7,7 +7,7 @@ description: Shared Computa secret-requirement ledger skill. Use whenever Export
 
 Use this whenever work discovers that a secret is required, including API keys such as OpenRouter, OpenAI, Stripe, Vercel, Supabase, GitHub, Google, Meta, analytics providers, OAuth apps, webhooks, database URLs, signing keys, or deployment credentials.
 
-Do not stop building just because a secret is missing unless the secret is required to choose the architecture or avoid unsafe code. Build with env placeholders, mocks, adapters, and clear runtime guards where reasonable, then record the missing secret and any verification that remains blocked.
+Do not stop building just because a secret is missing unless the secret is required to choose the architecture safely and no mock, fixture, docs, local emulator, sandbox substitute, or owner decision can resolve the choice. Treat missing secrets as a keyless-test-design problem. Build with env placeholders, mocks, fakes, provider adapters, contract tests, fixture payloads, dry-run modes, and clear runtime guards, then record the missing secret and only the live-credential verification that remains blocked.
 
 ## Artifact Location
 
@@ -52,7 +52,7 @@ Include:
 - target deployment/platform secret path, such as Vercel project env, Cloudflare Worker secret, GitHub Actions secret, Supabase Edge Function secret, Netlify env, Railway variable, or other system
 - code paths that read the secret
 - why the secret is needed
-- what was built with placeholders or mocks
+- what was built with placeholders, mocks, fakes, adapters, fixtures, contract tests, or dry-run modes
 - exact behavior blocked until the secret is configured
 - verification commands that can run before the secret exists
 - verification commands/runtime QA that must run after the secret exists
@@ -106,9 +106,10 @@ When a secret is missing:
 - Continue architecture/spec/build work using a documented env var name and placeholder example.
 - Add runtime validation that fails clearly when the env var is absent.
 - Add tests for missing-secret behavior when applicable.
+- Add keyless tests for secret-dependent behavior wherever possible: request construction, response parsing, validation, retries, error handling, synthetic webhook/event handling, provider adapter contracts, fixture payloads, dry-run behavior, and missing/invalid credential paths.
 - Do not commit real secrets.
 - Do not silently disable the feature.
-- Mark runtime/deployment verification as blocked only when it truly requires the secret.
+- Mark runtime/deployment verification as blocked only when it truly requires the live secret.
 
 ## Closeout
 

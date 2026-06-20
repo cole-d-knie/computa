@@ -8,7 +8,7 @@ compelete the task following the rules Rules: /caveman
 
 <insert here>
 
-This workflow can edit existing code, add functionality to an existing system, fix a Jira/task bug, or build a moderate project from scratch. For ultra-long autonomous projects use /computa-4d-chess. For massive research/strategy work that should decide what to build or what technologies to use before execution, use /computa-export-control. Export Control should produce `technical-spec/` before 4D campaign design when the work needs concrete engineering contracts. Existing-codebase Export Control should run the standalone audit suite (`security-audit`, `performance-audit`, and `ui-audit`) in documentation mode before final 4D campaign design. Every 4D Chess run must include final `SP-999-post-run-security-audit`, executed through `/computa-make-no-mistakes`, before marking the 4D session complete.
+This workflow can edit existing code, add functionality to an existing system, fix a Jira/task bug, or build a moderate project from scratch. For ultra-long autonomous projects use /computa-4d-chess. For massive research/strategy work that should decide what to build or what technologies to use before execution, use /computa-export-control. Export Control should produce `technical-spec/` before 4D campaign design when the work needs concrete engineering contracts, and `implementation-strategy/` before 4D when hard engineering issues, missing-key testability, migrations, provider integrations, concurrency/state risks, or rollout hazards could affect implementation. Existing-codebase Export Control should run the standalone audit suite (`security-audit`, `performance-audit`, and `ui-audit`) in documentation mode before final 4D campaign design. Every 4D Chess run must include final `SP-999-post-run-security-audit`, executed through `/computa-make-no-mistakes`, before marking the 4D session complete.
 
 Prefer small, modular, readable components over gigantic files. Split by responsibility, keep APIs narrow, follow existing project boundaries, and avoid dumping unrelated behavior into one file.
 
@@ -21,6 +21,7 @@ Before starting the master workflow or any standalone phase/subskill, invoke or 
 - /computa-speak immediately after raw request capture
 - /computa-resume when recovering prior work from artifacts
 - /computa-secrets-needed whenever API keys, OAuth credentials, webhook secrets, model-provider keys, deployment secrets, dashboard credentials, or private config are needed
+- /computa-export-control-implementation-strategy before 4D campaigns when complex engineering challenges or missing-key testability need resolution
 - /computa-make-no-mistakes-docs-update after every phase and during final closeout
 - /security-audit inside final `SP-999-post-run-security-audit`, executed by `/computa-make-no-mistakes`, before 4D `session_completed`
 - /superpowers or `using-superpowers`
@@ -71,7 +72,7 @@ Append rows as resumable units start, finish, block, defer, or materially change
 
 When any phase, task, subtask, Super-Phase, campaign, or research item needs an API key, OAuth credential, webhook secret, model-provider token, deployment secret, dashboard credential, or other private config, run `computa-secrets-needed` or equivalent immediately. Update `docs/computa-artifacts/secrets-needed/secrets-needed.csv`, create a per-secret Markdown file, create a safe `@Computer` handoff prompt, and append `secret_needed_added`, `secret_needed_updated`, `secret_configured`, or `secret_verification_blocked` to `activity-log.csv` as appropriate. Never store actual secret values in code, artifacts, logs, reports, screenshots, terminal output, or git.
 
-Build as far as possible even when a secret is missing. Use named env vars, placeholders, mocks, feature guards, and missing-secret tests where reasonable. Mark only runtime/deploy/platform verification that truly requires the credential as blocked.
+Build as far as possible even when a secret is missing. Missing API keys or private config are a keyless-test-design problem, not a reason to stop. Use named env vars, placeholders, mocks, fakes, provider adapters, contract tests, fixture payloads, dry-run modes, feature guards, and missing-secret tests. Mark only runtime/deploy/platform verification that truly requires the credential as blocked.
 
 Immediately after saving `user-task.md`, run `computa-speak` or equivalent. Save:
 - `normalized-task.md`: concise AI-ready working prompt.
@@ -176,7 +177,7 @@ Follow the ledgers as the source of truth:
 - Never start a task or subtask whose prerequisites are incomplete.
 - Never run overlapping tasks in parallel if they touch the same files, systems, data, migrations, dashboard settings, deployment state, or test environment.
 - Prefer small modular components and targeted files. If a task starts creating a giant file or mixed-responsibility module, split it into smaller components before continuing.
-- If the task needs private config, update `docs/computa-artifacts/secrets-needed/` before implementation and keep the task moving with placeholders/mocks/guards where safe.
+- If the task needs private config, update `docs/computa-artifacts/secrets-needed/` before implementation and keep the task moving with placeholders/mocks/fakes/provider adapters/contract tests/fixtures/dry-run modes/guards.
 
 Use agent swarms to increase parallelism where safe:
 - Parallelize independent investigation tasks.
@@ -282,6 +283,7 @@ After implementation:
 - Re-run the same tests and confirm they pass.
 - Add edge-case tests for boundary conditions, invalid inputs, race conditions, permissions, empty states, loading states, retries, duplicate actions, and regression-prone flows.
 - Add missing-secret behavior tests when a feature depends on API keys or private config.
+- For secret-dependent integrations, also test request construction, response parsing, validation, retries, error handling, synthetic webhook/event handling, provider adapter contracts, and missing/invalid credential paths without live credentials when possible.
 - Keep implementations small, modular, and readable; test through narrow interfaces where possible.
 - Run smoke tests against the real app or service.
 - Use `/playwright` for real-time browser verification when UI/browser behavior is involved.

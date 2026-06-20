@@ -20,6 +20,9 @@ Verify these exist:
 - `reuse-plan.md`
 - `technical-spec/spec-index.md` when the design says a technical spec is required
 - `technical-spec/acceptance-contract.md` when campaigns depend on a technical spec
+- `implementation-strategy/strategy-index.md` when the design says implementation strategy is required
+- `implementation-strategy/keyless-test-strategy.md` when campaigns depend on secret-dependent integrations
+- `implementation-strategy/campaign-readiness.md` when campaigns depend on complex engineering decisions
 - `standalone-audits/remediation-backlog.csv` when a codebase/app audit suite was required
 - `standalone-audits/implementation-campaign-map.md` when a codebase/app audit suite was required
 - `secrets-needed-readout.md` and root `docs/computa-artifacts/secrets-needed/secrets-needed.csv` when the design found private config requirements
@@ -31,6 +34,8 @@ If any required artifact is missing, stop and record a blocker. Do not execute f
 
 If campaign prompts reference `technical-spec/`, verify `technical-spec/spec-index.md` marks the spec `approved_for_campaign_design` or `approved_with_risks`. Do not launch 4D campaigns from unreviewed technical specs.
 
+If campaign prompts reference `implementation-strategy/`, verify `implementation-strategy/strategy-index.md` marks the strategy `approved_for_campaign_design` or `approved_with_risks`. Do not launch 4D campaigns when complex engineering issues or keyless test strategy remain unresolved.
+
 If campaign prompts reference standalone audit findings, verify `standalone-audits/remediation-backlog.csv` and audit-suite review outputs mark the backlog `approved_for_campaign_design` or `approved_with_risks`. Do not launch audit-driven 4D campaigns from unreviewed security/performance/UI findings.
 
 ## Execution Loop
@@ -38,7 +43,7 @@ If campaign prompts reference standalone audit findings, verify `standalone-audi
 For each approved campaign in dependency order:
 
 1. Confirm prerequisites and unresolved owner decisions.
-2. Re-read campaign instructions, research evidence, technical specs when referenced, standalone audit findings/backlog when referenced, and relevant maps.
+2. Re-read campaign instructions, research evidence, technical specs when referenced, implementation strategy when referenced, standalone audit findings/backlog when referenced, and relevant maps.
 3. Briefly justify why this campaign should start now and challenge why that might be wrong.
 4. Append `campaign_started` to `docs/computa-artifacts/activity-log.csv` with the campaign prompt or directory as `artifact_path`.
 5. Invoke `/computa-4d-chess` with the exact campaign prompt.
@@ -83,6 +88,7 @@ Produce:
 - `reports/export-control-summary.md`
 - `reports/research-decisions.md`
 - `reports/technology-and-reuse-report.md`
+- `reports/implementation-strategy.md`
 - `reports/standalone-audit-findings.md`
 - `reports/campaign-execution-report.md`
 - `reports/blockers-open-issues-and-owner-decisions.md`

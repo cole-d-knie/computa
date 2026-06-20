@@ -31,6 +31,7 @@ Focused sub-skills own the repeatable parts:
 - `computa-export-control-prior-art`: web/GitHub/local research for prior implementations and reusable patterns.
 - `computa-export-control-skill-mcp-intake`: local/importable skills, MCPs, plugins, connectors, and harness capabilities.
 - `computa-export-control-technical-spec`: execution-grade engineering specs with module boundaries, contracts, flows, data, integrations, rollout, test strategy, implementation slices, and acceptance contract.
+- `computa-export-control-implementation-strategy`: solves hard engineering challenges, keyless test strategy, integration risks, migration/rollout risks, and campaign readiness before 4D Chess starts.
 - `computa-export-control-audit-suite`: runs security, performance, and UI audits in documentation mode, then consolidates findings into a 4D implementation backlog.
 - `computa-4d-chess`: one-command Super-Phase entrypoint for very large tasks; runs architect, build, then execute.
 - `computa-4d-chess-architect`: audits, specs, designs, and records decisions before Super-Phase planning.
@@ -274,6 +275,7 @@ The workflow must:
 
 - use `computa-export-control` for massive work that needs research, requirements analysis, technology/package/prior-art discovery, codebase audit, and sequential 4D Chess campaigns
 - use `computa-export-control-technical-spec` before 4D campaign design when work needs concrete engineering contracts instead of broad product or architecture prose
+- use `computa-export-control-implementation-strategy` before 4D campaign design when hard engineering issues, provider integrations, missing keys, migrations, state/concurrency risks, unclear testability, or rollout hazards could affect implementation
 - run `computa-export-control-audit-suite` after Export Control research/spec work and before final 4D campaign design for existing codebases/apps
 - include final `SP-999-post-run-security-audit` in every 4D Chess Super-Phase plan, executed through `computa-make-no-mistakes`, before marking the 4D session complete
 - use `computa-4d-chess` for work that needs Super-Phases above normal Computa phases
@@ -290,7 +292,8 @@ The workflow must:
 - maintain root `docs/computa-artifacts/activity-log.csv` for crash recovery, logging session/campaign/Super-Phase/phase/task start, finish, block, and defer events as they happen
 - use `computa-resume` to recover the latest top-level or nested work item from `activity-log.csv`, `session-ledger.csv`, and local ledgers before relying on chat history
 - update `docs/computa-artifacts/secrets-needed/` whenever any layer needs an API key, OAuth credential, webhook secret, model-provider token, deployment secret, dashboard credential, or other private config
-- continue building/specing/testing with env var names, placeholders, mocks, guards, and missing-secret tests where safe; mark only real credential-dependent runtime/deploy verification as blocked
+- continue building/specing/testing with env var names, placeholders, mocks, fakes, provider adapters, contract tests, fixtures, dry-run modes, guards, and missing-secret tests; mark only real credential-dependent runtime/deploy verification as blocked
+- treat missing API keys/private config as a keyless-test-design problem, not a reason to stop, unless the key is required to choose a safe architecture and no mock, fixture, docs, sandbox substitute, or owner decision can resolve it
 - never store actual secret values in code, artifacts, logs, reports, screenshots, terminal output, or git; only store names, target env/platform paths, owner actions, and safe `@Computer` prompts
 - prefer small, modular, readable components over giant files
 - use phased planning

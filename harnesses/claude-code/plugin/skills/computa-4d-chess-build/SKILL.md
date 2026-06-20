@@ -21,6 +21,7 @@ Read the 4D artifact root, especially:
 - `strategic-design/risk-register.md`
 - `strategic-design/dependency-map.md`
 - `strategic-design/secrets-needed.md` and root `docs/computa-artifacts/secrets-needed/` entries when present
+- Export Control `implementation-strategy/` artifacts when this 4D session is launched by Export Control
 - `strategic-design/super-phase-candidates.md`
 - strategic design review outputs
 
@@ -47,6 +48,7 @@ For each Super-Phase directory `super-phases/SP-###-slug/`, create:
 - `issues-and-blockers.md` and `.csv`: local issues and blockers.
 - `evidence-index.md`: expected evidence, commands, screenshots, logs, dashboards, runtime QA, and test outputs.
 - `secrets-needed.md`: secrets/private config this Super-Phase needs, target env/platform paths, code paths, safe `@Computer` prompt links, and blocked verification. State `none known` when none are needed.
+- `keyless-test-plan.md`: how this Super-Phase will verify secret-dependent behavior before live credentials exist, including mocks/fakes, contract tests, fixtures, synthetic webhooks/events, dry-run modes, and post-secret verification gates.
 - `handoff.md`: low-context handoff template for execute/resume.
 
 For every created Super-Phase, append `super_phase_created` to the root `docs/computa-artifacts/activity-log.csv` with `artifact_path` pointing at the Super-Phase directory and `next_action` naming the first prerequisite or review step.
@@ -75,7 +77,7 @@ Also create mandatory final Super-Phase `super-phases/SP-999-post-run-security-a
 - Do not create overlapping Super-Phases unless the dependency order prevents simultaneous execution.
 - Separate dashboards, database/migrations, infrastructure, code, docs, QA, and release work when overlap would create risk.
 - Keep implementation boundaries modular. Super-Phase prompts should discourage giant files and call out expected component/module splits.
-- Include `computa-secrets-needed` in Super-Phase prompts whenever the Super-Phase touches API keys, provider tokens, OAuth/webhook credentials, deployment secrets, dashboard accounts, or private config. Do not block planning just because credentials are missing; require placeholder-safe implementation and explicit blocked-verification records.
+- Include `computa-secrets-needed` in Super-Phase prompts whenever the Super-Phase touches API keys, provider tokens, OAuth/webhook credentials, deployment secrets, dashboard accounts, or private config. Do not block planning just because credentials are missing; require placeholder-safe implementation, keyless tests, and explicit blocked-verification records.
 - Encode dependencies explicitly. No dependent Super-Phase may start before prerequisite evidence exists.
 - Preserve rejected, merged, split, and superseded Super-Phase candidates in a history section or ledger.
 

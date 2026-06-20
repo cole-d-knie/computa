@@ -1,0 +1,4 @@
+interface:
+  display_name: "Export Control Implementation Strategy"
+  short_description: "Solve hard implementation strategy before 4D"
+  default_prompt: "Plan the implementation strategy before launching 4D Chess."

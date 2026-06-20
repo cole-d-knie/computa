@@ -56,7 +56,7 @@ When this subskill is responsible for a task-level implementation step, append `
 
 Prefer small, modular, readable components over gigantic files. If a change starts to mix responsibilities, split it before it becomes difficult to test or review.
 
-If implementation needs an API key, OAuth credential, webhook secret, model-provider token, deployment secret, dashboard credential, or other private config, use `computa-secrets-needed` before coding against it. Build with named env vars, safe placeholders, mocks, validation guards, and missing-secret tests where reasonable. Mark only real credential-dependent runtime/deploy checks as blocked, and never store actual secret values in code, logs, artifacts, screenshots, reports, terminal output, or git.
+If implementation needs an API key, OAuth credential, webhook secret, model-provider token, deployment secret, dashboard credential, or other private config, use `computa-secrets-needed` before coding against it. Missing keys are a keyless-test-design problem, not a reason to stop. Build with named env vars, safe placeholders, mocks, fakes, provider adapters, contract tests, fixtures, dry-run modes, validation guards, and missing-secret tests. Mark only real live-credential runtime/deploy checks as blocked, and never store actual secret values in code, logs, artifacts, screenshots, reports, terminal output, or git.
 
 ## Default Commands
 

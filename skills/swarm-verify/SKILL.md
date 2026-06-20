@@ -70,7 +70,7 @@ Also read `references/master-swarm-verification-prompt.md` when present. It is t
 - Use `playwright` for browser-visible behavior.
 - Solve edge cases discovered during investigation.
 - Prefer small, modular, readable components over gigantic files. Split by responsibility, use narrow interfaces, and avoid mixing unrelated concerns in one file.
-- If any work needs an API key, OAuth credential, webhook secret, model-provider token, deployment secret, or dashboard/private config, use `computa-secrets-needed` immediately. Keep building with named env vars/placeholders/mocks/guards where safe, add missing-secret tests when applicable, and record the exact verification blocked by the missing secret.
+- If any work needs an API key, OAuth credential, webhook secret, model-provider token, deployment secret, or dashboard/private config, use `computa-secrets-needed` immediately. Missing keys are a keyless-test-design problem, not a reason to stop. Keep building with named env vars, placeholders, mocks, fakes, provider adapters, contract tests, fixtures, dry-run modes, guards, and missing-secret tests; record only the live-credential verification blocked by the missing secret.
 - Never store secret values in code, artifacts, logs, reports, screenshots, terminal output, or git. Store only secret names, target env paths, platform targets, code paths, owner action, and the safe `@Computer` handoff prompt.
 - Keep audit logs current. Do not reconstruct them only at the end.
 - For every Computa phase and task, append the event to `activity-log.csv` at start and completion, for example `phase_started`, `task_started`, `task_completed`, `phase_completed`, or `phase_blocked`.

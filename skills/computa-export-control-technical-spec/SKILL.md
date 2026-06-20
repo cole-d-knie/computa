@@ -61,6 +61,7 @@ Write under `technical-spec/` in the current Export Control session:
 - `performance-reliability.md`: latency, throughput, caching, concurrency, races, retries, timeouts, degradation, and SLO-like expectations.
 - `migration-rollout-backcompat.md`: migrations, flags, rollout phases, rollback, compatibility, data repair, and deploy order.
 - `test-strategy.md`: unit/integration/e2e/smoke/runtime/Playwright coverage, fixtures, failing-before expectations, and acceptance evidence.
+- `keyless-test-strategy.md`: tests that can run without live API keys or private config, including mocks/fakes, provider adapters, contract tests, fixture payloads, synthetic webhooks/events, dry-run paths, missing-secret behavior, and post-secret verification gates.
 - `implementation-slices.md`: engineering slices that can become 4D campaigns or Computa phases, with dependencies and non-overlap notes.
 - `risks-edge-cases.md`: edge cases, technical risks, unknowns, tradeoffs, and mitigation evidence.
 - `acceptance-contract.md`: exact conditions a later implementation must satisfy before it can be called done.
@@ -77,7 +78,8 @@ Only create sections that are relevant, but `spec-index.md`, `technical-brief.md
 - Prefer small, modular, readable components over giant files or monolithic subsystems.
 - Define boundaries before implementation slices.
 - Write concrete contracts: function/module responsibilities, API schemas, event names, data fields, state transitions, validation rules, error cases, and compatibility rules.
-- Use `computa-secrets-needed` for every private config requirement. Specs should still describe and slice implementation with named env vars, placeholders, mocks, missing-secret guards, and tests where possible.
+- Use `computa-secrets-needed` for every private config requirement. Specs should still describe and slice implementation with named env vars, placeholders, mocks, fakes, provider adapters, contract tests, fixture payloads, dry-run modes, missing-secret guards, and tests wherever possible.
+- Missing credentials should not block implementation slices unless they are required for a safe architecture decision and no mock, fixture, docs, sandbox substitute, or owner decision can resolve it. Separate pre-secret tests from post-secret verification gates.
 - Include rejected approaches and why they were rejected when the choice affects implementation.
 - Use diagrams only when they clarify flow or boundaries; label nodes and edges clearly.
 - Do not hide uncertainty. Block execution when unresolved questions could materially change architecture, data, security, privacy, or rollout.
