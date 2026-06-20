@@ -1,6 +1,6 @@
 ---
 name: computa-swarm-verify
-description: Execute a medium-scope task, code edit, system addition, Jira task, bugfix, or moderate build-from-scratch project with phased planning, raw task capture, codebase/task maps, external audit ledgers, TDD, runtime QA, Playwright checks, modular implementation discipline, and adversarial plus judge/verifier swarms after every task and phase.
+description: Execute debugging/implementation tasks with small-medium scope, code edit, system addition, or moderate build-from-scratch project with phased planning, raw task capture, codebase/task maps, external audit ledgers, TDD, runtime QA, Playwright checks, modular implementation discipline, and adversarial plus judge/verifier swarms after every task and phase.
 ---
 
 # Computa Swarm Verify

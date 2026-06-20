@@ -1,6 +1,6 @@
 ---
 name: computa-swarm-verify-setup
-description: "Create Phase 0 setup artifacts for computa-swarm-verified work under computa-artifacts: project-local artifact root, gitignore handling, raw user-task capture, session ledgers, phase/task/subtask ledgers, dependency order, issue ledgers, evidence paths, modular component boundaries, and audit logs. Use when starting any code edit, system addition, Jira task, bugfix, or moderate build-from-scratch task."
+description: "Create Phase 0 setup artifacts for computa-swarm-verified work under computa-artifacts: project-local artifact root, gitignore handling, raw user-task capture, session ledgers, phase/task/subtask ledgers, dependency order, issue ledgers, evidence paths, modular component boundaries, and audit logs. Use when starting debugging/implementation tasks with small-medium scope, code edit, system addition, or moderate build-from-scratch task."
 ---
 
 # Computa Swarm Verify Setup

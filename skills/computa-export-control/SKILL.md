@@ -11,7 +11,7 @@ Hierarchy:
 
 1. `computa-export-control`: research, decide, and quarterback multiple 4D campaigns.
 2. `computa-4d-chess`: architect and execute Super-Phases for ultra-long autonomous tasks.
-3. `computa-make-no-mistakes`: one-shot medium tasks, Jira tasks, edits, additions, and moderate build-from-scratch work.
+3. `computa-make-no-mistakes`: one-shot medium tasks, debugging/implementation tasks with small-medium scope, edits, additions, and moderate build-from-scratch work.
 
 Export Control is an intelligence layer. Its job is to prevent reinvention, find useful technologies, discover prior art, identify reusable code or packages, recommend helpful skills/MCPs/tools, audit the target codebase, flesh out requirements, and decide the best execution strategy.
 

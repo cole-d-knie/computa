@@ -1,11 +1,11 @@
 ---
 name: computa-make-no-mistakes
-description: One-command entrypoint that invokes the complete computa-swarm-verify suite for a medium-scope task, including Jira/task fixes, editing existing code, adding features to a system, or building a moderate project from scratch with setup, investigation, TDD/runtime QA, swarms, and closeout. Use when the user wants the full computa-swarm-verify workflow from one skill invocation.
+description: One-command entrypoint that invokes the complete computa-swarm-verify suite for a medium-scope task, including debugging/implementation tasks with small-medium scope, editing existing code, adding features to a system, or building a moderate project from scratch with setup, investigation, TDD/runtime QA, swarms, and closeout. Use when the user wants the full computa-swarm-verify workflow from one skill invocation.
 ---
 
 # Computa Make No Mistakes
 
-Use this as the single-command entrypoint for a Jira task, bugfix, system addition, code edit, or medium-scope build-from-scratch project. Treat the user's text after the skill name as the task.
+Use this as the single-command entrypoint for debugging/implementation tasks with small-medium scope, system additions, code edits, or medium-scope build-from-scratch projects. Treat the user's text after the skill name as the task.
 
 For ultra-long autonomous work, use `computa-4d-chess`. For massive research/strategy work that should decide what to build and what tools to use before 4D execution, use `computa-export-control`.
 

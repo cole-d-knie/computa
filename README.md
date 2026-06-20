@@ -10,7 +10,7 @@ The package has three execution levels:
 
 - `computa-export-control`: research/intelligence layer for massive projects. It prevents reinvention, audits the codebase, researches technologies/packages/prior art/skills/tools, clarifies requirements, then quarterbacks sequential 4D Chess campaigns.
 - `computa-4d-chess`: Super-Phase layer for ultra-long autonomous tasks, large edits, large system additions, and major build-from-scratch projects.
-- `computa-make-no-mistakes`: phase/task layer for Jira tasks, bugfixes, system additions, code edits, and medium-scope build-from-scratch tasks.
+- `computa-make-no-mistakes`: phase/task layer for debugging/implementation tasks with small-medium scope, system additions, code edits, and medium-scope build-from-scratch tasks.
 
 Focused sub-skills own the repeatable parts:
 
@@ -280,7 +280,7 @@ The workflow must:
 - run `computa-export-control-audit-suite` after Export Control research/spec work and before final 4D campaign design for existing codebases/apps
 - include final `SP-999-post-run-security-audit` in every 4D Chess Super-Phase plan, executed through `computa-make-no-mistakes`, before marking the 4D session complete
 - use `computa-4d-chess` for work that needs Super-Phases above normal Computa phases
-- use `computa-make-no-mistakes` for Jira tasks, edits, system additions, bugfixes, and medium-scope scratch builds
+- use `computa-make-no-mistakes` for debugging/implementation tasks with small-medium scope, edits, system additions, and medium-scope scratch builds
 - use `computa-docs-architecture` to create or update source-backed `docs/architecture/` docs, and use `computa-make-no-mistakes-docs-update` after every Computa phase
 - read existing `docs/architecture/` first when Export Control, 4D Chess, or Computa runs on an existing codebase, then verify the docs against source
 - run `computa-speak` immediately after raw request capture for direct Export Control, 4D Chess, or Make No Mistakes invocations; save the raw prompt unchanged and feed the optimized `normalized-task.md` to downstream skills
