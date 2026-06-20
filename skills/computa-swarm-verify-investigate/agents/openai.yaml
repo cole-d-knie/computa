@@ -1,0 +1,4 @@
+interface:
+  display_name: "Computa Swarm Verify Investigate"
+  short_description: "Baseline truth and root-cause verification."
+  default_prompt: "Use /computa-swarm-verify-investigate to verify the issue, origin, baseline behavior, and coverage gaps."

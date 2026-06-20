@@ -1,4 +1,0 @@
-interface:
-  display_name: "Swarm Verify Closeout"
-  short_description: "Reports, evidence, gap analysis, and commits."
-  default_prompt: "Use /swarm-verify-closeout to finish the task with reports, evidence, and gap analysis."

@@ -1,6 +1,6 @@
 ---
 name: computa-make-no-mistakes
-description: One-command entrypoint that invokes the complete swarm-verify suite for a medium-scope task, including Jira/task fixes, editing existing code, adding features to a system, or building a moderate project from scratch with setup, investigation, TDD/runtime QA, swarms, and closeout. Use when the user wants the full swarm-verify workflow from one skill invocation.
+description: One-command entrypoint that invokes the complete computa-swarm-verify suite for a medium-scope task, including Jira/task fixes, editing existing code, adding features to a system, or building a moderate project from scratch with setup, investigation, TDD/runtime QA, swarms, and closeout. Use when the user wants the full computa-swarm-verify workflow from one skill invocation.
 ---
 
 # Computa Make No Mistakes
@@ -35,25 +35,25 @@ If any dependency is missing, continue with equivalent behavior and record the m
 
 ## Invoke The Full Suite
 
-Load and apply every swarm-verify skill in this order:
+Load and apply every computa-swarm-verify skill in this order:
 
-1. `swarm-verify`
-2. `swarm-verify-setup`
+1. `computa-swarm-verify`
+2. `computa-swarm-verify-setup`
 3. `computa-speak`
-4. `swarm-verify-investigate`
-5. `swarm-verify-tdd-qa`
-6. `swarm-verify-swarms`
-7. `swarm-verify-closeout`
+4. `computa-swarm-verify-investigate`
+5. `computa-swarm-verify-tdd-qa`
+6. `computa-swarm-verify-swarms`
+7. `computa-swarm-verify-closeout`
 
 Also load and apply `computa-make-no-mistakes-docs-update` at the end of every phase and during final closeout.
 
 Do not skip a listed skill because this entrypoint is "one-shot". One-shot means the user invokes one skill; internally, the full suite still runs.
 
-Also read `swarm-verify/references/master-swarm-verification-prompt.md` when present. It is the parity source. If a detail is present there and absent here, follow the reference unless the user explicitly overrides it.
+Also read `computa-swarm-verify/references/master-computa-swarm-verification-prompt.md` when present. It is the parity source. If a detail is present there and absent here, follow the reference unless the user explicitly overrides it.
 
 ## Execution Contract
 
-Execute the task end to end under the complete swarm-verify rules:
+Execute the task end to end under the complete computa-swarm-verify rules:
 
 - Before each meaningful action, briefly justify it and challenge why it might be wrong.
 - Save the raw user request to `user-task.md` before rewriting, summarizing, or planning from memory.
@@ -101,7 +101,7 @@ If a previous pass was wrong, state what was wrong, preserve the old evidence, a
 
 ## Closeout Bar
 
-Do not claim completion until `swarm-verify-closeout` has produced concise but substantive Markdown reports covering:
+Do not claim completion until `computa-swarm-verify-closeout` has produced concise but substantive Markdown reports covering:
 
 - what was done
 - what still needs verification

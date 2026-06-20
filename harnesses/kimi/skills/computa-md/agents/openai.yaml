@@ -1,0 +1,4 @@
+interface:
+  display_name: "Computa MD"
+  short_description: "Archive old agent docs and write task-local Computa docs."
+  default_prompt: "Use /computa-md to archive old agent docs and write concise task-local AGENTS/CLAUDE/KIMI/Cursor/Goose guidance."

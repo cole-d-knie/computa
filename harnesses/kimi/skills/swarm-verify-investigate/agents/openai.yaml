@@ -1,4 +1,0 @@
-interface:
-  display_name: "Swarm Verify Investigate"
-  short_description: "Baseline truth and root-cause verification."
-  default_prompt: "Use /swarm-verify-investigate to verify the issue, origin, baseline behavior, and coverage gaps."

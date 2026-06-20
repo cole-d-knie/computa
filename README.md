@@ -1,4 +1,4 @@
-# Computa Make No Mistakes Skills
+# Computa Skills
 
 Private multi-harness skill package for phased, evidence-first task execution.
 
@@ -18,6 +18,7 @@ Focused sub-skills own the repeatable parts:
 - `computa-init`: initializes `docs/computa-artifacts/`, session ledgers, raw task capture, and shared artifact structure.
 - `computa-resume`: inspects `docs/computa-artifacts/activity-log.csv`, session ledgers, and nested session artifacts to identify the latest safe resume point after a crash or context loss.
 - `computa-secrets-needed`: records required API keys, OAuth credentials, webhook secrets, model-provider keys, deployment secrets, dashboard credentials, target env/platform paths, blocked verification, and safe `@Computer` credential handoff prompts without storing secret values.
+- `computa-md`: explicit-only helper that archives existing agent docs and writes concise task-local `AGENTS.md`, `CLAUDE.md`, `KIMI.md`, Cursor, Goose, Codex, and OpenCode guidance with artifact/resume paths.
 - `computa-docs-architecture`: creates or updates source-backed docs at `docs/architecture/`.
 - `computa-docs-architecture-init`: initializes the `docs/architecture/` skeleton.
 - `computa-docs-architecture-audit`: audits code and existing architecture docs against source truth.
@@ -41,16 +42,16 @@ Focused sub-skills own the repeatable parts:
 - `performance-audit`: performance findings/optimization skill for Export Control audit documentation and direct optimization work.
 - `ui-audit`: UI/UX findings/polish skill for Export Control audit documentation and direct UI work.
 - `computa-make-no-mistakes`: one command that loads the master skill, every subskill, and the full dependency set.
-- `swarm-verify`: master orchestration and parity reference routing.
-- `swarm-verify-setup`: Phase 0 artifact setup, `user-task.md`, ledgers, tasks, subtasks.
-- `swarm-verify-investigate`: Phase 1 orientation audit/maps plus Phase 2 source-truth investigation and baseline evidence.
-- `swarm-verify-tdd-qa`: TDD, edge cases, unit/integration/smoke/runtime QA, Playwright.
-- `swarm-verify-swarms`: task and phase adversarial plus judge/verifier swarms.
-- `swarm-verify-closeout`: final reports, gap analysis, blockers, verification needs, commits.
+- `computa-swarm-verify`: master orchestration and parity reference routing.
+- `computa-swarm-verify-setup`: Phase 0 artifact setup, `user-task.md`, ledgers, tasks, subtasks.
+- `computa-swarm-verify-investigate`: Phase 1 orientation audit/maps plus Phase 2 source-truth investigation and baseline evidence.
+- `computa-swarm-verify-tdd-qa`: TDD, edge cases, unit/integration/smoke/runtime QA, Playwright.
+- `computa-swarm-verify-swarms`: task and phase adversarial plus judge/verifier swarms.
+- `computa-swarm-verify-closeout`: final reports, gap analysis, blockers, verification needs, commits.
 
 The full parity prompt remains available at:
 
-`skills/swarm-verify/references/master-swarm-verification-prompt.md`
+`skills/computa-swarm-verify/references/master-computa-swarm-verification-prompt.md`
 
 ## Supported Harnesses
 
@@ -60,10 +61,10 @@ The full parity prompt remains available at:
 | Claude Code | `~/.claude/skills` | Native Agent Skills folders. A Claude plugin-shaped copy is also in `harnesses/claude-code/plugin`. |
 | Kimi Code | `~/.kimi-code/skills` plus `~/.kimi-code/config.toml` `extra_skill_dirs` | Kimi-specific copy uses "agent swarm/delegation" wording and does not require Codex `subagent-driven-development`. |
 | OpenCode | `~/.config/opencode/skills` | Native Agent Skills folders. |
-| Cursor | `.cursor/rules/swarm-verify.mdc` for a project, or staged at `~/.cursor/rules` | Cursor project rules are the reliable path. Cursor may also import Claude skills/plugins if enabled in Cursor settings. |
-| Goose | `~/.config/goose/recipes/swarm-verify.yaml` | Run as a Goose recipe. |
+| Cursor | `.cursor/rules/computa-swarm-verify.mdc` for a project, or staged at `~/.cursor/rules` | Cursor project rules are the reliable path. Cursor may also import Claude skills/plugins if enabled in Cursor settings. |
+| Goose | `~/.config/goose/recipes/computa-swarm-verify.yaml` | Run as a Goose recipe. |
 | Agent Skills open standard | `~/.agents/skills` | Useful for tools that read shared Agent Skills folders. |
-| Generic | `AGENTS.swarm-verify.md` | Fallback instructions for harnesses without native skill support. |
+| Generic | `AGENTS.computa-swarm-verify.md` | Fallback instructions for harnesses without native skill support. |
 
 ## Dependencies
 
@@ -101,8 +102,8 @@ Important: full `gstack` core is not vendored because it is large and machine-sp
 Clone:
 
 ```bash
-git clone git@github.com:cole-d-knie/swarm-verify-skills.git
-cd swarm-verify-skills
+git clone git@github.com:cole-d-knie/computa.git
+cd computa
 ```
 
 Codex:
@@ -135,7 +136,7 @@ OpenCode:
 ./install.sh --harness opencode
 ```
 
-Installs skills to `~/.config/opencode/skills` and merges `~/.config/opencode/opencode.json` with `instructions` entries and MCP servers. Reference template: `harnesses/opencode/opencode.swarm-verify.json`.
+Installs skills to `~/.config/opencode/skills` and merges `~/.config/opencode/opencode.json` with `instructions` entries and MCP servers. Reference template: `harnesses/opencode/opencode.computa-swarm-verify.json`.
 
 Cursor for a project:
 
@@ -143,13 +144,13 @@ Cursor for a project:
 ./install.sh --harness cursor --project /path/to/project
 ```
 
-Installs `/path/to/project/.cursor/rules/swarm-verify.mdc` and merges `/path/to/project/.cursor/mcp.json` with Context7 and Playwright. Without `--project`, the installer stages global files under `~/.cursor`.
+Installs `/path/to/project/.cursor/rules/computa-swarm-verify.mdc` and merges `/path/to/project/.cursor/mcp.json` with Context7 and Playwright. Without `--project`, the installer stages global files under `~/.cursor`.
 
 Goose:
 
 ```bash
 ./install.sh --harness goose
-goose run --recipe ~/.config/goose/recipes/swarm-verify.yaml --recipe-param task="audit PR 23 and 25"
+goose run --recipe ~/.config/goose/recipes/computa-swarm-verify.yaml --recipe-param task="audit PR 23 and 25"
 ```
 
 Installs a Goose recipe with the developer extension plus Context7 and Playwright stdio extensions.
@@ -168,7 +169,7 @@ Generic fallback file:
 ./install.sh --harness generic --project /path/to/project
 ```
 
-Installs `AGENTS.swarm-verify.md` for harnesses that do not support these skills directly.
+Installs `AGENTS.computa-swarm-verify.md` for harnesses that do not support these skills directly.
 
 Install all supported local targets:
 
@@ -254,7 +255,7 @@ Resume interrupted work:
 Advanced internal master skill:
 
 ```text
-/swarm-verify complete this task: ...
+/computa-swarm-verify complete this task: ...
 ```
 
 Cursor:
@@ -266,7 +267,7 @@ Use the computa-make-no-mistakes Cursor rule to complete this task: ...
 Goose:
 
 ```bash
-goose run --recipe ~/.config/goose/recipes/swarm-verify.yaml --recipe-param task="complete this task: ..."
+goose run --recipe ~/.config/goose/recipes/computa-swarm-verify.yaml --recipe-param task="complete this task: ..."
 ```
 
 ## Required Behavior
@@ -297,7 +298,7 @@ The workflow must:
 - never store actual secret values in code, artifacts, logs, reports, screenshots, terminal output, or git; only store names, target env/platform paths, owner actions, and safe `@Computer` prompts
 - prefer small, modular, readable components over giant files
 - use phased planning
-- invoke the full dependency set from every swarm-verify skill/subskill when run independently
+- invoke the full dependency set from every computa-swarm-verify skill/subskill when run independently
 - run an initial orientation audit of the task/codebase and save living maps under `maps/`
 - allow maps to change at any time when evidence changes, tracking each material map update in both `maps/map-change-log.md` and `maps/map-change-ledger.csv`
 - run investigation before implementation
@@ -325,5 +326,5 @@ for d in vendor/skills/*; do python3 /path/to/quick_validate.py "$d"; done
 Validate Goose recipe:
 
 ```bash
-goose recipe validate harnesses/goose/recipes/swarm-verify.yaml
+goose recipe validate harnesses/goose/recipes/computa-swarm-verify.yaml
 ```

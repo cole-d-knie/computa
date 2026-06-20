@@ -1,4 +1,0 @@
-interface:
-  display_name: "Swarm Verify"
-  short_description: "Phased TDD verification with review swarms."
-  default_prompt: "Use /swarm-verify <task> to execute the task with phased planning, TDD, runtime QA, and swarm review."

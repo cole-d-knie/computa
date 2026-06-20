@@ -1,0 +1,52 @@
+{
+  "$schema": "https://opencode.ai/config.json",
+  "instructions": [
+    "~/.config/opencode/skills/computa-init/SKILL.md",
+    "~/.config/opencode/skills/computa-speak/SKILL.md",
+    "~/.config/opencode/skills/computa-resume/SKILL.md",
+    "~/.config/opencode/skills/computa-secrets-needed/SKILL.md",
+    "~/.config/opencode/skills/computa-docs-architecture/SKILL.md",
+    "~/.config/opencode/skills/computa-docs-architecture-init/SKILL.md",
+    "~/.config/opencode/skills/computa-docs-architecture-audit/SKILL.md",
+    "~/.config/opencode/skills/computa-docs-architecture-update/SKILL.md",
+    "~/.config/opencode/skills/computa-make-no-mistakes-docs-update/SKILL.md",
+    "~/.config/opencode/skills/computa-export-control/SKILL.md",
+    "~/.config/opencode/skills/computa-export-control-design/SKILL.md",
+    "~/.config/opencode/skills/computa-export-control-execute/SKILL.md",
+    "~/.config/opencode/skills/computa-export-control-product-requirements/SKILL.md",
+    "~/.config/opencode/skills/computa-export-control-codebase-audit/SKILL.md",
+    "~/.config/opencode/skills/computa-export-control-tech-radar/SKILL.md",
+    "~/.config/opencode/skills/computa-export-control-prior-art/SKILL.md",
+    "~/.config/opencode/skills/computa-export-control-skill-mcp-intake/SKILL.md",
+    "~/.config/opencode/skills/computa-export-control-technical-spec/SKILL.md",
+    "~/.config/opencode/skills/computa-export-control-implementation-strategy/SKILL.md",
+    "~/.config/opencode/skills/computa-export-control-audit-suite/SKILL.md",
+    "~/.config/opencode/skills/computa-4d-chess/SKILL.md",
+    "~/.config/opencode/skills/computa-4d-chess-architect/SKILL.md",
+    "~/.config/opencode/skills/computa-4d-chess-build/SKILL.md",
+    "~/.config/opencode/skills/computa-4d-chess-execute/SKILL.md",
+    "~/.config/opencode/skills/security-audit/SKILL.md",
+    "~/.config/opencode/skills/performance-audit/SKILL.md",
+    "~/.config/opencode/skills/ui-audit/SKILL.md",
+    "~/.config/opencode/skills/computa-md/SKILL.md",
+    "~/.config/opencode/skills/computa-make-no-mistakes/SKILL.md",
+    "~/.config/opencode/skills/computa-swarm-verify/SKILL.md",
+    "~/.config/opencode/skills/computa-swarm-verify-setup/SKILL.md",
+    "~/.config/opencode/skills/computa-swarm-verify-investigate/SKILL.md",
+    "~/.config/opencode/skills/computa-swarm-verify-tdd-qa/SKILL.md",
+    "~/.config/opencode/skills/computa-swarm-verify-swarms/SKILL.md",
+    "~/.config/opencode/skills/computa-swarm-verify-closeout/SKILL.md"
+  ],
+  "mcp": {
+    "context7": {
+      "type": "remote",
+      "url": "https://mcp.context7.com/mcp",
+      "enabled": true
+    },
+    "playwright": {
+      "type": "local",
+      "command": ["npx", "-y", "@playwright/mcp@latest"],
+      "enabled": true
+    }
+  }
+}

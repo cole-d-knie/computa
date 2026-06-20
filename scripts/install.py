@@ -16,9 +16,9 @@ ROOT = Path(__file__).resolve().parents[1]
 SUITE_DIR = ROOT / "skills"
 KIMI_SUITE_DIR = ROOT / "harnesses" / "kimi" / "skills"
 VENDOR_DIR = ROOT / "vendor" / "skills"
-CURSOR_RULE = ROOT / "harnesses" / "cursor" / "rules" / "swarm-verify.mdc"
-GOOSE_RECIPE = ROOT / "harnesses" / "goose" / "recipes" / "swarm-verify.yaml"
-GENERIC_AGENTS = ROOT / "harnesses" / "generic" / "AGENTS.swarm-verify.md"
+CURSOR_RULE = ROOT / "harnesses" / "cursor" / "rules" / "computa-swarm-verify.mdc"
+GOOSE_RECIPE = ROOT / "harnesses" / "goose" / "recipes" / "computa-swarm-verify.yaml"
+GENERIC_AGENTS = ROOT / "harnesses" / "generic" / "AGENTS.computa-swarm-verify.md"
 
 KIMI_MCP_SERVERS = {
     "context7": {
@@ -87,16 +87,23 @@ SUITE_SKILLS = [
     "security-audit",
     "performance-audit",
     "ui-audit",
+    "computa-md",
     "computa-make-no-mistakes",
+    "computa-swarm-verify",
+    "computa-swarm-verify-setup",
+    "computa-swarm-verify-investigate",
+    "computa-swarm-verify-tdd-qa",
+    "computa-swarm-verify-swarms",
+    "computa-swarm-verify-closeout",
+]
+
+LEGACY_SUITE_SKILLS = [
     "swarm-verify",
     "swarm-verify-setup",
     "swarm-verify-investigate",
     "swarm-verify-tdd-qa",
     "swarm-verify-swarms",
     "swarm-verify-closeout",
-]
-
-LEGACY_SUITE_SKILLS = [
     "swarm-verify-one-shot",
 ]
 
@@ -402,7 +409,7 @@ def install_dependencies(args: argparse.Namespace, harness: str, target: Path) -
         log("missing local gstack source")
 
     log(f"warning: gstack core not found for {harness}")
-    log("note: swarm-verify can still use systematic-debugging/manual investigation, but gstack investigate may be unavailable.")
+    log("note: computa-swarm-verify can still use systematic-debugging/manual investigation, but gstack investigate may be unavailable.")
     return ok
 
 
@@ -540,7 +547,7 @@ def ensure_opencode_config(skill_target: Path, dry_run: bool) -> bool:
         ]
         if len(existing_instructions) != original_count:
             changed = True
-            log("remove: legacy OpenCode swarm-verify-one-shot instruction")
+            log("remove: legacy OpenCode swarm-verify instruction")
         for instruction in instruction_paths:
             if instruction not in existing_instructions:
                 existing_instructions.append(instruction)
@@ -601,11 +608,11 @@ def install_skill_harness(args: argparse.Namespace, harness: str) -> bool:
 
 def install_cursor(args: argparse.Namespace) -> bool:
     if args.project:
-        target = Path(args.project).expanduser().resolve() / ".cursor" / "rules" / "swarm-verify.mdc"
+        target = Path(args.project).expanduser().resolve() / ".cursor" / "rules" / "computa-swarm-verify.mdc"
         log(f"[cursor] project rule: {target}")
         ok = copy_file(CURSOR_RULE, target, args.dry_run)
     else:
-        target = Path.home() / ".cursor" / "rules" / "swarm-verify.mdc"
+        target = Path.home() / ".cursor" / "rules" / "computa-swarm-verify.mdc"
         log(f"[cursor] staging rule: {target}")
         ok = copy_file(CURSOR_RULE, target, args.dry_run)
         log("note: Cursor's reliable documented project install is <project>/.cursor/rules; rerun with --project for project-scoped rules.")
@@ -617,18 +624,18 @@ def install_cursor(args: argparse.Namespace) -> bool:
 
 def install_generic(args: argparse.Namespace) -> bool:
     if args.project:
-        target = Path(args.project).expanduser().resolve() / "AGENTS.swarm-verify.md"
+        target = Path(args.project).expanduser().resolve() / "AGENTS.computa-swarm-verify.md"
     else:
-        target = Path.home() / ".swarm-verify-skills" / "AGENTS.swarm-verify.md"
+        target = Path.home() / ".computa" / "AGENTS.computa-swarm-verify.md"
     log(f"[generic] target: {target}")
     return copy_file(GENERIC_AGENTS, target, args.dry_run)
 
 
 def install_goose(args: argparse.Namespace) -> bool:
-    target = Path.home() / ".config" / "goose" / "recipes" / "swarm-verify.yaml"
+    target = Path.home() / ".config" / "goose" / "recipes" / "computa-swarm-verify.yaml"
     log(f"[goose] recipe: {target}")
     ok = copy_file(GOOSE_RECIPE, target, args.dry_run)
-    log('note: run with `goose run --recipe ~/.config/goose/recipes/swarm-verify.yaml --recipe-param task="..."`.')
+    log('note: run with `goose run --recipe ~/.config/goose/recipes/computa-swarm-verify.yaml --recipe-param task="..."`.')
     log("note: add this directory to GOOSE_RECIPE_PATH if your Goose build does not discover it.")
     return ok
 

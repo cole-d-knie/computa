@@ -19,11 +19,11 @@ Checked on 2026-06-19 using GitHub, npm package metadata, installed local plugin
 | Codex | Copy suite skills and vendored dependency skills into `${CODEX_HOME:-~/.codex}/skills`. | Codex-specific tool/plugin availability still depends on the host. Full `gstack` core is optional and copied only with `--install-local-gstack`. |
 | Claude Code | Copy suite and dependency skills into `~/.claude/skills`; plugin adapter also contains the suite, dependency skills, and `.mcp.json`. | Claude plugin `.mcp.json` follows current Claude plugin docs for multiple MCP servers. |
 | Kimi Code | Copy Kimi-specific suite skills into `~/.kimi-code/skills`; copy compatible dependency skills; update `config.toml` `extra_skill_dirs`; add missing `context7` and `playwright` MCP servers to `~/.kimi-code/mcp.json`. | Kimi suite wording uses agent swarm/delegation and does not require `subagent-driven-development`. |
-| OpenCode | Copy suite/dependency skills into `~/.config/opencode/skills`; merge `~/.config/opencode/opencode.json` with `instructions` and MCP server entries. | OpenCode uses `instructions` and `mcp` config rather than the exact Codex/Claude skill loader. Template: `harnesses/opencode/opencode.swarm-verify.json`. |
-| Cursor | Install `.cursor/rules/swarm-verify.mdc`; add missing `context7` and `playwright` entries to `.cursor/mcp.json` for project installs or `~/.cursor/mcp.json` for global installs. | Cursor rules are the reliable instruction path. MCP config is project/global JSON and should be reviewed like infrastructure config. |
-| Goose | Install `~/.config/goose/recipes/swarm-verify.yaml`. | Recipe includes built-in developer extension plus Context7 and Playwright stdio extensions. |
+| OpenCode | Copy suite/dependency skills into `~/.config/opencode/skills`; merge `~/.config/opencode/opencode.json` with `instructions` and MCP server entries. | OpenCode uses `instructions` and `mcp` config rather than the exact Codex/Claude skill loader. Template: `harnesses/opencode/opencode.computa-swarm-verify.json`. |
+| Cursor | Install `.cursor/rules/computa-swarm-verify.mdc`; add missing `context7` and `playwright` entries to `.cursor/mcp.json` for project installs or `~/.cursor/mcp.json` for global installs. | Cursor rules are the reliable instruction path. MCP config is project/global JSON and should be reviewed like infrastructure config. |
+| Goose | Install `~/.config/goose/recipes/computa-swarm-verify.yaml`. | Recipe includes built-in developer extension plus Context7 and Playwright stdio extensions. |
 | Agent Skills open standard | Copy suite/dependency skill folders into `~/.agents/skills`. | Useful for tools that read shared Agent Skills folders; MCP/tooling still depends on the harness. |
-| Generic | Install `AGENTS.swarm-verify.md`. | Fallback instructions only; user must configure equivalent tools manually. |
+| Generic | Install `AGENTS.computa-swarm-verify.md`. | Fallback instructions only; user must configure equivalent tools manually. |
 
 ## Config Files Installed Or Generated
 
@@ -32,8 +32,8 @@ Checked on 2026-06-19 using GitHub, npm package metadata, installed local plugin
 | `harnesses/claude-code/plugin/.mcp.json` | Claude plugin MCP config for Context7 and Playwright. |
 | `harnesses/kimi/mcp.json` | Reference Kimi MCP config; installer merges missing entries into `~/.kimi-code/mcp.json`. |
 | `harnesses/cursor/mcp.json` | Reference Cursor MCP config; installer merges missing entries into project/global Cursor MCP config. |
-| `harnesses/opencode/opencode.swarm-verify.json` | Reference OpenCode config for instructions and MCP servers; installer merges equivalent entries into global OpenCode config. |
-| `harnesses/goose/recipes/swarm-verify.yaml` | Goose recipe with task parameter, instructions, developer extension, Context7, and Playwright. |
+| `harnesses/opencode/opencode.computa-swarm-verify.json` | Reference OpenCode config for instructions and MCP servers; installer merges equivalent entries into global OpenCode config. |
+| `harnesses/goose/recipes/computa-swarm-verify.yaml` | Goose recipe with task parameter, instructions, developer extension, Context7, and Playwright. |
 
 ## Verification Sources
 

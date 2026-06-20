@@ -1,4 +1,0 @@
-interface:
-  display_name: "Swarm Verify Swarms"
-  short_description: "Adversarial and judge swarms for each unit."
-  default_prompt: "Use /swarm-verify-swarms to review each task and phase with adversarial and judge swarms."

@@ -1,5 +1,5 @@
 {
-  "name": "swarm-verify",
+  "name": "computa",
   "version": "0.1.0",
   "description": "Research intelligence, Super-Phase architecture, phased TDD verification, runtime QA, and adversarial plus judge swarms.",
   "author": {
@@ -7,7 +7,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/cole-d-knie/swarm-verify-skills.git"
+    "url": "https://github.com/cole-d-knie/computa.git"
   },
   "license": "UNLICENSED",
   "keywords": [

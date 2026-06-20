@@ -1,4 +1,0 @@
-interface:
-  display_name: "Swarm Verify Setup"
-  short_description: "Create Computa docs artifacts"
-  default_prompt: "Use /swarm-verify-setup to create a docs/computa-artifacts session for this task."

@@ -1,4 +1,4 @@
 interface:
   display_name: "Computa Make No Mistakes"
-  short_description: "Run the full swarm-verify suite from one invocation."
+  short_description: "Run the full computa-swarm-verify suite from one invocation."
   default_prompt: "Use /computa-make-no-mistakes <task> to execute the full suite: dependencies, setup, investigation, TDD/runtime QA, swarms, and closeout."

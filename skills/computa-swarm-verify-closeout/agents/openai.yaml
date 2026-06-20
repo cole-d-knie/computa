@@ -1,0 +1,4 @@
+interface:
+  display_name: "Computa Swarm Verify Closeout"
+  short_description: "Reports, evidence, gap analysis, and commits."
+  default_prompt: "Use /computa-swarm-verify-closeout to finish the task with reports, evidence, and gap analysis."

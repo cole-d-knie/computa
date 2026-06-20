@@ -1,0 +1,4 @@
+interface:
+  display_name: "Computa Swarm Verify"
+  short_description: "Phased TDD verification with review swarms."
+  default_prompt: "Use /computa-swarm-verify <task> to execute the task with phased planning, TDD, runtime QA, and swarm review."
