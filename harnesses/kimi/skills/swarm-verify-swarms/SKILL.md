@@ -1,6 +1,6 @@
 ---
 name: swarm-verify-swarms
-description: "Run required swarm reviews for swarm-verified work: after every task and phase, dispatch one adversarial reviewer per subtask or task, then one judge/verifier per matching reviewer, approve or reject findings, and only implement approved recommendations."
+description: "Run required swarm reviews for swarm-verified work: after every task and phase, dispatch one adversarial reviewer per subtask or task, then one judge/verifier per matching reviewer, check evidence, modularity, giant-file risk, regressions, and only implement approved recommendations."
 ---
 
 # Swarm Verify Swarms
@@ -9,14 +9,14 @@ Use this after every task and every phase, and after material plan changes.
 
 ## Required Dependency Skills
 
-When this subskill is invoked directly, use or trigger all Kimi-compatible swarm-verify dependencies when available:
+When this subskill is invoked directly, use or trigger all swarm-verify dependencies when available:
 
 - `caveman`: terse, concrete communication.
 - `using-superpowers`: start-of-task planning discipline.
 - `writing-plans` and `executing-plans`: plan creation and execution.
 - `test-driven-development`: fail-first implementation.
 - `systematic-debugging` or `investigate`: root-cause investigation.
-- `dispatching-parallel-agents` or Kimi agent swarm/delegation: safe swarm parallelism.
+- native agent swarm/delegation: safe swarm parallelism.
 - `requesting-code-review`: adversarial review.
 - `verification-before-completion`: completion proof.
 - `playwright`: browser-visible runtime QA.
@@ -24,7 +24,7 @@ When this subskill is invoked directly, use or trigger all Kimi-compatible swarm
 
 If any dependency is missing, continue with equivalent behavior and record the missing dependency in the artifact ledger.
 
-Use Kimi agent swarm/delegation, parallel agent dispatch, and adversarial review when available.
+Use native agent swarm/delegation and `requesting-code-review` when available.
 
 ## Parallelism Guard
 
@@ -41,6 +41,7 @@ Round 1: task adversarial swarm
 - Run one adversarial-review agent per subtask.
 - Each agent reviews its subtask, evidence, tests, code changes, edge cases, and unresolved risks.
 - Each agent challenges missing edge cases, weak tests, false assumptions, regressions, security/privacy risks, bad sequencing, and incomplete QA.
+- Each agent checks whether the implementation stayed small, modular, readable, and aligned with existing boundaries instead of creating giant files.
 - Each outputs findings and recommended next actions.
 
 Round 2: task judge/verifier swarm
@@ -56,11 +57,14 @@ Before closing the task:
 - confirm all subtasks are complete or explicitly deferred
 - run required task verification
 - update task logs, issue ledgers, subtask ledgers, and master ledgers
+- append `task_completed`, `task_blocked`, or `task_deferred` to the root `docs/computa-artifacts/activity-log.csv` with the task evidence and next action
 - commit the completed task only if verification passes and commits are allowed
 
 ## Phase-Level Swarm
 
 At the end of every phase, run two rounds.
+
+Before the phase-level swarm, run `computa-make-no-mistakes-docs-update` or verify that it already ran for this phase. The phase review must include whether architecture docs were created, updated, no-op recorded, or blocked with evidence.
 
 Round 1: phase adversarial swarm
 
@@ -68,6 +72,8 @@ Round 1: phase adversarial swarm
 - Each agent reviews its task, subtasks, evidence, tests, code changes, edge cases, and unresolved risks.
 - Each challenges whether the task satisfies phase acceptance criteria.
 - Each checks for missing subtasks, bad sequencing, unresolved dependencies, untested edge cases, regressions, and incomplete runtime QA.
+- Each checks whether the phase introduced avoidable monoliths, oversized files, or mixed responsibilities.
+- Each checks whether the docs update hook reflected phase ledger work in `docs/architecture/`, or correctly recorded a no-op/blocker.
 - Each outputs findings and recommended next actions.
 
 Round 2: phase judge/verifier swarm
@@ -77,6 +83,7 @@ Round 2: phase judge/verifier swarm
 - Classify findings as `correct`, `partly correct`, `wrong`, or `needs more evidence`.
 - Decide whether the task is complete, needs rework, or is blocked.
 - Do not close the phase until every task is approved complete, approved deferred, or blocked with evidence.
+- Do not close the phase if the architecture-docs hook is missing, stale, or unsupported by evidence.
 
 Before closing the phase:
 
@@ -84,6 +91,7 @@ Before closing the phase:
 - run required phase verification
 - update phase logs, issue ledgers, task ledgers, and master ledgers
 - record the phase verdict
+- append `phase_completed`, `phase_blocked`, or `phase_deferred` to the root `docs/computa-artifacts/activity-log.csv` with the phase evidence and next action
 
 ## Plan-Change Swarm
 

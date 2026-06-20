@@ -1,0 +1,4 @@
+interface:
+  display_name: "Performance Audit"
+  short_description: "Audit performance findings"
+  default_prompt: "Run the performance audit for this codebase."

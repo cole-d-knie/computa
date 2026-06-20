@@ -1,0 +1,4 @@
+interface:
+  display_name: "Computa Skill MCP Intake"
+  short_description: "Map skills MCPs and tools"
+  default_prompt: "Use computa-export-control-skill-mcp-intake to find agent tools for: ..."

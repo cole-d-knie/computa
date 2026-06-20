@@ -1,0 +1,4 @@
+interface:
+  display_name: "Computa Product Requirements"
+  short_description: "Clarify product requirements"
+  default_prompt: "Use computa-export-control-product-requirements to clarify requirements for: ..."

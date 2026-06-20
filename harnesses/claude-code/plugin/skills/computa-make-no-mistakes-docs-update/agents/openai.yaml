@@ -1,0 +1,4 @@
+interface:
+  display_name: "Computa Phase Docs Update"
+  short_description: "Update docs after Computa phases"
+  default_prompt: "Use $computa-make-no-mistakes-docs-update after this Computa phase to update architecture docs."

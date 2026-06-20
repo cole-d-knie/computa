@@ -1,0 +1,4 @@
+interface:
+  display_name: "Computa Prior Art"
+  short_description: "Find reusable prior work safely"
+  default_prompt: "Use computa-export-control-prior-art to find prior implementations for: ..."

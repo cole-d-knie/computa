@@ -1,0 +1,4 @@
+interface:
+  display_name: "Computa Architecture Update"
+  short_description: "Update architecture docs from code truth"
+  default_prompt: "Use $computa-docs-architecture-update to update architecture docs from the current codebase."

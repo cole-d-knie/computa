@@ -1,0 +1,4 @@
+interface:
+  display_name: "Computa Architecture Init"
+  short_description: "Initialize architecture doc structure"
+  default_prompt: "Use $computa-docs-architecture-init to create the architecture docs structure."

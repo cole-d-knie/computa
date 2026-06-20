@@ -1,0 +1,4 @@
+interface:
+  display_name: "Computa Codebase Audit"
+  short_description: "Audit codebase gaps and reuse"
+  default_prompt: "Use computa-export-control-codebase-audit to audit this codebase for: ..."

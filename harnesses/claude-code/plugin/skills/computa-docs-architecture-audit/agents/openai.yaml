@@ -1,0 +1,4 @@
+interface:
+  display_name: "Computa Architecture Audit"
+  short_description: "Audit code truth for architecture docs"
+  default_prompt: "Use $computa-docs-architecture-audit to verify architecture docs against the codebase."

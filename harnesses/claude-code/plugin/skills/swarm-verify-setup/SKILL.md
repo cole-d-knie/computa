@@ -1,6 +1,6 @@
 ---
 name: swarm-verify-setup
-description: "Create Phase 0 setup artifacts for swarm-verified work: external plan directory, raw user-task capture, phase/task/subtask ledgers, dependency order, issue ledgers, evidence paths, and audit logs. Use when starting any swarm-verify task or when planning artifacts must be auditable outside the repo."
+description: "Create Phase 0 setup artifacts for swarm-verified work under computa-artifacts: project-local artifact root, gitignore handling, raw user-task capture, session ledgers, phase/task/subtask ledgers, dependency order, issue ledgers, evidence paths, modular component boundaries, and audit logs. Use when starting any code edit, system addition, Jira task, bugfix, or moderate build-from-scratch task."
 ---
 
 # Swarm Verify Setup
@@ -11,6 +11,10 @@ Use this for Phase 0. Finish it before implementation.
 
 When this subskill is invoked directly, use or trigger all swarm-verify dependencies when available:
 
+- `computa-init`: project-local `docs/` and `docs/computa-artifacts/` initialization.
+- `computa-speak`: prompt normalization after raw task capture.
+- `computa-resume`: recover existing activity-log state when setup is invoked to continue a crashed session.
+- `computa-secrets-needed`: root secret-requirement ledger and safe credential handoff prompt creation.
 - `caveman`: terse, concrete communication.
 - `using-superpowers`: start-of-task planning discipline.
 - `writing-plans` and `executing-plans`: plan creation and execution.
@@ -26,19 +30,63 @@ If any dependency is missing, continue with equivalent behavior and record the m
 
 ## Artifact Root
 
-Create an artifact root outside the repo. Use a stable, timestamped path that names the task.
+Run `computa-init` when available. Create `docs/` if missing, then create or reuse `docs/computa-artifacts/` in the invocation root.
 
-Immediately create `user-task.md` in that root before summarizing or planning. Include:
+Invocation root rules:
+
+- Use the explicit project/root path if the user gives one.
+- Otherwise use the current working directory where the skill is invoked.
+- If invoked from inside a git repo and no separate root is explicit, prefer the git top-level so one project has one artifact root.
+- If the invocation root is inside a git repo, ensure the repo ignores the artifact directory. Add the relative path, such as `/docs/computa-artifacts/` or `/subdir/docs/computa-artifacts/`, to `.gitignore` if it is missing. Do not duplicate entries.
+- If not inside a git repo, still create `docs/computa-artifacts/`; no gitignore action is needed.
+
+Initialize or update:
+
+- `docs/computa-artifacts/artifact-index.md`: what sessions exist and how to find current work.
+- `docs/computa-artifacts/session-ledger.csv`: session_id, layer, parent_session_id, status, invocation_root, session_path, user_task_path, started_at, completed_at, task_slug, summary_path, next_action.
+- `docs/computa-artifacts/activity-log.csv`: timestamped root resume log for sessions, campaigns, Super-Phases, phases, and tasks.
+- `docs/computa-artifacts/secrets-needed/`: shared secret/API-key/private-config requirement ledger, per-secret Markdown files, and safe `@Computer` credential handoff prompts.
+- `docs/computa-artifacts/export-control/`: standalone Export Control sessions.
+- `docs/computa-artifacts/4d-chess/`: standalone 4D Chess sessions.
+- `docs/computa-artifacts/computa/`: standalone Computa Make No Mistakes sessions.
+- `docs/computa-artifacts/shared/`: optional shared evidence, source snapshots, or cross-session references.
+
+Actual architecture docs belong in `docs/architecture/`, as a sibling of `docs/computa-artifacts/`. Do not create architecture docs inside `docs/computa-artifacts/`.
+
+Create a new session directory for every invocation. Never overwrite an old session.
+
+Session IDs:
+
+- Export Control: `EC-YYYYMMDD-HHMMSS-slug`
+- 4D Chess: `4D-YYYYMMDD-HHMMSS-slug`
+- Computa Make No Mistakes: `CMN-YYYYMMDD-HHMMSS-slug`
+
+Standalone Computa sessions live at `docs/computa-artifacts/computa/CMN-.../`.
+If invoked by 4D Chess, Computa sessions live under the parent 4D session at `.../computa/CMN-.../`.
+If invoked by Export Control through 4D Chess, Computa sessions live under the nested 4D session.
+Every session, standalone or nested, must also be registered in `docs/computa-artifacts/session-ledger.csv` with its parent session ID when applicable.
+
+Append a `session_started` row to `docs/computa-artifacts/activity-log.csv` immediately after the session directory exists.
+
+Activity log header:
+
+`timestamp,session_id,layer,parent_session_id,event_type,scope_type,scope_id,scope_name,status,artifact_path,evidence_path,next_action,notes`
+
+Use this root CSV for resumable units only: sessions, Export Control campaigns, 4D Super-Phases, Computa phases, and Computa tasks. Do not log every subtask here; subtask progress belongs in the task-level `subtask-ledger.csv`.
+
+Immediately create `user-task.md` in the session directory before summarizing or planning. Include:
 
 - raw user request
 - timestamp
 - invocation text or skill name
-- repo/path and base branch, if known
+- invocation root, repo/path, base branch, and parent session ID if known
 - explicit permissions, exclusions, and do-not-touch constraints
 - initial assumptions
 - ambiguities and user input still needed
 
 If the task is ambiguous, still save `user-task.md`, log the ambiguity, and ask only questions that truly block safe work.
+
+After `user-task.md` exists, run `computa-speak` before any substantive planning, investigation, architecture design, or implementation. Save its output as `normalized-task.md` and `prompt-normalization-log.md` in the same session.
 
 ## Plan Directory
 
@@ -50,6 +98,10 @@ Create a plan directory with:
 - `issues-and-blockers.csv`: structured tracker with issue ID, severity, owner, status, dependency, and resolution.
 - `maps/`: living codebase/task maps created during Phase 1 and updated whenever later evidence changes the working model.
 - `reports/`: final report directory for closeout.
+
+When implementation is expected, include a modularity note in `plan.md`: which components/modules should exist, which existing modules should be reused, what files must not become catch-alls, and how the task will avoid giant files.
+
+When any planned work may need API keys, OAuth credentials, webhook secrets, model-provider tokens, deployment secrets, dashboard credentials, or private config, include a secrets note in `plan.md` and use `computa-secrets-needed` before implementation. Plan to build with env var names, placeholders, mocks, and missing-secret tests where reasonable, while clearly marking runtime/deploy verification blocked by missing private config.
 
 ## Map Directory
 
@@ -63,6 +115,7 @@ Expected map artifacts:
 - `flow-map.md`: runtime/user/data/control flows related to the task, with source files and external systems.
 - `test-and-command-map.md`: package manager, test/build/lint commands, smoke/runtime commands, existing tests, gaps, and expected verification order.
 - `risk-map.md`: risky areas, edge cases, dependencies, migrations, dashboards, credentials, production-touching surfaces, and assumptions to challenge.
+- `secrets-map.md`: private config and API keys needed or possibly needed, related code paths, env files/platform targets, and verification blocked by missing secrets. If no secrets are needed, record that.
 - `map-change-log.md`: narrative log of every map update, why it changed, what evidence caused it, and which task/phase used the updated map.
 - `map-change-ledger.csv`: structured tracker with change ID, timestamp, phase, task, subtask, map file, reason, evidence path, before/after summary, and status.
 
@@ -105,8 +158,9 @@ For each subtask, create a subdirectory or ledger row with:
 ## Ledger Rules
 
 - Log every phase, task, and subtask.
+- In addition to local ledgers, append `phase_started`, `task_started`, `task_completed`, `phase_completed`, `phase_blocked`, `session_completed`, and `session_blocked` rows to the root `docs/computa-artifacts/activity-log.csv` as those events happen.
 - Mark rows done only after evidence exists.
 - Preserve superseded plans and old evidence; do not delete audit history.
 - Add new phases, tasks, or subtasks when evidence shows the plan is incomplete.
 - Justify every plan change and update affected dependencies.
-- Keep artifacts outside the repo unless the user explicitly asks otherwise.
+- Keep artifacts under `docs/computa-artifacts/`. If this directory is inside a git repo, keep it gitignored unless the user explicitly asks to track artifacts.

@@ -1,6 +1,6 @@
 ---
 name: swarm-verify-investigate
-description: "Run Phase 1 orientation audit and Phase 2 investigation/baseline for swarm-verified work: map the codebase/task, independently verify source truth, current behavior, expected behavior, issue origin, edge cases, coverage gaps, baseline commands, and failing evidence before implementation. Use before coding or fixing bugs."
+description: "Run Phase 1 orientation audit and Phase 2 investigation/baseline for swarm-verified work: map the codebase/task, independently verify source truth, current behavior, expected behavior, issue origin, edge cases, modular component boundaries, coverage gaps, baseline commands, and failing evidence before implementation. Use before code edits, bug fixes, additions, or moderate build-from-scratch work."
 ---
 
 # Swarm Verify Investigate
@@ -38,25 +38,31 @@ Before each investigation action, state:
 Inspect the relevant source materials before changing code:
 
 - user-task.md
+- normalized-task.md when present, cross-checked against user-task.md
+- `docs/architecture/` first when it exists, especially `README.md`, `ARCHITECTURE.md`, `AUDIT-REPORT.md`, and relevant module docs
 - repo files and tests
 - PRs, branches, tickets, docs, specs, prompts, logs, dashboards, or console state
 - prior reports and ledgers
 - runtime behavior where applicable
 
-Do not infer scope from branch names alone. Use the original request and source-of-truth artifacts.
+Do not infer scope from branch names alone. Use the original request and source-of-truth artifacts. Treat existing architecture docs as orientation, not proof; verify their claims against code and record stale, wrong, missing, or unknown docs in the maps and issue ledgers.
 
 ## Orientation Audit And Map
 
 Before targeted fixes or implementation, audit the working context broadly enough to avoid editing blind.
 
+Append `phase_started` to `docs/computa-artifacts/activity-log.csv` before Phase 1 orientation begins, with `scope_name=orientation-audit` and `artifact_path` pointing at the Phase 1 directory or `maps/`.
+
 Create or update the artifact root `maps/` directory with:
 
+- `architecture-docs-map.md`: existing `docs/architecture/` files read, claims trusted only after verification, stale or missing docs, and docs surfaces that should be updated after phases.
 - `map-index.md`: map inventory, timestamps, evidence paths, and where later phases should look first.
 - `task-scope-map.md`: raw request summary, acceptance criteria, constraints, explicit exclusions, likely stakeholders, and unresolved questions.
 - `codebase-map.md`: repo roots, package/app boundaries, key modules, entrypoints, route/API surfaces, config files, generated/reference-only files, and relevant ownership boundaries.
 - `flow-map.md`: user, runtime, data, analytics, queue, network, database, deployment, or dashboard flows relevant to the task.
 - `test-and-command-map.md`: package manager, install/build/lint/test commands, existing test locations, missing test coverage, smoke/runtime commands, and Playwright/browser routes if relevant.
 - `risk-map.md`: high-risk files/systems, edge cases, migrations, external consoles, credentials/secrets boundaries, production-touching surfaces, race conditions, and assumptions to challenge.
+- `modularity-map.md`: existing component/module boundaries, reusable helpers, files at risk of becoming too large, and recommended split points for readable implementation.
 - `map-change-log.md`: narrative change log for map updates.
 - `map-change-ledger.csv`: structured change ledger for map updates.
 
@@ -76,12 +82,15 @@ Identify and log:
 - likely edge cases
 - current tests and coverage gaps
 - systems/files that may be touched
+- modular component boundaries and files that should not become catch-alls
 - safe verification commands for the repo
 - runtime QA route or endpoint, if relevant
 - map artifacts used and any map updates made
 - map change ledger rows added during this investigation
 
 Run baseline verification before changing code. Capture command output and evidence paths.
+
+Append `phase_started` to `activity-log.csv` before Phase 2 investigation/baseline begins, with `scope_name=investigation-baseline` and `artifact_path` pointing at the Phase 2 directory or baseline evidence directory. Append completion or blocked status through `swarm-verify-swarms` before moving to implementation.
 
 ## Reproduction Or Gap Proof
 

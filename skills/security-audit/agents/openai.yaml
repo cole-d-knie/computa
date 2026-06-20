@@ -1,0 +1,4 @@
+interface:
+  display_name: "Security Audit"
+  short_description: "Audit and harden security"
+  default_prompt: "Run the security audit for this codebase."

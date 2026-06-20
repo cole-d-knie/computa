@@ -1,0 +1,4 @@
+interface:
+  display_name: "Computa 4D Chess"
+  short_description: "One-shot Super-Phase orchestration"
+  default_prompt: "Use computa-4d-chess to architect, build, and execute Super-Phases for this task: ..."

@@ -1,6 +1,6 @@
 ---
 name: swarm-verify-tdd-qa
-description: "Apply test-driven development and runtime QA for swarm-verified work: failing tests before implementation, minimal fixes, passing tests after, edge cases, unit/integration/smoke checks, live API or UI verification, and Playwright for browser-visible behavior."
+description: "Apply test-driven development and runtime QA for swarm-verified work: failing tests before implementation, minimal modular fixes or builds, passing tests after, edge cases, unit/integration/smoke checks, live API or UI verification, and Playwright for browser-visible behavior."
 ---
 
 # Swarm Verify TDD QA
@@ -9,14 +9,15 @@ Use this for every implementation task that changes behavior.
 
 ## Required Dependency Skills
 
-When this subskill is invoked directly, use or trigger all Kimi-compatible swarm-verify dependencies when available:
+When this subskill is invoked directly, use or trigger all swarm-verify dependencies when available:
 
 - `caveman`: terse, concrete communication.
+- `computa-secrets-needed`: safe ledger and handoff prompts for missing API keys, OAuth credentials, webhook secrets, model-provider keys, and deployment secrets.
 - `using-superpowers`: start-of-task planning discipline.
 - `writing-plans` and `executing-plans`: plan creation and execution.
 - `test-driven-development`: fail-first implementation.
 - `systematic-debugging` or `investigate`: root-cause investigation.
-- `dispatching-parallel-agents` or Kimi agent swarm/delegation: safe swarm parallelism.
+- native agent swarm/delegation: safe swarm parallelism.
 - `requesting-code-review`: adversarial review.
 - `verification-before-completion`: completion proof.
 - `playwright`: browser-visible runtime QA.
@@ -51,6 +52,12 @@ For every meaningful code change:
 
 Do not over-engineer. Solve the verified behavior and edge cases.
 
+When this subskill is responsible for a task-level implementation step, append `task_started` to the root `docs/computa-artifacts/activity-log.csv` before changing code and `task_completed`, `task_blocked`, or `task_deferred` after verification or blocker capture. Do not duplicate subtask rows in the root log.
+
+Prefer small, modular, readable components over gigantic files. If a change starts to mix responsibilities, split it before it becomes difficult to test or review.
+
+If implementation needs an API key, OAuth credential, webhook secret, model-provider token, deployment secret, dashboard credential, or other private config, use `computa-secrets-needed` before coding against it. Build with named env vars, safe placeholders, mocks, validation guards, and missing-secret tests where reasonable. Mark only real credential-dependent runtime/deploy checks as blocked, and never store actual secret values in code, logs, artifacts, screenshots, reports, terminal output, or git.
+
 ## Default Commands
 
 Try these when appropriate:
@@ -75,6 +82,7 @@ Use the level of coverage that matches risk:
 - smoke tests for primary flows
 - edge-case tests for boundary conditions, invalid inputs, races, permissions, empty/loading states, retries, duplicate actions, and regression-prone flows
 - runtime checks for actual app/service behavior
+- missing-secret behavior tests when a feature depends on private config
 
 ## Live QA
 

@@ -1,0 +1,4 @@
+interface:
+  display_name: "UI Audit"
+  short_description: "Audit UI and UX findings"
+  default_prompt: "Run the UI audit for this app."

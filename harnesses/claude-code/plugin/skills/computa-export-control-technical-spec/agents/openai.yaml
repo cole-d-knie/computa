@@ -1,0 +1,4 @@
+interface:
+  display_name: "Computa Technical Spec"
+  short_description: "Create execution-grade technical specs"
+  default_prompt: "Create an execution-grade technical spec for this project."

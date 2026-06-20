@@ -1,0 +1,4 @@
+interface:
+  display_name: "Computa Secrets Needed"
+  short_description: "Track missing API keys safely"
+  default_prompt: "Record the secrets needed for this Computa task."

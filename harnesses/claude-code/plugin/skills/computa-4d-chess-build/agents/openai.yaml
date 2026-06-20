@@ -1,0 +1,4 @@
+interface:
+  display_name: "Computa 4D Chess Build"
+  short_description: "Create Super-Phase plans and ledgers"
+  default_prompt: "Use computa-4d-chess-build to build the Super-Phase artifact plan for this task: ..."

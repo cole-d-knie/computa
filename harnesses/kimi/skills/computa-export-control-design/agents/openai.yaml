@@ -1,0 +1,4 @@
+interface:
+  display_name: "Computa Export Control Design"
+  short_description: "Design research-backed campaigns"
+  default_prompt: "Use computa-export-control-design to research and design the 4D campaign plan for: ..."

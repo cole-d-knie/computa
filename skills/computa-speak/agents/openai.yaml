@@ -1,0 +1,4 @@
+interface:
+  display_name: "Computa Speak"
+  short_description: "Rewrite prompts for AI execution"
+  default_prompt: "Use $computa-speak to turn this raw task into a concise AI-ready coding prompt."

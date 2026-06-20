@@ -1,0 +1,4 @@
+interface:
+  display_name: "Computa Init"
+  short_description: "Initialize Computa project artifacts"
+  default_prompt: "Use $computa-init to initialize Computa artifacts for this project."

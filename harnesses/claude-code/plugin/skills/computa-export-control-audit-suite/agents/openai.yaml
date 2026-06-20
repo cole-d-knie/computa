@@ -1,0 +1,4 @@
+interface:
+  display_name: "Computa Audit Suite"
+  short_description: "Run security performance UI audits"
+  default_prompt: "Run the Export Control audit suite for this project."

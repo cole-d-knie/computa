@@ -1,7 +1,7 @@
 {
   "name": "swarm-verify",
   "version": "0.1.0",
-  "description": "Phased TDD verification with audit ledgers, runtime QA, and adversarial plus judge swarms.",
+  "description": "Research intelligence, Super-Phase architecture, phased TDD verification, runtime QA, and adversarial plus judge swarms.",
   "author": {
     "name": "Cole Knie"
   },
@@ -15,6 +15,22 @@
     "verification",
     "tdd",
     "qa",
-    "agent-swarm"
+    "agent-swarm",
+    "super-phases",
+    "architecture",
+    "research",
+    "technology-selection",
+    "technical-spec",
+    "system-design",
+    "audit-suite",
+    "security-audit",
+    "performance-audit",
+    "ui-audit",
+    "prompt-normalization",
+    "resume",
+    "activity-log",
+    "secrets",
+    "api-keys",
+    "env-vars"
   ]
 }

@@ -2,21 +2,40 @@
 
 Use these instructions when the harness does not support native `SKILL.md` discovery.
 
-When the user asks for `/computa-make-no-mistakes`, swarm verification, phased TDD execution, adversarial review, judge/verifier review, runtime QA, or audit-ready implementation:
+When the user asks for `/computa-export-control`, `/computa-4d-chess`, `/computa-make-no-mistakes`, research-first planning, swarm verification, phased TDD execution, adversarial review, judge/verifier review, runtime QA, or audit-ready implementation:
 
-1. Treat `/computa-make-no-mistakes <task>` as a request to invoke the full suite: `swarm-verify`, `swarm-verify-setup`, `swarm-verify-investigate`, `swarm-verify-tdd-qa`, `swarm-verify-swarms`, and `swarm-verify-closeout`.
-2. Immediately save the raw user request to an external `user-task.md`.
-3. Create an external artifact root with `plan.md`, `master-task-ledger.csv`, issue/blocker Markdown and CSV ledgers, phase directories, task directories, subtask ledgers, evidence logs, `maps/`, and `reports/`.
-4. When any swarm-verify phase or subworkflow is run independently, use the same available dependency capabilities: terse communication, planning, TDD, investigation, parallel agents, adversarial review, completion verification, Playwright/browser QA, and Context7/current docs.
-5. Run Phase 1 orientation audit before implementation: create `maps/map-index.md`, `task-scope-map.md`, `codebase-map.md`, `flow-map.md`, `test-and-command-map.md`, `risk-map.md`, `map-change-log.md`, and `map-change-ledger.csv`.
-6. Run Phase 2 investigation before implementation: reference and update the maps, verify source truth, current behavior, expected behavior, issue origin, edge cases, baseline commands, and failing evidence.
-7. Use TDD for behavior changes: failing test first, smallest fix, passing test after.
-8. Run unit, integration, smoke, runtime, and browser-visible QA as relevant.
-9. Use safe parallelism only for independent review/investigation/test-reading work. Do not parallelize overlapping files, shared runtime state, dashboards, databases, deployments, migrations, or dependent subtasks.
-10. After every task, run one adversarial reviewer per subtask and one judge/verifier per subtask. Only implement judge-approved recommendations.
-11. After every phase, run one adversarial reviewer per task and one judge/verifier per task. Do not close the phase until each task is approved complete, approved deferred, or blocked with evidence.
-12. Keep ledgers and maps current. Maps may change at any time as work reveals new information; track every material map update in both `maps/map-change-log.md` and `maps/map-change-ledger.csv`. Mark items done only after evidence exists.
-13. Create final Markdown reports for summary, verification still needed, blockers/open issues, original-task gap analysis, map artifacts and map-change coverage, and new issues found split fixed vs not fixed.
-14. Make one commit per completed task only after verification passes and commits are allowed. Do not push unless explicitly asked.
+1. Treat `/computa-export-control <task>` as the research/intelligence entrypoint for massive projects. Research requirements, codebase, technologies, packages, prior art, skills/MCPs/tools, technical specs when needed, security/performance/UI audit-suite documentation when a codebase/app exists, then design and execute sequential `/computa-4d-chess` campaigns.
+2. Treat `/computa-4d-chess <task>` as the Super-Phase one-shot entrypoint for ultra-long autonomous tasks, large edits, major system additions, and build-from-scratch projects. First architect the work, then build a Super-Phase plan, review it adversarially and with judges/verifiers, then execute each approved Super-Phase through `/computa-make-no-mistakes`.
+3. Every 4D Chess plan must include final `SP-999-post-run-security-audit`, executed through `/computa-make-no-mistakes` with a nested `/security-audit` task before appending 4D `session_completed`.
+4. Treat `/computa-make-no-mistakes <task>` as the phase-level suite for Jira tasks, code edits, bugfixes, system additions, and medium-scope scratch builds: `swarm-verify`, `swarm-verify-setup`, `swarm-verify-investigate`, `swarm-verify-tdd-qa`, `swarm-verify-swarms`, and `swarm-verify-closeout`.
+5. Treat `/computa-resume` as the recovery entrypoint. Inspect `docs/computa-artifacts/activity-log.csv`, `session-ledger.csv`, `secrets-needed/secrets-needed.csv`, and local ledgers to identify the latest safe resume point before executing more work.
+6. Treat `/computa-secrets-needed` as the shared ledger for API keys, OAuth credentials, webhook secrets, model-provider keys, deployment secrets, dashboard credentials, target env/platform paths, blocked verification, and safe `@Computer` handoff prompts. Never store actual secret values in code, artifacts, logs, reports, screenshots, terminal output, or git.
+7. If Export Control or 4D Chess targets an existing codebase, audit the codebase first. Do not finalize architecture, technology choices, prior-art reuse, or campaign/Super-Phase design from chat context alone.
+8. Immediately save the raw user request to `user-task.md`.
+9. Run `computa-speak` immediately after raw request capture. Save `normalized-task.md` and `prompt-normalization-log.md`; downstream work analyzes `normalized-task.md` and cross-checks `user-task.md`.
+10. Create `docs/` if missing, create or reuse `<invocation-root>/docs/computa-artifacts/`, and gitignore it when it is inside a git repo.
+11. Keep actual architecture docs as a sibling directory at `docs/architecture/`; never place them under `docs/computa-artifacts/`.
+12. Support multiple sessions in one project: standalone Export Control sessions under `docs/computa-artifacts/export-control/EC-.../`, standalone 4D sessions under `docs/computa-artifacts/4d-chess/4D-.../`, standalone Computa sessions under `docs/computa-artifacts/computa/CMN-.../`, and nested child sessions under their parent session directories.
+13. Maintain root `docs/computa-artifacts/activity-log.csv` with session, campaign, audit-suite, Super-Phase, phase, task, secret-needed, and 4D security-audit start/finish/block/defer events as they happen. Do not duplicate subtask rows there.
+14. If `docs/architecture/` exists, read it first for orientation, then verify claims against source. If architecture docs are missing or stale and the project needs handoff docs, use `computa-docs-architecture`.
+15. For Export Control work, create `requirements/`, `codebase-audit/`, `tech-radar/`, `prior-art/`, `skills-and-tools/`, `technical-spec/` when needed, `standalone-audits/`, `campaigns/`, `4d-chess/`, `reviews/`, and `reports/` inside the EC session.
+16. In Export Control, create `technical-spec/` before 4D campaign design when the work needs concrete engineering contracts. Include current/target state, module boundaries, component/API/data/integration design, env/secrets, security/privacy, rollout/backcompat, observability, test strategy, implementation slices, and acceptance contract.
+17. In Export Control, run the standalone audit suite before final 4D campaign design for existing codebases/apps. Run `security-audit`, `performance-audit`, and `ui-audit` in documentation mode, produce category findings plus `standalone-audits/remediation-backlog.csv`, then make 4D campaigns implement the accepted backlog.
+18. For 4D Chess work, create `strategic-design/`, `super-phases/`, `security-audit/`, `computa/`, `maps/`, `ledgers/`, `reviews/`, `handoffs/`, and `reports/` inside the 4D session. Actual architecture docs remain in `docs/architecture/`.
+19. For Computa phase work, create `plan.md`, `master-task-ledger.csv`, issue/blocker Markdown and CSV ledgers, phase directories, task directories, subtask ledgers, evidence logs, `maps/`, and `reports/` inside the CMN session.
+20. When any Computa subworkflow is run independently, use the same available dependency capabilities: terse communication, planning, TDD, investigation, parallel agents, adversarial review, completion verification, Playwright/browser QA, Context7/current docs, and web research when decisions depend on current external information.
+21. Run orientation audit before implementation: create `maps/map-index.md`, `architecture-docs-map.md`, `task-scope-map.md`, `codebase-map.md`, `flow-map.md`, `test-and-command-map.md`, `risk-map.md`, `secrets-map.md`, `modularity-map.md`, `map-change-log.md`, and `map-change-ledger.csv`.
+22. Investigate before implementation: reference and update the maps, verify source truth, current behavior, expected behavior, issue origin, edge cases, baseline commands, and failing evidence.
+23. Prefer small, modular, readable components over giant files.
+24. Build/spec/test as far as possible when secrets are missing; use env var names, placeholders, mocks, runtime guards, and missing-secret tests. Mark only real credential-dependent runtime/deploy verification as blocked.
+25. Use TDD for behavior changes: failing test first, smallest fix, passing test after.
+26. Run unit, integration, smoke, runtime, and browser-visible QA as relevant.
+27. Use safe parallelism only for independent review/investigation/test-reading work. Do not parallelize overlapping files, shared runtime state, dashboards, databases, deployments, migrations, or dependent subtasks.
+28. In 4D Chess, review each Super-Phase after creation and review the full Super-Phase plan before execution: one adversarial reviewer per Super-Phase, then one judge/verifier per Super-Phase.
+29. In 4D Chess closeout, execute final `SP-999-post-run-security-audit` through `/computa-make-no-mistakes`, create `security-audit/` artifacts, run the full `/security-audit` loop or document an explicit N/A/blocker, then adversarially review and judge/verify the security audit outcome.
+30. In Computa phase work, after every task run one adversarial reviewer per subtask and one judge/verifier per subtask; after every phase run the architecture-docs update hook, then one adversarial reviewer per task and one judge/verifier per task. Only implement judge-approved recommendations.
+31. Keep ledgers, maps, secrets-needed, and `activity-log.csv` current. Maps may change at any time as work reveals new information; track every material map update in both `maps/map-change-log.md` and `maps/map-change-ledger.csv`. Mark items done only after evidence exists.
+32. Create final Markdown reports for summary, verification still needed, blockers/open issues, original-task gap analysis, map artifacts and map-change coverage, architecture-docs status, secrets-needed, security audit, and new issues found split fixed vs not fixed.
+33. Make one commit per completed task only after verification passes and commits are allowed. Do not push unless explicitly asked.
 
 Golden rule: evidence before assertions. Never claim work is complete without verification command output and runtime proof.

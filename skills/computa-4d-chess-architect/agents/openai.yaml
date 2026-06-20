@@ -1,0 +1,4 @@
+interface:
+  display_name: "Computa 4D Chess Architect"
+  short_description: "Audit and spec Super-Phase strategy"
+  default_prompt: "Use computa-4d-chess-architect to audit and architect Super-Phases for this task: ..."

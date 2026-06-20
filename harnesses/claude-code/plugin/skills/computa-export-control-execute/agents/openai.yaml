@@ -1,0 +1,4 @@
+interface:
+  display_name: "Computa Export Control Execute"
+  short_description: "Run approved 4D campaigns"
+  default_prompt: "Use computa-export-control-execute to run the approved 4D campaign plan for: ..."

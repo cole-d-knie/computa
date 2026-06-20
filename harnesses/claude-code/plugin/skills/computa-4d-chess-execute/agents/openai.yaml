@@ -1,0 +1,4 @@
+interface:
+  display_name: "Computa 4D Chess Execute"
+  short_description: "Run approved Super-Phases via Computa"
+  default_prompt: "Use computa-4d-chess-execute to execute the approved Super-Phase plan for this task: ..."

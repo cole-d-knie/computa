@@ -1,0 +1,4 @@
+interface:
+  display_name: "Computa Resume"
+  short_description: "Resume recent Computa sessions from logs"
+  default_prompt: "Find the latest Computa work and tell me where to resume."

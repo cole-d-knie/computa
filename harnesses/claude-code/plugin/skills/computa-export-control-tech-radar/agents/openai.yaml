@@ -1,0 +1,4 @@
+interface:
+  display_name: "Computa Tech Radar"
+  short_description: "Research packages and tools"
+  default_prompt: "Use computa-export-control-tech-radar to research technology options for: ..."
