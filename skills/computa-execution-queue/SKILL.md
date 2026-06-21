@@ -152,6 +152,20 @@ Also append to `docs/computa-artifacts/activity-log.csv` for queue-level resume 
 
 The activity log should point to the queue file and the relevant artifact path. Do not duplicate subtask detail in the root activity log unless a subtask is the current crash-resume point and no task-level ledger is sufficient.
 
+## Completion Artifact Integration
+
+For each terminal queue item, write a completion artifact before marking the row `complete`, `deferred`, `blocked`, or `superseded` when a real artifact directory exists. Use `templates/computa-completion-artifact.md` when available.
+
+The completion artifact is the handoff contract for crash recovery and external orchestrators:
+
+- what changed
+- what was verified
+- what review gate passed or remains blocked
+- where the evidence lives
+- what the next queue item or blocker is
+
+Update the queue row `evidence_path` or `artifact_path`, the local ledger, and `activity-log.csv` to point to the completion artifact. Do not rely on chat context as proof that a queue item finished.
+
 ## Resume Contract
 
 On resume, `computa-resume` must inspect the queue before choosing the next skill. The next action should be the highest-priority ready item, not the most recent chat instruction.

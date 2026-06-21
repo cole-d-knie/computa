@@ -19,7 +19,7 @@ When this subskill is invoked directly, use or trigger all computa-swarm-verify 
 - `writing-plans` and `executing-plans`: plan creation and execution.
 - `test-driven-development`: fail-first implementation.
 - `systematic-debugging` or `investigate`: root-cause investigation.
-- native agent swarm/delegation: safe swarm parallelism.
+- `dispatching-parallel-agents` and `subagent-driven-development`: safe swarm parallelism.
 - `requesting-code-review`: adversarial review.
 - `verification-before-completion`: completion proof.
 - `playwright`: browser-visible runtime QA.
@@ -34,12 +34,14 @@ Before writing the final answer:
 - re-read `user-task.md`
 - re-read `normalized-task.md` and `prompt-normalization-log.md` when present
 - re-read all plan, phase, task, subtask, issue, blocker, and evidence ledgers
+- re-read all `completion-*.md` artifacts for terminal queue, phase, task, Super-Phase, campaign, and session rows
 - re-read root `docs/computa-artifacts/activity-log.csv`
 - re-read `docs/computa-artifacts/secrets-needed/secrets-needed.csv` and related per-secret Markdown files when they exist
 - confirm every phase/task/subtask is done or explicitly deferred with rationale
 - compare completed work to the original user request
 - identify satisfied, partially satisfied, missing, deferred, and out-of-scope items
 - append `session_completed` or `session_blocked` to `activity-log.csv` before the final response, with the final report path and exact next action
+- write a final `completion-<session-id>.md` or `reports/completion-<session-id>.md` using `templates/computa-completion-artifact.md` when available
 
 ## Final Reports
 

@@ -37,7 +37,23 @@ Completed sessions must have the expected artifact shape:
 
 Missing artifact shape is incomplete work, even if a ledger row says `complete`.
 
-## 5. Git Discipline
+## 5. Completion Artifacts Are Resume Handshakes
+
+Every terminal queue item, phase, task, Super-Phase, campaign, and top-level session should write a small completion artifact using `templates/computa-completion-artifact.md` when available.
+
+The completion artifact must record:
+
+- queue/session/scope IDs
+- terminal status and rationale
+- changed files or external systems
+- verification evidence or blocked verification
+- adversarial and judge/verifier review outcome
+- commit SHA when code changed
+- exact next queue item, blocker, or resume point
+
+Then update `execution-queue.csv`, local ledgers, and `activity-log.csv` to reference the artifact path. If a context crashes, `computa-resume` and external orchestrators must be able to continue from the artifact without trusting chat memory.
+
+## 6. Git Discipline
 
 Never use broad staging commands:
 
@@ -49,7 +65,7 @@ Never use broad staging commands:
 
 Stage intentional files explicitly. Do not let reference repos, secrets, `docs/computa-artifacts/`, dependency trees, generated caches, or unrelated user changes enter commits by accident.
 
-## 6. Hook Checks Are Evidence Gates
+## 7. Hook Checks Are Evidence Gates
 
 Before closeout or handoff, run:
 

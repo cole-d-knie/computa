@@ -251,13 +251,23 @@ def audit_shared_files(audit: Audit) -> None:
             ROOT / "harnesses" / "claude-code" / "plugin" / "templates" / "computa-execution-contract.md",
             "Claude execution contract copy",
         ),
+        (
+            ROOT / "templates" / "computa-completion-artifact.md",
+            ROOT / "harnesses" / "kimi" / "templates" / "computa-completion-artifact.md",
+            "Kimi completion artifact template copy",
+        ),
+        (
+            ROOT / "templates" / "computa-completion-artifact.md",
+            ROOT / "harnesses" / "claude-code" / "plugin" / "templates" / "computa-completion-artifact.md",
+            "Claude completion artifact template copy",
+        ),
     ]
     for source, target, label in exact_pairs:
         if not target.exists():
             audit.fail(f"{label} missing: {rel(target)}")
         elif source.read_text() != target.read_text():
             audit.fail(f"{label} drift: {rel(source)} != {rel(target)}")
-    audit.ok("validated shared hook runner and execution contract copies")
+    audit.ok("validated shared hook runner and Computa template copies")
 
 
 def audit_hook_contract(audit: Audit) -> None:

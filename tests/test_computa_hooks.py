@@ -57,6 +57,23 @@ def base_project() -> tempfile.TemporaryDirectory:
             }
         ],
     )
+    write_csv(
+        artifact / "activity-log.csv",
+        hooks.ACTIVITY_HEADER,
+        [
+            {
+                "timestamp": "2026-01-01T00:00:00Z",
+                "session_id": "EC-1",
+                "layer": "export-control",
+                "event_type": "session_started",
+                "scope_type": "session",
+                "scope_id": "EC-1",
+                "scope_name": "Export Control",
+                "status": "running",
+                "artifact_path": "export-control/EC-1",
+            }
+        ],
+    )
     (artifact / "export-control" / "EC-1").mkdir(parents=True)
     return temp
 
@@ -192,6 +209,60 @@ class ComputaHookTests(unittest.TestCase):
             data = json.loads(result.stdout)
             self.assertIn("missing required artifact", "\n".join(data["messages"]))
             self.assertIn("missing phases/ directory", "\n".join(data["messages"]))
+
+    def test_validate_flags_malformed_activity_log_extra_columns(self) -> None:
+        with base_project() as temp:
+            root = Path(temp)
+            artifact = root / "docs" / "computa-artifacts"
+            write_csv(artifact / "execution-queue.csv", hooks.QUEUE_HEADER, [queue_row(status="running")])
+            with (artifact / "activity-log.csv").open("a") as handle:
+                handle.write(
+                    "2026-01-01T00:01:00Z,EC-1,export-control,,session_started,session,EC-1,"
+                    "Export Control,running,export-control/EC-1,,,,unexpected-extra\n"
+                )
+
+            result = run_hook(["validate", "--strict", "--json"], root)
+
+            self.assertEqual(result.returncode, 2)
+            data = json.loads(result.stdout)
+            self.assertIn("Malformed activity-log.csv row", "\n".join(data["messages"]))
+
+    def test_validate_flags_duplicate_activity_start_with_different_artifact(self) -> None:
+        with base_project() as temp:
+            root = Path(temp)
+            artifact = root / "docs" / "computa-artifacts"
+            write_csv(artifact / "execution-queue.csv", hooks.QUEUE_HEADER, [queue_row(status="running")])
+            rows = [
+                {
+                    "timestamp": "2026-01-01T00:00:00Z",
+                    "session_id": "4D-1",
+                    "layer": "4d-chess",
+                    "event_type": "campaign_started",
+                    "scope_type": "campaign",
+                    "scope_id": "CAM-001",
+                    "scope_name": "Foundation",
+                    "status": "running",
+                    "artifact_path": "4d-chess/4D-1",
+                },
+                {
+                    "timestamp": "2026-01-01T00:01:00Z",
+                    "session_id": "4D-2",
+                    "layer": "4d-chess",
+                    "event_type": "campaign_started",
+                    "scope_type": "campaign",
+                    "scope_id": "CAM-001",
+                    "scope_name": "Foundation",
+                    "status": "running",
+                    "artifact_path": "4d-chess/4D-2",
+                },
+            ]
+            write_csv(artifact / "activity-log.csv", hooks.ACTIVITY_HEADER, rows)
+
+            result = run_hook(["validate", "--strict", "--json"], root)
+
+            self.assertEqual(result.returncode, 2)
+            data = json.loads(result.stdout)
+            self.assertIn("Duplicate activity start", "\n".join(data["messages"]))
 
 
 if __name__ == "__main__":

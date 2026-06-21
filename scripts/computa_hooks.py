@@ -81,6 +81,22 @@ SESSION_TERMINAL_STATUSES = {
     "superseded",
     "session_blocked",
 }
+ACTIVITY_START_EVENTS = {
+    "session_started",
+    "campaign_started",
+    "super_phase_started",
+    "phase_started",
+    "task_started",
+    "queue_item_started",
+}
+ACTIVITY_COMPLETION_EVENTS = {
+    "session_completed",
+    "campaign_completed",
+    "super_phase_completed",
+    "phase_completed",
+    "task_completed",
+    "queue_item_completed",
+}
 ROUTING_EXEMPT_STATUSES = {"deferred", "blocked", "superseded"}
 EXPAND_EVENTS = {"SessionStart", "UserPromptSubmit", "PreCompact", "PostCompact"}
 LAYER_SKILL = {
@@ -292,6 +308,32 @@ def read_csv(path: Path) -> list[dict[str, str]]:
         return [{k: (v or "") for k, v in row.items()} for row in reader]
 
 
+def csv_integrity_messages(path: Path, expected_header: list[str], label: str) -> list[str]:
+    """Catch malformed CSV before resume logic trusts corrupt rows."""
+    if not path.exists():
+        return []
+
+    messages: list[str] = []
+    with path.open(newline="") as handle:
+        reader = csv.DictReader(handle, restkey="__extra__")
+        header = reader.fieldnames or []
+        if header != expected_header:
+            messages.append(f"Invalid {label} header. Expected exact Computa {label} header.")
+        for line_no, row in enumerate(reader, start=2):
+            extras = row.get("__extra__") or []
+            if extras:
+                messages.append(
+                    f"Malformed {label} row at CSV line {line_no}: extra field(s) after {expected_header[-1]}. "
+                    "This usually means rows were joined, a field was not quoted, or a note contains raw commas."
+                )
+            missing = [field for field in expected_header if row.get(field) is None]
+            if missing:
+                messages.append(
+                    f"Malformed {label} row at CSV line {line_no}: missing field(s) {', '.join(missing[:8])}."
+                )
+    return messages
+
+
 def utc_now() -> str:
     return datetime.now(timezone.utc).replace(microsecond=0).isoformat().replace("+00:00", "Z")
 
@@ -320,13 +362,9 @@ def queue_rows(artifact_root: Path) -> tuple[list[dict[str, str]], list[str]]:
     queue_path = artifact_root / "execution-queue.csv"
     if not queue_path.exists():
         return [], [f"Missing root execution queue: {queue_path}"]
+    messages.extend(csv_integrity_messages(queue_path, QUEUE_HEADER, "execution-queue.csv"))
     with queue_path.open(newline="") as handle:
-        reader = csv.DictReader(handle)
-        header = reader.fieldnames or []
-        if header != QUEUE_HEADER:
-            messages.append(
-                "Invalid execution-queue.csv header. Expected exact Computa queue header."
-            )
+        reader = csv.DictReader(handle, restkey="__extra__")
         rows = [{k: (v or "") for k, v in row.items()} for row in reader]
     return rows, messages
 
@@ -733,6 +771,57 @@ def session_shape_messages(root: Path, artifact_root: Path, rows: list[dict[str,
     return messages
 
 
+def activity_log_messages(artifact_root: Path) -> list[str]:
+    messages: list[str] = []
+    activity_log = artifact_root / "activity-log.csv"
+    if not activity_log.exists():
+        return [f"Computa sessions exist but activity-log.csv is missing: {activity_log}"]
+
+    messages.extend(csv_integrity_messages(activity_log, ACTIVITY_HEADER, "activity-log.csv"))
+    rows = read_csv(activity_log)
+    seen_starts: dict[tuple[str, str, str, str, str], tuple[int, str]] = {}
+
+    for line_no, row in enumerate(rows, start=2):
+        event_type = row.get("event_type", "").strip()
+        status = row.get("status", "").strip()
+        artifact_path = row.get("artifact_path", "").strip()
+        evidence_path = row.get("evidence_path", "").strip()
+
+        if not row.get("timestamp", "").strip():
+            messages.append(f"activity-log.csv line {line_no} is missing timestamp.")
+        if not event_type:
+            messages.append(f"activity-log.csv line {line_no} is missing event_type.")
+            continue
+
+        if event_type in ACTIVITY_START_EVENTS:
+            key = (
+                event_type,
+                row.get("layer", "").strip(),
+                row.get("scope_type", "").strip(),
+                row.get("scope_id", "").strip(),
+                row.get("scope_name", "").strip(),
+            )
+            previous = seen_starts.get(key)
+            if previous and previous[1] != artifact_path:
+                messages.append(
+                    f"Duplicate activity start for {event_type} {row.get('scope_type')}:{row.get('scope_id') or row.get('scope_name')} "
+                    f"at CSV lines {previous[0]} and {line_no} with different artifact paths."
+                )
+            else:
+                seen_starts[key] = (line_no, artifact_path)
+
+        if event_type in ACTIVITY_COMPLETION_EVENTS and not artifact_path and not evidence_path:
+            messages.append(
+                f"activity-log.csv line {line_no} records {event_type} without artifact_path or evidence_path."
+            )
+        if status in DONE_STATUSES and event_type.endswith("_completed") and not artifact_path and not evidence_path:
+            messages.append(
+                f"activity-log.csv line {line_no} has terminal status {status} without artifact_path or evidence_path."
+            )
+
+    return messages
+
+
 def active_parent_skills(rows: list[dict[str, str]], artifact_root: Path) -> tuple[set[str], list[str]]:
     parents: set[str] = set()
     routing: list[str] = []
@@ -1119,6 +1208,7 @@ def validate(root: Path, strict: bool = False, closeout: bool = False) -> CheckR
 
     rows, queue_messages = queue_rows(artifact_root)
     messages.extend(queue_messages)
+    messages.extend(activity_log_messages(artifact_root))
 
     if not rows:
         messages.append("Computa sessions exist but execution queue has no rows.")
