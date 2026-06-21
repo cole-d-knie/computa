@@ -96,6 +96,7 @@ When `/computa-export-control` starts, queue at least:
 - campaign design
 - per-campaign review gates
 - `computa-export-control-execute`
+- final Export Control security closeout through `computa-make-no-mistakes` invoking `security-audit` when a codebase/app exists, campaigns touched security/privacy-sensitive surfaces, or the audit suite found security backlog items
 - final reports and closeout
 
 When `/computa-4d-chess` starts, queue at least:
@@ -112,7 +113,7 @@ When `/computa-4d-chess` starts, queue at least:
 - full Super-Phase plan judge/verifier review
 - `computa-4d-chess-execute`
 - every known Super-Phase execution through `computa-make-no-mistakes`
-- `SP-999-post-run-security-audit` through `computa-make-no-mistakes` invoking `security-audit`
+- 4D security/privacy checkpoint and Export Control handoff reconciliation
 - architecture docs update
 - final reports and closeout
 

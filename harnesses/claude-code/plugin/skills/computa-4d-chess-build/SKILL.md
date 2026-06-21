@@ -36,7 +36,7 @@ Create:
 - `super-phases/issues-and-blockers.md` and `.csv`: global Super-Phase issues and blockers.
 - `super-phases/reviews/`: per-Super-Phase and whole-plan adversarial plus judge/verifier reviews.
 - `super-phases/handoff-index.md`: low-context index of every Super-Phase and its invocation prompt.
-- `security-audit/`: reserved post-run `/security-audit` gate artifacts, including `invocation.md`, `summary.md`, `issues-and-blockers.md`, `issues-and-blockers.csv`, and `security-audit-ledger.csv`.
+- `security-checkpoints/`: lightweight 4D security/privacy checkpoint artifacts, including `summary.md`, `handoff-to-export-control.md`, `issues-and-blockers.md`, and `issues-and-blockers.csv`.
 
 For each Super-Phase directory `super-phases/SP-###-slug/`, create:
 
@@ -49,6 +49,7 @@ For each Super-Phase directory `super-phases/SP-###-slug/`, create:
 - `evidence-index.md`: expected evidence, commands, screenshots, logs, dashboards, runtime QA, and test outputs.
 - `secrets-needed.md`: secrets/private config this Super-Phase needs, target env/platform paths, code paths, safe `@Computer` prompt links, and blocked verification. State `none known` when none are needed.
 - `keyless-test-plan.md`: how this Super-Phase will verify secret-dependent behavior before live credentials exist, including mocks/fakes, contract tests, fixtures, synthetic webhooks/events, dry-run modes, and post-secret verification gates.
+- `security-privacy-checkpoint.md`: auth, secrets, permissions, user data, payments, webhooks, uploads, SSRF, cookies, tracking, consent, infra, dependency, admin, and privacy surfaces touched by this Super-Phase; fixes made; risks deferred; and any handoff item for Export Control final security closeout.
 - `handoff.md`: low-context handoff template for execute/resume.
 
 For every created Super-Phase, append `super_phase_created` to the root `docs/computa-artifacts/activity-log.csv` with `artifact_path` pointing at the Super-Phase directory and `next_action` naming the first prerequisite or review step.
@@ -64,25 +65,14 @@ For every created Super-Phase, also append or update root and 4D session-local `
 
 Use explicit dependencies so no Super-Phase execution can start before its build reviews pass, and no dependent Super-Phase can start before prerequisite evidence exists.
 
-Also create mandatory final Super-Phase `super-phases/SP-999-post-run-security-audit/` and include it in `super-phases/super-phase-ledger.csv`.
-
-`SP-999-post-run-security-audit` requirements:
-
-- depends on every implementation Super-Phase
-- uses the same Super-Phase artifact files as other Super-Phases
-- `computa-invocation.md` must invoke `/computa-make-no-mistakes` and instruct it to run `/security-audit` in 4D final Super-Phase implementation mode
-- creates or updates `<4D-session>/security-audit/` and `reports/security-audit.md`
-- records branch/progress file/commit range for the security audit
-- updates maps, ledgers, architecture docs, and final reports after any security changes
-- runs Super-Phase adversarial review followed by judge/verifier review
-- must be complete, explicitly N/A, or blocked/deferred with evidence and owner acceptance before 4D `session_completed`
+Do not create an automatic final security-audit Super-Phase for normal 4D runs. Full `/security-audit` belongs to Export Control final closeout after all 4D campaigns, unless the user explicitly invokes 4D as a standalone security-audit task. A 4D plan must instead create lightweight security/privacy checkpoint artifacts and hand off any unresolved sensitive findings to the parent Export Control session when one exists.
 
 ## Super-Phase Design Rules
 
 - A Super-Phase is a complete multi-phase Computa plan, not a normal task.
 - Each Super-Phase must be independently runnable through `/computa-make-no-mistakes`.
 - Each Super-Phase must produce its own Phase 0, maps, investigation, TDD/QA, swarms, closeout, and reports inside its Computa artifact root.
-- The overall 4D plan must include `SP-999-post-run-security-audit` as the final Super-Phase after all implementation Super-Phases and before 4D `session_completed`. This is not a replacement for Super-Phase security reviews; it is the final whole-codebase hardening pass orchestrated through `/computa-make-no-mistakes`.
+- The overall 4D plan must include security/privacy checkpointing and handoff, but not a full whole-codebase `/security-audit` unless the task explicitly asks for one. Export Control owns the single full final security closeout for massive multi-campaign work.
 - Keep Super-Phase prompts concise but complete enough for a fresh agent to execute without chat history.
 - When architecture docs exist, include references to the relevant docs and audit status in Super-Phase `input-context.md`, but require the nested Computa run to verify source truth.
 - Do not create overlapping Super-Phases unless the dependency order prevents simultaneous execution.

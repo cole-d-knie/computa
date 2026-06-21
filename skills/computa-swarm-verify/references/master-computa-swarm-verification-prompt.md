@@ -8,7 +8,7 @@ compelete the task following the rules Rules: /caveman
 
 <insert here>
 
-This workflow can edit existing code, add functionality to an existing system, handle debugging/implementation tasks with small-medium scope, or build a moderate project from scratch. For ultra-long autonomous projects use /computa-4d-chess. For massive research/strategy work that should decide what to build or what technologies to use before execution, use /computa-export-control. Export Control should produce `technical-spec/` before 4D campaign design when the work needs concrete engineering contracts, and `implementation-strategy/` before 4D when hard engineering issues, missing-key testability, migrations, provider integrations, concurrency/state risks, or rollout hazards could affect implementation. Existing-codebase Export Control should run the standalone audit suite (`security-audit`, `performance-audit`, and `ui-audit`) in documentation mode before final 4D campaign design. Every 4D Chess run must include final `SP-999-post-run-security-audit`, executed through `/computa-make-no-mistakes`, before marking the 4D session complete.
+This workflow can edit existing code, add functionality to an existing system, handle debugging/implementation tasks with small-medium scope, or build a moderate project from scratch. For ultra-long autonomous projects use /computa-4d-chess. For massive research/strategy work that should decide what to build or what technologies to use before execution, use /computa-export-control. Export Control should produce `technical-spec/` before 4D campaign design when the work needs concrete engineering contracts, and `implementation-strategy/` before 4D when hard engineering issues, missing-key testability, migrations, provider integrations, concurrency/state risks, or rollout hazards could affect implementation. Existing-codebase Export Control should run the standalone audit suite (`security-audit`, `performance-audit`, and `ui-audit`) in documentation mode before final 4D campaign design. 4D Chess runs lightweight security/privacy checkpoints and handoffs; Export Control runs one final `/security-audit` closeout through `/computa-make-no-mistakes` after all 4D campaigns when applicable.
 
 Prefer small, modular, readable components over gigantic files. Split by responsibility, keep APIs narrow, follow existing project boundaries, and avoid dumping unrelated behavior into one file.
 
@@ -23,7 +23,7 @@ Before starting the master workflow or any standalone phase/subskill, invoke or 
 - /computa-secrets-needed whenever API keys, OAuth credentials, webhook secrets, model-provider keys, deployment secrets, dashboard credentials, or private config are needed
 - /computa-export-control-implementation-strategy before 4D campaigns when complex engineering challenges or missing-key testability need resolution
 - /computa-make-no-mistakes-docs-update after every phase and during final closeout
-- /security-audit inside final `SP-999-post-run-security-audit`, executed by `/computa-make-no-mistakes`, before 4D `session_completed`
+- /security-audit inside Export Control final security closeout, executed once by `/computa-make-no-mistakes` after 4D campaigns when applicable
 - /superpowers or `using-superpowers`
 - `writing-plans` and `executing-plans`
 - /test-driven-development
@@ -379,7 +379,7 @@ You must provide:
 - A brief summary of what changed and why.
 - Any remaining risks, blockers, or unverified assumptions.
 - Paths to the plan, phase, task, subtask, issue, and evidence artifacts.
-- Path to `docs/computa-artifacts/activity-log.csv`, confirmation it has the latest session/phase/task/security-audit status, and the latest resume point.
+- Path to `docs/computa-artifacts/activity-log.csv`, confirmation it has the latest session/phase/task/security-checkpoint or final-security-closeout status, and the latest resume point.
 - A final `session_completed` or `session_blocked` row in `activity-log.csv` with the final report path and next action.
 
 # Commits And Pushes

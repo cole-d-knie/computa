@@ -60,8 +60,8 @@ Append a row immediately when a resumable unit starts, finishes, blocks, defers,
 Required events:
 
 - Queue: `queue_initialized`, `queue_expanded`, `queue_item_started`, `queue_item_completed`, `queue_item_blocked`, `queue_item_deferred`, `queue_item_superseded`.
-- Export Control: `session_started`, `research_task_started`, `research_task_completed`, `research_task_blocked`, `audit_suite_started`, `audit_task_started`, `audit_task_completed`, `audit_task_blocked`, `audit_suite_completed`, `audit_suite_blocked`, `campaign_started`, `campaign_completed`, `campaign_blocked`, `session_completed`, `session_blocked`.
-- 4D Chess: `session_started`, `super_phase_created`, `super_phase_started`, `super_phase_completed`, `super_phase_blocked`, `security_audit_started`, `security_audit_completed`, `security_audit_blocked`, `security_audit_deferred`, `session_completed`, `session_blocked`.
+- Export Control: `session_started`, `research_task_started`, `research_task_completed`, `research_task_blocked`, `audit_suite_started`, `audit_task_started`, `audit_task_completed`, `audit_task_blocked`, `audit_suite_completed`, `audit_suite_blocked`, `campaign_started`, `campaign_completed`, `campaign_blocked`, `security_closeout_started`, `security_closeout_completed`, `security_closeout_blocked`, `security_closeout_deferred`, `session_completed`, `session_blocked`.
+- 4D Chess: `session_started`, `super_phase_created`, `super_phase_started`, `super_phase_completed`, `super_phase_blocked`, `security_checkpoint_started`, `security_checkpoint_completed`, `security_checkpoint_blocked`, `security_checkpoint_deferred`, `session_completed`, `session_blocked`.
 - Computa Make No Mistakes: `session_started`, `phase_started`, `task_started`, `task_completed`, `phase_completed`, `phase_blocked`, `session_completed`, `session_blocked`.
 - Cross-layer secrets: `secret_needed_added`, `secret_needed_updated`, `secret_configured`, `secret_verification_blocked`.
 

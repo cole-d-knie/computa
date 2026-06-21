@@ -78,7 +78,7 @@ Before proposing Super-Phases:
 - distinguish required work from optional optimization
 - define evidence needed for each future Super-Phase
 - define what must be true before a Super-Phase can start
-- account for mandatory final Super-Phase `SP-999-post-run-security-audit`: expected branch/progress isolation, likely security surfaces, audit blockers, and any user constraints that could prevent automated hardening commits
+- identify security/privacy-sensitive surfaces for each future Super-Phase and define how they will be checkpointed, verified, and handed to Export Control final security closeout when this 4D session is nested under Export Control
 
 ## Super-Phase Candidates
 
@@ -96,7 +96,7 @@ Produce `strategic-design/super-phase-candidates.md` and `.csv` with:
 - rollback/stop conditions
 - output artifacts expected
 - completion criteria
-- relationship to final `SP-999-post-run-security-audit`, including any security-sensitive surfaces the audit must re-check after all implementation Super-Phases land
+- security/privacy checkpoint expectations, including any sensitive surfaces that Export Control final security closeout must re-check after all campaigns land
 
 ## Architect Reviews
 

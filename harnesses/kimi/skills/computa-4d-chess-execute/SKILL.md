@@ -17,8 +17,7 @@ Before execution, verify:
 - `super-phases/super-phase-ledger.csv` exists
 - `docs/computa-artifacts/secrets-needed/secrets-needed.csv` exists or can be initialized
 - each Super-Phase has `super-phase.md`, `computa-invocation.md`, `expected-artifacts.md`, and `handoff.md`
-- mandatory final `super-phases/SP-999-post-run-security-audit/` exists unless there is an explicit no-codebase/N/A blocker
-- root and 4D session-local `execution-queue.csv` exist and include rows for every Super-Phase execution, review gate, docs hook, `SP-999`, and closeout
+- root and 4D session-local `execution-queue.csv` exist and include rows for every Super-Phase execution, review gate, docs hook, security/privacy checkpoint, and closeout
 - overall Super-Phase plan is `approved_for_execution` or `approved_with_risks`
 - repo/path/base branch and permissions are known
 - no explicit do-not-touch constraint is violated
@@ -27,13 +26,13 @@ If preflight fails, stop and record a blocker. Do not improvise execution from c
 
 ## Execution Loop
 
-For each highest-priority ready Super-Phase execution queue item, including mandatory final `SP-999-post-run-security-audit`:
+For each highest-priority ready Super-Phase execution queue item:
 
 1. Confirm prerequisites are complete with evidence.
 2. Re-read the Super-Phase directory and global maps.
 3. Briefly justify starting it and challenge why it might be unsafe or premature.
 4. Append `super_phase_started` to `docs/computa-artifacts/activity-log.csv` with the Super-Phase directory as `artifact_path`.
-5. Mark the queue item `running`, append `queue_item_started`, then invoke `/computa-make-no-mistakes` using the exact prompt in `computa-invocation.md`. For `SP-999-post-run-security-audit`, that prompt must instruct Computa to run `/security-audit` in 4D final Super-Phase implementation mode.
+5. Mark the queue item `running`, append `queue_item_started`, then invoke `/computa-make-no-mistakes` using the exact prompt in `computa-invocation.md`.
 6. Require the nested Computa run to create its own child session under this 4D session at `computa/CMN-YYYYMMDD-HHMMSS-slug/`, save its own `user-task.md`, register in `docs/computa-artifacts/session-ledger.csv`, append its own phase/task activity rows to the root `activity-log.csv`, build phases/tasks/subtasks, run investigation, TDD/QA, swarms, and closeout.
 7. Import or link the nested Computa artifact root in the Super-Phase ledger.
 8. Verify the nested closeout against the Super-Phase acceptance criteria.
@@ -88,29 +87,17 @@ After each Super-Phase, record:
 - whether dependent Super-Phases may start
 - matching `activity-log.csv` row and latest resume point
 
-## Final Security Super-Phase
+## Security/Privacy Checkpoint
 
-`SP-999-post-run-security-audit` is the mandatory final Super-Phase. It is part of `super-phases/super-phase-ledger.csv`, not a hidden closeout hook.
+4D Chess does not run a mandatory full `/security-audit` at closeout. After Super-Phases finish, create or update `security-checkpoints/` and `reports/security-and-privacy-checkpoint.md` with:
 
-The nested Computa run for SP-999 must create `security-audit/` inside the 4D session with:
+- security/privacy surfaces touched by each Super-Phase
+- auth, secrets, permissions, user data, payments, webhooks, uploads, SSRF, cookies, tracking, consent, infra, dependency, admin, and privacy notes when relevant
+- security-sensitive changes already verified by the nested Computa runs
+- unresolved risks, blocked live checks, missing secrets, and owner decisions
+- explicit handoff items for the parent Export Control final security closeout when this 4D session is nested under Export Control
 
-- `invocation.md`: exact `/computa-make-no-mistakes` invocation, nested `/security-audit` invocation, repo path, starting branch, starting commit SHA, 4D session ID, and scoped audit branch/progress file names.
-- `summary.md`: final security audit outcome, applied count, N/A count, blocked/skipped prompts, most important fixes, and remaining risks.
-- `issues-and-blockers.md` and `.csv`: audit blockers, unsafe recommendations, owner decisions, and follow-up items.
-- `security-audit-ledger.csv`: audit start/end timestamps, branch, progress file, commit range, verification command summary, and final status.
-
-SP-999 execution rules:
-
-1. Append normal `super_phase_started` and `super_phase_completed` or blocked/deferred rows for SP-999.
-2. Also append `security_audit_started` to `docs/computa-artifacts/activity-log.csv` with `artifact_path` pointing to `security-audit/invocation.md` when `/security-audit` starts.
-3. Invoke `/security-audit` through `/computa-make-no-mistakes`, using branch `vibecoder/security-<4d-session-id-or-slug>` and progress file `.claude/vibecoder/security-<4d-session-id-or-slug>-progress.md`.
-4. Let `/security-audit` complete all 100 prompts or record precise blockers. Do not weaken security controls to satisfy a prompt.
-5. Import or link the security audit progress file and git commit range into `security-audit/summary.md`.
-6. Run architecture-docs update after audit changes.
-7. Run SP-999 adversarial review, then judge/verifier review. Implement only judge-approved follow-up that is safe in this closeout context; otherwise log it as follow-up.
-8. Append `security_audit_completed`, `security_audit_blocked`, or `security_audit_deferred` to `activity-log.csv`.
-
-If there is no codebase/repo to audit, SP-999 can be `deferred` with a concrete N/A reason. If the 4D run is read-only or the user forbids security hardening commits, SP-999 must be `blocked` or `deferred` and 4D cannot be marked complete unless the blocker is explicitly accepted.
+Run adversarial review, then judge/verifier review of the checkpoint. Implement only judge-approved fixes that are clearly within the 4D task scope; otherwise record them as handoff or follow-up. If the user directly invoked a standalone 4D security-audit task, the Super-Phase plan may include `/security-audit`, but that must be explicit in the task and queue, not an automatic 4D closeout rule.
 
 ## 4D Closeout
 
@@ -118,10 +105,10 @@ After all Super-Phases:
 
 - reconcile the master ledger and every Super-Phase ledger
 - reconcile root and session-local execution queues against the master ledger and every Super-Phase ledger
-- verify `SP-999-post-run-security-audit` is completed, explicitly N/A, or blocked/deferred with evidence and owner acceptance
+- verify the security/privacy checkpoint and any Export Control handoff items are current
 - append `session_completed` or `session_blocked` for the 4D session to `docs/computa-artifacts/activity-log.csv`
 - produce `reports/4d-summary.md`
-- produce `reports/security-audit.md`
+- produce `reports/security-and-privacy-checkpoint.md`
 - produce `reports/verification-needed.md`
 - produce `reports/blockers-and-open-issues.md`
 - produce `reports/gaps-vs-user-task.md`
@@ -130,6 +117,6 @@ After all Super-Phases:
 - produce `reports/secrets-needed.md` summarizing required private config, target env/platform paths, safe `@Computer` prompt paths, configured/verified status, and remaining blocked verification
 - state whether the original task is complete, partially complete, blocked, or requires owner decision
 
-Do not claim completion while a nested Computa run is still active, while any Super-Phase is unreviewed, or while SP-999 is missing from the ledger.
+Do not claim completion while a nested Computa run is still active, while any Super-Phase is unreviewed, or while the 4D security/privacy checkpoint and handoff are missing.
 
 Do not claim completion while any required execution queue row remains `queued`, `ready`, `running`, or `review_needed`.

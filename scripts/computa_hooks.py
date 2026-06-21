@@ -109,6 +109,7 @@ REQUIRED_CHILD_SKILLS = {
         "computa-export-control-audit-suite",
         "computa-export-control-design",
         "computa-export-control-execute",
+        "computa-make-no-mistakes",
     ],
     "computa-4d-chess": [
         "computa-init",
@@ -117,7 +118,6 @@ REQUIRED_CHILD_SKILLS = {
         "computa-4d-chess-architect",
         "computa-4d-chess-build",
         "computa-4d-chess-execute",
-        "security-audit",
     ],
     "computa-make-no-mistakes": [
         "computa-init",
@@ -139,7 +139,7 @@ CHILD_REQUIRED_OUTPUTS = {
     "computa-export-control-execute": "4D campaign invocations and campaign closeout",
     "computa-4d-chess-execute": "Super-Phase invocations and 4D closeout",
     "computa-make-no-mistakes": "nested Computa session, phases/tasks/subtasks, TDD/QA, reviews, closeout",
-    "security-audit": "SP-999 security audit evidence and report",
+    "security-audit": "Export Control final security closeout evidence and report",
 }
 
 
@@ -529,6 +529,13 @@ def add_child_skill_rows(rows: list[dict[str, str]], parent: dict[str, str]) -> 
         dependency = previous_id
         status = "ready" if dependencies_done(rows, dependency) else "queued"
         qid = next_queue_id(rows)
+        scope_name = f"{parent_skill} -> {skill}"
+        required_outputs = CHILD_REQUIRED_OUTPUTS.get(skill, f"/{skill} required outputs and evidence")
+        next_action = f"invoke /{skill} as required child of /{parent_skill}"
+        if parent_skill == "computa-export-control" and skill == "computa-make-no-mistakes":
+            scope_name = "computa-export-control final security closeout -> computa-make-no-mistakes"
+            required_outputs = "Export Control final security closeout through /computa-make-no-mistakes invoking /security-audit, or documented N/A/blocker"
+            next_action = "invoke /computa-make-no-mistakes for final Export Control security closeout; inside that task invoke /security-audit once if applicable"
         child = queue_row(
             queue_id=qid,
             parent_queue_id=parent.get("queue_id", ""),
@@ -536,14 +543,14 @@ def add_child_skill_rows(rows: list[dict[str, str]], parent: dict[str, str]) -> 
             layer=parent.get("layer") or SKILL_LAYER.get(parent_skill, ""),
             scope_type="child-skill",
             scope_id=skill,
-            scope_name=f"{parent_skill} -> {skill}",
+            scope_name=scope_name,
             skill=skill,
             priority=parent_priority + index,
             status=status,
             dependencies=dependency,
             artifact_path=parent.get("artifact_path", ""),
-            required_outputs=CHILD_REQUIRED_OUTPUTS.get(skill, f"/{skill} required outputs and evidence"),
-            next_action=f"invoke /{skill} as required child of /{parent_skill}",
+            required_outputs=required_outputs,
+            next_action=next_action,
             notes="auto-added by Computa queue expander hook",
         )
         rows.append(child)
@@ -577,10 +584,7 @@ def add_recursive_execution_rows(rows: list[dict[str, str]]) -> list[str]:
         ) and skill != "computa-make-no-mistakes":
             target = "computa-make-no-mistakes"
             required_outputs = "nested Computa session, phase/task ledgers, tests, reviews, closeout"
-            if scope_id.upper().startswith("SP-999") or "security" in scope_name:
-                next_action = "invoke /computa-make-no-mistakes with a task that invokes /security-audit"
-            else:
-                next_action = "invoke /computa-make-no-mistakes with the Super-Phase computa-invocation.md prompt"
+            next_action = "invoke /computa-make-no-mistakes with the Super-Phase computa-invocation.md prompt"
 
         if not target or child_skill_row(rows, row, target):
             continue
@@ -749,7 +753,7 @@ def recursive_routing_messages(rows: list[dict[str, str]], artifact_root: Path) 
     if (chess_execute_active or super_phase_rows) and not queue_has_skill(rows, "computa-make-no-mistakes"):
         routing.append(
             "4D Chess execution has Super-Phase work but no /computa-make-no-mistakes queue row. "
-            "Every Super-Phase must execute through /computa-make-no-mistakes, including SP-999."
+            "Every Super-Phase must execute through /computa-make-no-mistakes."
         )
 
     return routing

@@ -38,7 +38,7 @@ Instead, the hook runner makes recursive invocation unavoidable through the queu
 4. It checks recursive execution routing:
    - Export Control campaign execution must route to `/computa-4d-chess`.
    - 4D Chess Super-Phase execution must route to `/computa-make-no-mistakes`.
-   - SP-999 must still run through `/computa-make-no-mistakes`, which invokes `/security-audit`.
+   - Export Control final security closeout must route through `/computa-make-no-mistakes`, which invokes `/security-audit` once when applicable.
 5. It injects the exact next queue item and required skill invocation into session/prompt/compaction context.
 6. It blocks final `Stop` / `SessionEnd` if child-skill expansion or recursive routing was skipped.
 

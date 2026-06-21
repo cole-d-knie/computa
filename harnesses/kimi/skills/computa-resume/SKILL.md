@@ -34,8 +34,8 @@ This root log tracks resumable units only:
 - sessions
 - Export Control campaigns
 - Export Control audit-suite tasks
+- Export Control final security closeout
 - 4D Super-Phases
-- 4D final security Super-Phase and nested security audits
 - Computa phases
 - Computa tasks
 - research tasks and strategic design milestones
@@ -51,15 +51,15 @@ Do not expect subtask rows in the root log. For subtask progress, open the task 
 4. Read root `execution-queue.csv` and the latest active session-local `execution-queue.csv` when present. Identify ready/running/blocked/review_needed queue items and their dependencies.
 5. Identify the latest active top-level session: a session with `session_started` and no matching `session_completed` or `session_blocked`, or the most recent blocked/deferred session if nothing is active.
 6. Walk into nested children through `parent_session_id` to find the deepest active work item.
-7. Prefer unfinished queue rows over chat context. Choose the highest-priority ready item whose dependencies are complete and whose non-overlap key is safe. If no item is ready, use activity-log rows in this order: active task, active phase, active Computa session, active Super-Phase including `SP-999-post-run-security-audit`, active nested 4D security audit, active 4D session, active campaign, active Export Control audit suite, active Export Control session.
+7. Prefer unfinished queue rows over chat context. Choose the highest-priority ready item whose dependencies are complete and whose non-overlap key is safe. If no item is ready, use activity-log rows in this order: active task, active phase, active Computa session, active Super-Phase, active 4D session, active campaign, active Export Control final security closeout, active Export Control audit suite, active Export Control session.
 8. Open the referenced `artifact_path`, then read the relevant local ledger:
    - task: `task.md`, `task-log.md`, `subtask-ledger.csv`, task issues/blockers
    - phase: `phase.md`, `phase-task-ledger.csv`, phase issues/blockers
    - Computa session: `plan.md`, `master-task-ledger.csv`, `maps/`, `reports/`
    - Super-Phase: `super-phase.md`, `super-phase-ledger.csv`, `handoff.md`, nested Computa link
-   - 4D final security Super-Phase: `super-phases/SP-999-post-run-security-audit/super-phase.md`, `computa-invocation.md`, nested Computa link, `security-audit/invocation.md`, `security-audit/security-audit-ledger.csv`, `.claude/vibecoder/security-<4d-session-id-or-slug>-progress.md`
    - 4D session: `super-phases/super-phase-ledger.csv`, `super-phases/handoff-index.md`, `reports/`
    - campaign: `campaigns/campaign-ledger.csv`, campaign prompt, child 4D link
+   - Export Control final security closeout: `security-closeout/invocation.md`, `security-closeout/security-closeout-ledger.csv`, nested Computa link, `reports/final-security-closeout.md`, `.claude/vibecoder/security-<ec-session-id-or-slug>-progress.md`
    - Export Control audit suite: `standalone-audits/audit-suite-ledger.csv`, `standalone-audits/remediation-backlog.csv`, category audit directories, `standalone-audits/implementation-campaign-map.md`
    - Export Control session: `research-agenda.md`, `decision-matrix.md`, `campaigns/`, `reports/`
 9. Check whether the latest item is genuinely incomplete, blocked, or complete-but-unclosed by comparing queue rows, local ledgers, and evidence paths.
@@ -73,7 +73,7 @@ Include:
 
 - artifact root
 - latest top-level session and latest nested session
-- current layer: export-control, export-control-audit-suite, 4d-chess, final-security-super-phase, nested-security-audit, computa, phase, task, or subtask context
+- current layer: export-control, export-control-final-security-closeout, export-control-audit-suite, 4d-chess, computa, phase, task, or subtask context
 - latest activity-log row
 - latest relevant execution-queue row and whether it is ready, blocked, running, review_needed, stale, or superseded
 - current secrets-needed status, including whether missing API keys/private config block runtime/deploy verification and which safe `@Computer` prompt to use

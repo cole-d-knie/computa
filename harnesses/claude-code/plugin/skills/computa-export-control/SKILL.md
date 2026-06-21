@@ -47,7 +47,7 @@ During design, run `computa-export-control-implementation-strategy` after codeba
 
 During design, run `computa-export-control-audit-suite` after codebase/research/spec work and before final 4D campaign design when a codebase or app exists. The audit suite runs `security-audit`, `performance-audit`, and `ui-audit` in documentation mode, then produces the remediation backlog that 4D campaigns implement.
 
-During execution, each approved campaign must invoke `computa-4d-chess`. Each 4D campaign may then invoke `computa-make-no-mistakes` and must include final `SP-999-post-run-security-audit` before the campaign is marked complete.
+During execution, each approved campaign must invoke `computa-4d-chess`. Each 4D campaign may then invoke `computa-make-no-mistakes` and must produce a lightweight security/privacy checkpoint and handoff. The full `/security-audit` remediation pass belongs to Export Control final closeout after all 4D campaigns, not to every 4D campaign.
 
 ## Research Standard
 
@@ -98,6 +98,7 @@ Inside the Export Control session, at minimum create:
 - `implementation-strategy/`: complex engineering challenges, solution approaches, keyless test strategy, integration risk plan, migration/rollout plan, and campaign-readiness analysis before 4D starts.
 - `secrets-needed-readout.md`: private config/API key requirements found during research and specs, with links to root `docs/computa-artifacts/secrets-needed/` entries.
 - `standalone-audits/`: security/performance/UI audit findings, evidence, recommendations, consolidated remediation backlog, and 4D implementation campaign map.
+- `security-closeout/`: final Export Control security closeout artifacts created after campaigns when code/app security-sensitive work exists, including invocation, summary, blockers, findings/fixes, evidence, and handoff items.
 - `docs-readout/`: whether `docs/architecture/` existed, what was read, stale/missing docs findings, and whether docs were updated or should be updated before execution. This is only a session readout, not the architecture docs themselves.
 - `campaigns/`: sequential `computa-4d-chess` campaign plan, prompts, prerequisites, ledgers.
 - `4d-chess/`: child 4D Chess sessions created by this Export Control session.
@@ -130,6 +131,7 @@ The root activity log is not a replacement for campaign ledgers. It is the crash
 - Before 4D campaign design, run `computa-export-control-implementation-strategy` when hard engineering problems could affect architecture, sequencing, keyless testability, integration strategy, data model, migration plan, deployment order, or rollback. Do not make 4D improvise through unresolved engineering uncertainty.
 - Before 4D campaign design, run `computa-export-control-audit-suite` for existing codebases/apps unless explicitly N/A. Use its remediation backlog and implementation campaign map as source truth for audit-driven 4D work.
 - Do not execute 4D Chess campaigns until the export-control design has passed review or is explicitly accepted with documented risk.
+- After all 4D campaigns complete, run one Export Control final security closeout when a codebase/app exists or campaigns touched security/privacy-sensitive surfaces. Invoke `/computa-make-no-mistakes` with a task that invokes `/security-audit`, using all standalone audit findings, campaign checkpoints, 4D reports, and current source truth. If it is not applicable, record the N/A reason with evidence. Do not run this full audit once per 4D campaign.
 - Do not treat a child skill as complete because it was loaded. It is complete only when its queue item and required outputs are complete, deferred with rationale, or blocked with evidence.
 
 ## Review Gates
@@ -162,5 +164,6 @@ Finish with reports that state:
 - what implementation challenges were solved before 4D, what keyless test strategy was chosen, and what remains risky
 - what secrets/private config are needed, where they must be configured, and which verification remains blocked
 - what 4D Chess campaigns were executed or left pending
+- what final Export Control security closeout ran, fixed, deferred, blocked, or marked N/A
 - what remains unknown, risky, blocked, or owner-decision-dependent
 - whether `docs/computa-artifacts/activity-log.csv` is current and where `computa-resume` should restart if follow-up is needed

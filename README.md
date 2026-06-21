@@ -39,7 +39,7 @@ Focused sub-skills own the repeatable parts:
 - `computa-4d-chess-architect`: audits, specs, designs, and records decisions before Super-Phase planning.
 - `computa-4d-chess-build`: creates Super-Phase design, ledgers, maps, handoffs, and review gates.
 - `computa-4d-chess-execute`: executes approved Super-Phases through `computa-make-no-mistakes`.
-- `security-audit`: security findings/hardening skill; Export Control uses it in documentation mode and 4D Chess runs it through `SP-999-post-run-security-audit`.
+- `security-audit`: security findings/hardening skill; Export Control uses it in documentation mode and once during Export Control final security closeout when applicable.
 - `performance-audit`: performance findings/optimization skill for Export Control audit documentation and direct optimization work.
 - `ui-audit`: UI/UX findings/polish skill for Export Control audit documentation and direct UI work.
 - `computa-make-no-mistakes`: one command that loads the master skill, every subskill, and the full dependency set.
@@ -321,7 +321,7 @@ The workflow must:
 - use `computa-export-control-technical-spec` before 4D campaign design when work needs concrete engineering contracts instead of broad product or architecture prose
 - use `computa-export-control-implementation-strategy` before 4D campaign design when hard engineering issues, provider integrations, missing keys, migrations, state/concurrency risks, unclear testability, or rollout hazards could affect implementation
 - run `computa-export-control-audit-suite` after Export Control research/spec work and before final 4D campaign design for existing codebases/apps
-- include final `SP-999-post-run-security-audit` in every 4D Chess Super-Phase plan, executed through `computa-make-no-mistakes`, before marking the 4D session complete
+- run a single Export Control final security closeout through `computa-make-no-mistakes` invoking `security-audit` when applicable; 4D Chess runs lightweight security/privacy checkpoints and handoffs, not mandatory per-campaign full audits
 - use `computa-4d-chess` for work that needs Super-Phases above normal Computa phases
 - use `computa-make-no-mistakes` for debugging/implementation tasks with small-medium scope, edits, system additions, and medium-scope scratch builds
 - use `computa-docs-architecture` to create or update source-backed `docs/architecture/` docs, and use `computa-make-no-mistakes-docs-update` after every Computa phase

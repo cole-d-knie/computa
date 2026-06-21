@@ -25,6 +25,7 @@ Verify these exist:
 - `implementation-strategy/campaign-readiness.md` when campaigns depend on complex engineering decisions
 - `standalone-audits/remediation-backlog.csv` when a codebase/app audit suite was required
 - `standalone-audits/implementation-campaign-map.md` when a codebase/app audit suite was required
+- `security-closeout/` can be initialized for final Export Control security closeout when a codebase/app exists or campaigns may touch security/privacy-sensitive surfaces
 - `secrets-needed-readout.md` and root `docs/computa-artifacts/secrets-needed/secrets-needed.csv` when the design found private config requirements
 - `campaigns/campaign-sequence.md`
 - `campaigns/campaign-ledger.csv`
@@ -48,9 +49,9 @@ For each highest-priority ready approved campaign queue item in dependency order
 3. Briefly justify why this campaign should start now and challenge why that might be wrong.
 4. Append `campaign_started` to `docs/computa-artifacts/activity-log.csv` with the campaign prompt or directory as `artifact_path`.
 5. Mark the campaign queue item `running`, append `queue_item_started`, then invoke `/computa-4d-chess` with the exact campaign prompt.
-6. Require the 4D run to create its own child session under this Export Control session at `4d-chess/4D-YYYYMMDD-HHMMSS-slug/`, create Super-Phases, reviews, nested Computa runs, include final `SP-999-post-run-security-audit`, update root `activity-log.csv`, and closeout.
+6. Require the 4D run to create its own child session under this Export Control session at `4d-chess/4D-YYYYMMDD-HHMMSS-slug/`, create Super-Phases, reviews, nested Computa runs, update root `activity-log.csv`, produce a security/privacy checkpoint and handoff, and closeout.
 7. Link the 4D session path in `campaigns/campaign-ledger.csv` and register it in `docs/computa-artifacts/session-ledger.csv` with this Export Control session as parent.
-8. Verify the 4D closeout against export-control decisions, standalone audit backlog items, campaign acceptance criteria, and final `SP-999-post-run-security-audit` status.
+8. Verify the 4D closeout against export-control decisions, standalone audit backlog items, campaign acceptance criteria, and the campaign security/privacy checkpoint.
 9. Verify the campaign reconciled `docs/computa-artifacts/secrets-needed/` and did not hide private-config blockers.
 10. Run campaign-level adversarial review.
 11. Run campaign-level judge/verifier review.
@@ -72,6 +73,19 @@ If a campaign reveals that the design is wrong:
 
 Never silently skip, merge, reorder, or broaden campaigns.
 
+## Final Security Closeout
+
+After all campaign queue items are complete, blocked with accepted evidence, or deferred with rationale, reconcile security/privacy evidence before Export Control closeout:
+
+1. Read standalone audit-suite security findings, each campaign's 4D security/privacy checkpoint, campaign closeout reports, secrets-needed entries, architecture docs, and current source truth.
+2. Create or update `security-closeout/invocation.md`, `security-closeout/summary.md`, `security-closeout/issues-and-blockers.md`, `security-closeout/issues-and-blockers.csv`, and `security-closeout/security-closeout-ledger.csv`.
+3. If a codebase/app exists or campaigns touched security/privacy-sensitive surfaces, invoke `/computa-make-no-mistakes` with a scoped task that invokes `/security-audit` once for the Export Control session. Use an Export-Control-scoped branch/progress file name and record command/test/runtime evidence.
+4. If full security closeout is not applicable, read-only, or blocked by explicit constraints, write an evidence-backed N/A/blocker instead of running it.
+5. Run adversarial review, then judge/verifier review of the final security closeout. Implement only judge-approved follow-up that is safe inside the Export Control scope; otherwise record follow-up or owner decision.
+6. Append `security_closeout_started` and `security_closeout_completed`, `security_closeout_blocked`, or `security_closeout_deferred` rows to `docs/computa-artifacts/activity-log.csv`.
+
+Do not run this final full `/security-audit` after every 4D campaign. 4D campaigns provide checkpoints and handoff items; Export Control owns the single whole-program closeout.
+
 ## Parallelism
 
 Export Control defaults to sequential 4D campaigns because these are massive projects. Parallelize only if all are true:
@@ -92,6 +106,7 @@ Produce:
 - `reports/technology-and-reuse-report.md`
 - `reports/implementation-strategy.md`
 - `reports/standalone-audit-findings.md`
+- `reports/final-security-closeout.md`
 - `reports/campaign-execution-report.md`
 - `reports/blockers-open-issues-and-owner-decisions.md`
 - `reports/secrets-needed.md`
@@ -101,5 +116,7 @@ Produce:
 Append `session_completed` or `session_blocked` for the Export Control session to `docs/computa-artifacts/activity-log.csv`.
 
 Before session closeout, reconcile root and session-local execution queues. Do not mark Export Control complete while required child skill, campaign, review, reconciliation, or report rows remain `queued`, `ready`, `running`, or `review_needed`.
+
+Do not mark Export Control complete until the final security closeout is completed, explicitly N/A, blocked/deferred with evidence, or outside the task scope by user instruction.
 
 State whether the massive project is complete, partially complete, blocked, or ready for the next export-control cycle, and include the latest resume point from `activity-log.csv`.

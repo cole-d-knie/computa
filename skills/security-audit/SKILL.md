@@ -1,6 +1,6 @@
 ---
 name: security-audit
-description: Security audit and hardening skill for authentication, access control, injection, secrets, data exposure, privacy, and related app security risks. Use directly with /security-audit, inside Computa Export Control audit-suite documentation mode, or inside the mandatory Computa 4D final Super-Phase SP-999 where /computa-make-no-mistakes orchestrates security remediation before 4D closeout.
+description: Security audit and hardening skill for authentication, access control, injection, secrets, data exposure, privacy, and related app security risks. Use directly with /security-audit, inside Computa Export Control audit-suite documentation mode, or inside Export Control final security closeout where /computa-make-no-mistakes orchestrates remediation after 4D campaigns complete.
 allowed-tools: Read Edit Write Grep Glob Bash(git *) Bash(npm *) Bash(npx *) Bash(pnpm *) Bash(yarn *) Bash(bun *)
 ---
 
@@ -31,23 +31,23 @@ For each prompt, record whether it is applicable, not applicable, already satisf
 
 Use subagents for read-only batch investigation when available. Suggested batches are 10 prompts each. Do not parallelize batches that require shared runtime state, credentials, dashboards, migrations, or write access.
 
-### 4D Final Super-Phase Implementation Mode
+### Export Control Final Security Closeout Mode
 
-Use when invoked by `/computa-make-no-mistakes` from `SP-999-post-run-security-audit`. This is the mandatory final 4D Super-Phase, not a hidden closeout hook.
+Use when invoked by `/computa-make-no-mistakes` from Export Control final security closeout. This is the single post-campaign closeout for an Export Control session, not a hidden 4D closeout hook and not something to run after every 4D campaign.
 
 The nested Computa run must:
 
 - save its own `user-task.md`
-- use the 4D-scoped branch `vibecoder/security-<4d-session-id-or-slug>` unless the parent task forbids branches
-- use `.claude/vibecoder/security-<4d-session-id-or-slug>-progress.md`
+- use an Export-Control-scoped branch such as `vibecoder/security-<ec-session-id-or-slug>` unless the parent task forbids branches
+- use an Export-Control-scoped progress file such as `.claude/vibecoder/security-<ec-session-id-or-slug>-progress.md`
 - read `references/prompts.md`
 - turn relevant prompt findings into Computa phases/tasks/subtasks
 - create tests or verification evidence before and after fixes where possible
 - make scoped commits only when commits are allowed
 - update maps, ledgers, architecture docs, and final reports after security changes
-- write or update `<4D-session>/security-audit/` and `reports/security-audit.md`
+- write or update `<Export-Control-session>/security-closeout/` and `reports/final-security-closeout.md`
 
-The final 4D session cannot append `session_completed` until this Super-Phase is completed, explicitly N/A, or blocked/deferred with evidence and owner acceptance.
+The Export Control session cannot append `session_completed` until this final closeout is completed, explicitly N/A, or blocked/deferred with evidence and owner acceptance.
 
 ### Direct Remediation Mode
 
@@ -69,7 +69,7 @@ Use when the user directly invokes `/security-audit` and asks for hardening. Wor
 
 ## Review Gate
 
-Before handing findings to Export Control or closing SP-999:
+Before handing findings to Export Control or closing final security closeout:
 
 1. Run adversarial review of coverage, missed security surfaces, weak evidence, false positives, unsafe recommendations, and missing tests.
 2. Run judge/verifier review of the adversarial findings.
