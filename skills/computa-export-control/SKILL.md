@@ -7,6 +7,8 @@ description: Top-level Computa intelligence and quarterback skill for massive pr
 
 Use this as the top layer above `computa-4d-chess`.
 
+Before planning or closeout, follow the hook-enforced Computa execution contract when available: `templates/computa-execution-contract.md`. Queue validation is not optional; if the contract and prose disagree, fix the artifacts or queue before continuing.
+
 Hierarchy:
 
 1. `computa-export-control`: research, decide, and quarterback multiple 4D campaigns.
@@ -133,6 +135,7 @@ The root activity log is not a replacement for campaign ledgers. It is the crash
 - Do not execute 4D Chess campaigns until the export-control design has passed review or is explicitly accepted with documented risk.
 - After all 4D campaigns complete, run one Export Control final security closeout when a codebase/app exists or campaigns touched security/privacy-sensitive surfaces. Invoke `/computa-make-no-mistakes` with a task that invokes `/security-audit`, using all standalone audit findings, campaign checkpoints, 4D reports, and current source truth. If it is not applicable, record the N/A reason with evidence. Do not run this full audit once per 4D campaign.
 - Do not treat a child skill as complete because it was loaded. It is complete only when its queue item and required outputs are complete, deferred with rationale, or blocked with evidence.
+- Do not use broad staging commands such as `git add .`, `git add -A`, `git add --all`, `git add -u`, or `git add :/`. Stage intentional files explicitly.
 
 ## Review Gates
 
@@ -167,3 +170,4 @@ Finish with reports that state:
 - what final Export Control security closeout ran, fixed, deferred, blocked, or marked N/A
 - what remains unknown, risky, blocked, or owner-decision-dependent
 - whether `docs/computa-artifacts/activity-log.csv` is current and where `computa-resume` should restart if follow-up is needed
+- whether `computa_hooks.py validate --strict` and `validate --closeout --strict` pass, or the exact remaining queue/artifact blockers if they do not

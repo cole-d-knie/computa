@@ -11,6 +11,7 @@ import argparse
 import csv
 import json
 import os
+import re
 import subprocess
 import sys
 from dataclasses import dataclass
@@ -141,6 +142,30 @@ CHILD_REQUIRED_OUTPUTS = {
     "computa-make-no-mistakes": "nested Computa session, phases/tasks/subtasks, TDD/QA, reviews, closeout",
     "security-audit": "Export Control final security closeout evidence and report",
 }
+COMMAND_PAYLOAD_KEYS = {
+    "command",
+    "cmd",
+    "shell_command",
+    "bash_command",
+    "script",
+}
+COMMAND_CONTAINER_KEYS = {
+    "tool_input",
+    "toolInput",
+    "parameters",
+    "params",
+    "args",
+    "arguments",
+    "input",
+}
+UNSAFE_SHELL_EVENTS = {"PreToolUse", "PermissionRequest", "BeforeShellExecution"}
+UNSAFE_GIT_ADD_PATTERNS = [
+    re.compile(r"(^|[;&|]\s*)git\s+add\s+(?:--\s+)?\.(?:\s|$)"),
+    re.compile(r"(^|[;&|]\s*)git\s+add\s+(?:--\s+)?:\/?(?:\s|$)"),
+    re.compile(r"(^|[;&|]\s*)git\s+add\s+(?:-[^\s]*A[^\s]*|--all)(?:\s|$)"),
+    re.compile(r"(^|[;&|]\s*)git\s+add\s+(?:-[^\s]*A[^\s]*|--all)\s+\.(?:\s|$)"),
+    re.compile(r"(^|[;&|]\s*)git\s+add\s+(?:-[^\s]*u[^\s]*|--update)(?:\s|$)"),
+]
 
 
 @dataclass
@@ -174,6 +199,49 @@ def read_stdin_json() -> dict[str, Any]:
     except json.JSONDecodeError:
         return {}
     return data if isinstance(data, dict) else {}
+
+
+def iter_hook_command_strings(value: Any, depth: int = 0) -> list[str]:
+    """Extract likely shell commands from hook payloads without scanning prose."""
+    if depth > 8:
+        return []
+    commands: list[str] = []
+    if isinstance(value, dict):
+        for key, nested in value.items():
+            normalized = str(key)
+            if normalized in COMMAND_PAYLOAD_KEYS and isinstance(nested, str):
+                commands.append(nested)
+            elif normalized in COMMAND_CONTAINER_KEYS:
+                commands.extend(iter_hook_command_strings(nested, depth + 1))
+        return commands
+    if isinstance(value, list):
+        for item in value:
+            commands.extend(iter_hook_command_strings(item, depth + 1))
+    return commands
+
+
+def unsafe_git_add_reason(command: str) -> str | None:
+    compact = " ".join(command.strip().split())
+    if not compact:
+        return None
+    for pattern in UNSAFE_GIT_ADD_PATTERNS:
+        if pattern.search(compact):
+            return (
+                "Broad git staging is blocked by Computa. Stage intentional files explicitly; "
+                "do not use `git add .`, `git add -A`, `git add --all`, `git add -u`, or `git add :/`."
+            )
+    return None
+
+
+def unsafe_shell_policy_messages(event: str, payload: dict[str, Any]) -> list[str]:
+    if event not in UNSAFE_SHELL_EVENTS:
+        return []
+    messages: list[str] = []
+    for command in iter_hook_command_strings(payload):
+        reason = unsafe_git_add_reason(command)
+        if reason:
+            messages.append(reason)
+    return messages
 
 
 def git_root(start: Path) -> Path | None:
@@ -310,6 +378,18 @@ def row_status(row: dict[str, str]) -> str:
     return row.get("status", "").strip().lower()
 
 
+def row_is_terminal(row: dict[str, str]) -> bool:
+    return row_status(row) in DONE_STATUSES
+
+
+def row_has_rationale(row: dict[str, str]) -> bool:
+    return bool(
+        row.get("notes", "").strip()
+        or row.get("evidence_path", "").strip()
+        or row.get("next_action", "").strip()
+    )
+
+
 def next_queue_id(rows: list[dict[str, str]]) -> str:
     used = {row.get("queue_id", "") for row in rows}
     index = 1
@@ -406,6 +486,32 @@ def child_skill_row(
     return None
 
 
+def child_skill_rows(
+    rows: list[dict[str, str]],
+    parent: dict[str, str],
+    skill: str,
+) -> list[dict[str, str]]:
+    expected = normalize_skill(skill)
+    parent_id = parent.get("queue_id", "")
+    session_id = parent.get("session_id", "")
+    matches: list[dict[str, str]] = []
+    for row in rows:
+        if normalize_skill(row.get("skill", "")) != expected:
+            continue
+        if row_status(row) == "superseded":
+            continue
+        if parent_id and row.get("parent_queue_id") == parent_id:
+            matches.append(row)
+            continue
+        if (
+            session_id
+            and row.get("session_id") == session_id
+            and row.get("scope_type", "").strip().lower() in {"child-skill", "recursive-skill"}
+        ):
+            matches.append(row)
+    return matches
+
+
 def queue_has_skill(rows: list[dict[str, str]], skill: str) -> bool:
     expected = normalize_skill(skill)
     return any(
@@ -420,6 +526,211 @@ def dependencies_done(rows: list[dict[str, str]], dependencies: str) -> bool:
         return True
     by_id = {row.get("queue_id", ""): row for row in rows}
     return all(by_id.get(dep, {}).get("status") in {"complete", "deferred"} for dep in parse_dependencies(dependencies))
+
+
+def terminal_rationale_messages(rows: list[dict[str, str]]) -> list[str]:
+    messages: list[str] = []
+    for row in rows:
+        status = row_status(row)
+        if status in {"deferred", "blocked", "superseded"} and not row_has_rationale(row):
+            messages.append(
+                f"Queue row {row.get('queue_id')} is {status} without notes, evidence_path, or next_action rationale."
+            )
+    return messages
+
+
+def parent_completion_messages(rows: list[dict[str, str]]) -> list[str]:
+    messages: list[str] = []
+    for parent in rows:
+        parent_skill = normalize_skill(parent.get("skill", ""))
+        if parent_skill not in REQUIRED_CHILD_SKILLS:
+            continue
+        if row_status(parent) != "complete":
+            continue
+        missing: list[str] = []
+        non_terminal: list[str] = []
+        weak_terminal: list[str] = []
+        for skill in REQUIRED_CHILD_SKILLS[parent_skill]:
+            matches = child_skill_rows(rows, parent, skill)
+            if not matches:
+                missing.append(skill)
+                continue
+            if not any(row_is_terminal(row) for row in matches):
+                non_terminal.extend(
+                    f"{row.get('queue_id')}:{row.get('status') or 'missing-status'}"
+                    for row in matches
+                )
+                continue
+            for row in matches:
+                if row_status(row) in {"deferred", "blocked", "superseded"} and not row_has_rationale(row):
+                    weak_terminal.append(f"{row.get('queue_id')}:{row_status(row)}")
+        if missing:
+            messages.append(
+                f"Completed /{parent_skill} row {parent.get('queue_id')} is missing required child rows: "
+                + ", ".join(f"/{skill}" for skill in missing[:12])
+                + ("" if len(missing) <= 12 else f", +{len(missing) - 12} more")
+            )
+        if non_terminal:
+            messages.append(
+                f"Completed /{parent_skill} row {parent.get('queue_id')} has non-terminal child rows: "
+                + ", ".join(non_terminal[:20])
+            )
+        if weak_terminal:
+            messages.append(
+                f"Completed /{parent_skill} row {parent.get('queue_id')} has deferred/blocked/superseded children without rationale: "
+                + ", ".join(weak_terminal[:20])
+            )
+    return messages
+
+
+def resolve_artifact_path(root: Path, artifact_root: Path, value: str) -> Path | None:
+    raw = value.strip()
+    if not raw:
+        return None
+    path = Path(raw).expanduser()
+    candidates: list[Path]
+    if path.is_absolute():
+        candidates = [path]
+    else:
+        candidates = [
+            root / path,
+            artifact_root / path,
+            artifact_root.parent.parent / path if artifact_root.parent.parent.exists() else root / path,
+        ]
+    for candidate in candidates:
+        if candidate.exists():
+            return candidate
+    return candidates[0] if candidates else None
+
+
+def row_artifact_messages(root: Path, artifact_root: Path, rows: list[dict[str, str]], closeout: bool) -> list[str]:
+    messages: list[str] = []
+    for row in rows:
+        if row_status(row) != "complete" and not closeout:
+            continue
+        for field in ["artifact_path", "evidence_path"]:
+            value = row.get(field, "").strip()
+            if not value:
+                continue
+            candidate = resolve_artifact_path(root, artifact_root, value)
+            if candidate and not candidate.exists():
+                messages.append(
+                    f"Queue row {row.get('queue_id')} is {row_status(row) or 'unknown'} but {field} does not exist: {value}"
+                )
+    return messages
+
+
+def require_file(path: Path, rel: str, messages: list[str], label: str) -> None:
+    if not (path / rel).exists():
+        messages.append(f"{label} missing required artifact: {path / rel}")
+
+
+def cmn_shape_messages(path: Path, label: str) -> list[str]:
+    messages: list[str] = []
+    if not path.exists() or not path.is_dir():
+        messages.append(f"{label} artifact directory is missing: {path}")
+        return messages
+    require_file(path, "user-task.md", messages, label)
+    if not ((path / "normalized-task.md").exists() or (path / "plan.md").exists()):
+        messages.append(f"{label} missing normalized-task.md or plan.md: {path}")
+    phases = path / "phases"
+    if not phases.exists():
+        messages.append(f"{label} missing phases/ directory: {phases}")
+        return messages
+    phase_dirs = sorted(child for child in phases.iterdir() if child.is_dir())
+    if not phase_dirs:
+        messages.append(f"{label} has phases/ but no phase directories: {phases}")
+        return messages
+    for phase in phase_dirs:
+        require_file(phase, "phase.md", messages, f"{label} phase {phase.name}")
+        if not ((phase / "phase-ledger.csv").exists() or (phase / "phase-task-ledger.csv").exists()):
+            messages.append(f"{label} phase {phase.name} missing phase-ledger.csv or phase-task-ledger.csv")
+        tasks = phase / "tasks"
+        if not tasks.exists():
+            messages.append(f"{label} phase {phase.name} missing tasks/ directory")
+            continue
+        task_dirs = sorted(child for child in tasks.iterdir() if child.is_dir())
+        if not task_dirs:
+            messages.append(f"{label} phase {phase.name} has no task directories")
+        for task in task_dirs:
+            require_file(task, "task.md", messages, f"{label} task {task.name}")
+            require_file(task, "task-ledger.csv", messages, f"{label} task {task.name}")
+            if not ((task / "subtasks.csv").exists() or (task / "subtask-ledger.csv").exists()):
+                messages.append(f"{label} task {task.name} missing subtasks.csv or subtask-ledger.csv")
+    return messages
+
+
+def chess_shape_messages(path: Path, label: str) -> list[str]:
+    messages: list[str] = []
+    if not path.exists() or not path.is_dir():
+        messages.append(f"{label} artifact directory is missing: {path}")
+        return messages
+    require_file(path, "user-task.md", messages, label)
+    super_phases = path / "super-phases"
+    if not super_phases.exists():
+        messages.append(f"{label} missing super-phases/ directory: {super_phases}")
+        return messages
+    sp_dirs = sorted(child for child in super_phases.iterdir() if child.is_dir())
+    if not sp_dirs:
+        messages.append(f"{label} has super-phases/ but no Super-Phase directories")
+    for sp_dir in sp_dirs:
+        if not ((sp_dir / "super-phase.md").exists() or (sp_dir / "plan.md").exists()):
+            messages.append(f"{label} Super-Phase {sp_dir.name} missing super-phase.md or plan.md")
+        if not ((sp_dir / "super-phase-ledger.csv").exists() or (sp_dir / "phase-ledger.csv").exists()):
+            messages.append(f"{label} Super-Phase {sp_dir.name} missing super-phase-ledger.csv or phase-ledger.csv")
+        if not (
+            (sp_dir / "computa-invocation.md").exists()
+            or (sp_dir / "computa").exists()
+            or any(sp_dir.glob("**/CMN-*"))
+        ):
+            messages.append(f"{label} Super-Phase {sp_dir.name} missing computa invocation or nested CMN artifact")
+    return messages
+
+
+def export_control_shape_messages(path: Path, label: str) -> list[str]:
+    messages: list[str] = []
+    if not path.exists() or not path.is_dir():
+        messages.append(f"{label} artifact directory is missing: {path}")
+        return messages
+    for rel in ["user-task.md", "normalized-task.md", "execution-queue.csv"]:
+        require_file(path, rel, messages, label)
+    if not ((path / "campaigns").exists() or (path / "reports").exists()):
+        messages.append(f"{label} missing campaigns/ or reports/ directory: {path}")
+    return messages
+
+
+def session_shape_messages(root: Path, artifact_root: Path, rows: list[dict[str, str]], closeout: bool) -> list[str]:
+    messages: list[str] = []
+    session_ledger = artifact_root / "session-ledger.csv"
+    if session_ledger.exists():
+        for session in read_csv(session_ledger):
+            status = session.get("status", "").strip().lower()
+            if status in SESSION_TERMINAL_STATUSES and not closeout:
+                continue
+            session_path = session.get("session_path", "").strip()
+            if session_path:
+                resolved = resolve_artifact_path(root, artifact_root, session_path)
+                if resolved and not resolved.exists():
+                    messages.append(f"Session {session.get('session_id')} path missing: {session_path}")
+
+    for row in rows:
+        if row_status(row) != "complete" and not closeout:
+            continue
+        skill = normalize_skill(row.get("skill", ""))
+        artifact = row.get("artifact_path", "").strip()
+        if not artifact:
+            continue
+        resolved = resolve_artifact_path(root, artifact_root, artifact)
+        if not resolved or not resolved.exists():
+            continue
+        label = f"Queue row {row.get('queue_id')} /{skill}"
+        if skill == "computa-make-no-mistakes":
+            messages.extend(cmn_shape_messages(resolved, label))
+        elif skill == "computa-4d-chess":
+            messages.extend(chess_shape_messages(resolved, label))
+        elif skill == "computa-export-control":
+            messages.extend(export_control_shape_messages(resolved, label))
+    return messages
 
 
 def active_parent_skills(rows: list[dict[str, str]], artifact_root: Path) -> tuple[set[str], list[str]]:
@@ -844,6 +1155,10 @@ def validate(root: Path, strict: bool = False, closeout: bool = False) -> CheckR
             ]
             messages.append("Closeout blocked; active queue rows remain: " + "; ".join(labels))
         next_item = first_ready_item(rows)
+        messages.extend(terminal_rationale_messages(rows))
+        messages.extend(parent_completion_messages(rows))
+        messages.extend(row_artifact_messages(root, artifact_root, rows, closeout))
+        messages.extend(session_shape_messages(root, artifact_root, rows, closeout))
 
     routing_messages = recursive_routing_messages(rows, artifact_root)
     if closeout and routing_messages:
@@ -927,6 +1242,11 @@ def run_hook(args: argparse.Namespace) -> int:
         event = "Stop" if args.closeout else "SessionStart"
 
     root = detect_root(args.root, payload)
+    policy_messages = unsafe_shell_policy_messages(event, payload)
+    if policy_messages:
+        context = "Computa hook blocked unsafe command. " + " ".join(policy_messages)
+        return output_hook_result(args.format, event, False, context, additional_context=context)
+
     expand_messages: list[str] = []
     if args.expand_queue or event in EXPAND_EVENTS:
         expand_result = expand_queue(root)

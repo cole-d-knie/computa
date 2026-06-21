@@ -7,6 +7,8 @@ description: Inspect docs/computa-artifacts logs and ledgers to resume the lates
 
 Use this to recover work from artifacts, not chat memory. It is read-only by default unless the user asks to continue execution.
 
+When available, run or emulate `scripts/computa_hooks.py validate --strict`, `scripts/computa_hooks.py next`, and the contract in `templates/computa-execution-contract.md` before trusting a ledger row that claims completion.
+
 ## Inputs
 
 Start at the invocation root. If inside a git repo, prefer the git top-level. Look for:

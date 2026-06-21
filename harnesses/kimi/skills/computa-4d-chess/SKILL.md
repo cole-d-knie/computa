@@ -7,6 +7,8 @@ description: One-shot Computa super-phase entrypoint for ultra-long autonomous t
 
 Use this as the one-shot entrypoint for work that needs one level above Computa phases: ultra-long autonomous tasks, large system changes, large code edits, or major build-from-scratch projects.
 
+Before architecture, execution, and closeout, follow the hook-enforced Computa execution contract when available: `templates/computa-execution-contract.md`. If hook validation reports missing child rows, active rows, or broken artifact shape, correct the queue/artifacts before claiming progress.
+
 For massive research/strategy work that should decide what technologies, packages, prior art, tools, or requirements to use before 4D execution, use `computa-export-control`.
 
 Computa creates and executes phases. 4D Chess creates and executes Super-Phases. A Super-Phase is a complete multi-phase Computa plan with its own inputs, acceptance criteria, artifact root, ledgers, maps, evidence, reviews, and closeout.
@@ -74,6 +76,7 @@ If a dependency is missing, continue with equivalent behavior and record it in t
 - Build and execute Super-Phases as far as possible even when API keys, OAuth credentials, webhook secrets, model-provider tokens, deployment secrets, or dashboard/private config are missing. A missing key is not a valid reason to skip a Super-Phase unless the key is required to choose the architecture safely and no mock, fixture, docs, sandbox substitute, or owner decision can resolve the choice. Use `computa-secrets-needed` to record the required secrets, target env/platform paths, code paths, blocked verification, and safe `@Computer` handoff prompts. Do not store actual secret values.
 - Every secret-dependent Super-Phase must define keyless tests before execution: mocks/fakes, provider adapters, contract tests, fixture payloads, synthetic webhooks/events, dry-run paths, env-validation tests, and negative-path behavior for missing/invalid credentials. Only live provider calls and dashboard-side checks may remain blocked by the missing key.
 - Do not push unless explicitly asked.
+- Do not use broad staging commands such as `git add .`, `git add -A`, `git add --all`, `git add -u`, or `git add :/`. Stage intentional files explicitly.
 - Do not mark a skill, Super-Phase, or session complete while its required queue rows are still queued, ready, running, or review_needed.
 
 ## Closeout Bar
@@ -91,5 +94,6 @@ Do not claim the 4D task is complete until:
 - existing architecture docs were read first when present and were verified, updated through nested Computa docs hooks, or documented as stale/blocked
 - `docs/computa-artifacts/secrets-needed/` is current for all Super-Phases, including any runtime/deploy verification blocked by missing private config
 - final reports explain what was done, what needs verification, current blockers, open issues, gaps versus the original request, new issues found and fixed, and new issues found but not fixed
+- `computa_hooks.py validate --strict` and `validate --closeout --strict` pass, or the final report lists the exact queue/artifact blockers
 
 Golden rule: evidence before assertions. Never say "it works" without verification and runtime proof.

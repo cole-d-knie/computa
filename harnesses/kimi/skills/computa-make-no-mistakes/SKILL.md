@@ -7,6 +7,8 @@ description: One-command entrypoint that invokes the complete computa-swarm-veri
 
 Use this as the single-command entrypoint for debugging/implementation tasks with small-medium scope, system additions, code edits, or medium-scope build-from-scratch projects. Treat the user's text after the skill name as the task.
 
+Before setup, phase execution, and closeout, follow the hook-enforced Computa execution contract when available: `templates/computa-execution-contract.md`. If hook validation finds active queue rows, missing child rows, or missing phase/task/subtask artifacts, the task is not complete.
+
 For ultra-long autonomous work, use `computa-4d-chess`. For massive research/strategy work that should decide what to build and what tools to use before 4D execution, use `computa-export-control`.
 
 If the task is missing or too vague to test, ask only for the blocking objective, expected behavior, and repo/path. Otherwise start.
@@ -87,6 +89,7 @@ Execute the task end to end under the complete computa-swarm-verify rules:
 - Keep ledgers, logs, and evidence current as work happens.
 - Do not treat a skill as done because it was loaded. Mark it complete only after required outputs, evidence paths, review gates, and queue rows are complete.
 - Make one descriptive commit per completed task only after verification passes and commits are allowed.
+- Do not use broad staging commands such as `git add .`, `git add -A`, `git add --all`, `git add -u`, or `git add :/`. Stage intentional files explicitly.
 - Do not push unless explicitly asked.
 - At closeout, append `session_completed` when the task is complete, or `session_blocked` when it cannot safely proceed. The final row must include the report path and exact `next_action` for resume.
 
@@ -119,5 +122,6 @@ Do not claim completion until `computa-swarm-verify-closeout` has produced conci
 - new issues found and not fixed
 - exact verification commands and runtime QA evidence
 - execution queue status, including blocked/deferred queue items and the exact safe next action
+- `computa_hooks.py validate --strict` and `validate --closeout --strict` status, including exact blockers if either fails
 
 Golden rule: evidence before assertions. Never say "it works" without verification command output and runtime proof.

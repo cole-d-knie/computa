@@ -16,4 +16,4 @@ Closeout gate:
 python3 /path/to/computa/scripts/computa_hooks.py validate --closeout --strict
 ```
 
-Completion is blocked until the closeout gate passes.
+The shared contract is `templates/computa-execution-contract.md`. Completion is blocked until the closeout gate passes. Parent rows must have terminal children, completed sessions must have required artifact shape, and broad staging commands such as `git add .`, `git add -A`, `git add --all`, `git add -u`, and `git add :/` are forbidden.

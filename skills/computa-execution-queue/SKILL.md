@@ -7,6 +7,8 @@ description: Create and maintain Computa dependency-aware execution queues for E
 
 Use this as the shared queue manager for every Computa layer.
 
+Also follow `templates/computa-execution-contract.md` from the Computa repo when available. That contract is the hook-enforced source for recursive routing, terminal child completion, artifact shape, and safe git staging.
+
 The queue turns skill prose into an explicit execution graph. A skill invocation is not complete just because the skill was loaded. When a top-level or orchestration skill starts, it must expand its expected child skills, phases, review gates, docs hooks, and closeout gates into the queue before executing them.
 
 ## Queue Files
@@ -169,5 +171,6 @@ No Export Control, 4D Chess, or Computa Make No Mistakes session may be marked c
 - no required child skill remains `queued`, `ready`, `running`, or `review_needed`
 - final reports identify any deferred/blocked queue items
 - `execution-queue.csv`, session ledgers, and `activity-log.csv` agree on the next action
+- hook validation passes with `computa_hooks.py validate --strict` and closeout validation passes with `computa_hooks.py validate --closeout --strict`, when the runner is available
 
 Golden rule: invocation expands the queue; execution consumes the queue.

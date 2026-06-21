@@ -16,6 +16,8 @@ python3 /path/to/computa/scripts/computa_hooks.py next
 python3 /path/to/computa/scripts/computa_hooks.py validate --closeout --strict
 ```
 
+The shared contract is `templates/computa-execution-contract.md`. It requires recursive skill routing, terminal child rows before parent completion, required artifact shape, and explicit file staging.
+
 The plugin already wires lifecycle events to the runner. For manual checks:
 
 ```bash
@@ -24,3 +26,5 @@ python3 /path/to/computa/scripts/computa_hooks.py hook --format opencode --event
 ```
 
 Hook-added queue rows are real queue rows. They should be consumed or explicitly deferred with rationale.
+
+Do not use `git add .`, `git add -A`, `git add --all`, `git add -u`, or `git add :/`. Stage intentional files explicitly.

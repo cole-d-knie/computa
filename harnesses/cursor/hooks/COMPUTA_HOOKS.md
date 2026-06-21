@@ -30,6 +30,10 @@ Run before closeout:
 python3 /path/to/computa/scripts/computa_hooks.py validate --closeout --strict
 ```
 
+The shared contract is `templates/computa-execution-contract.md`. It requires recursive skill routing, terminal child rows before parent completion, required artifact shape, and explicit file staging.
+
 If the closeout command fails, do not claim completion. Reconcile queue rows, ledgers, reviews, evidence, and docs hooks first.
 
 Hook-added rows are intentional deterministic expansions. Consume them through the queue.
+
+Do not use `git add .`, `git add -A`, `git add --all`, `git add -u`, or `git add :/`. Stage intentional files explicitly.

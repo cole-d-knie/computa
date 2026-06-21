@@ -13,6 +13,8 @@ python3 /path/to/computa/scripts/computa_hooks.py expand
 python3 /path/to/computa/scripts/computa_hooks.py validate --closeout --strict
 ```
 
+The contract these commands enforce is documented at `templates/computa-execution-contract.md`.
+
 Use `COMPUTA_ROOT=/path/to/project` when the harness does not pass a working directory.
 
 ## Hook Modes
@@ -20,6 +22,7 @@ Use `COMPUTA_ROOT=/path/to/project` when the harness does not pass a working dir
 - `SessionStart` / `UserPromptSubmit`: add context reminding the agent to use the queue.
 - `expand`: deterministically append missing queue rows for known parent skills and recursive routing.
 - `PreToolUse` / `BeforeShellExecution`: optionally block unsafe closeout attempts when the queue is invalid.
+- `PreToolUse` / `PermissionRequest`: block broad `git add .`, `git add -A`, `git add --all`, `git add -u`, and `git add :/`; agents must stage intentional files explicitly.
 - `Stop` / `SessionEnd`: block completion when required queue rows are still active.
 - `resume`: use `validate` and `next` before relying on chat history.
 
@@ -62,4 +65,6 @@ The core enforcement is always the same:
 1. `execution-queue.csv` must exist when Computa sessions exist.
 2. Queue headers/statuses/dependencies must be valid.
 3. Closeout is blocked while required queue rows are `queued`, `ready`, `running`, or `review_needed`.
-4. Resume starts from the highest-priority safe queue item.
+4. Completed parent rows must have terminal required child rows.
+5. Completed Export Control, 4D Chess, and Make No Mistakes sessions must have required artifact shape.
+6. Resume starts from the highest-priority safe queue item.
