@@ -17,6 +17,8 @@ Create `docs/` if it does not exist. Then create or reuse:
 - `docs/computa-artifacts/artifact-index.md`
 - `docs/computa-artifacts/session-ledger.csv`
 - `docs/computa-artifacts/activity-log.csv`
+- `docs/computa-artifacts/execution-queue.csv`
+- `docs/computa-artifacts/execution-queue.md`
 - `docs/computa-artifacts/secrets-needed/`
 - `docs/computa-artifacts/secrets-needed/index.md`
 - `docs/computa-artifacts/secrets-needed/secrets-needed.csv`
@@ -57,6 +59,7 @@ Append a row immediately when a resumable unit starts, finishes, blocks, defers,
 
 Required events:
 
+- Queue: `queue_initialized`, `queue_expanded`, `queue_item_started`, `queue_item_completed`, `queue_item_blocked`, `queue_item_deferred`, `queue_item_superseded`.
 - Export Control: `session_started`, `research_task_started`, `research_task_completed`, `research_task_blocked`, `audit_suite_started`, `audit_task_started`, `audit_task_completed`, `audit_task_blocked`, `audit_suite_completed`, `audit_suite_blocked`, `campaign_started`, `campaign_completed`, `campaign_blocked`, `session_completed`, `session_blocked`.
 - 4D Chess: `session_started`, `super_phase_created`, `super_phase_started`, `super_phase_completed`, `super_phase_blocked`, `security_audit_started`, `security_audit_completed`, `security_audit_blocked`, `security_audit_deferred`, `session_completed`, `session_blocked`.
 - Computa Make No Mistakes: `session_started`, `phase_started`, `task_started`, `task_completed`, `phase_completed`, `phase_blocked`, `session_completed`, `session_blocked`.
@@ -76,6 +79,18 @@ Immediately save `user-task.md` in the new session before summarizing or plannin
 - explicit permissions, exclusions, and do-not-touch areas
 - parent session ID when applicable
 - initial assumptions and ambiguities
+
+## Execution Queue
+
+Initialize `docs/computa-artifacts/execution-queue.csv` with:
+
+`queue_id,parent_queue_id,session_id,layer,scope_type,scope_id,scope_name,skill,action,priority,status,dependencies,non_overlap_key,allowed_parallelism,required_outputs,review_gate,artifact_path,evidence_path,next_action,created_at,started_at,completed_at,notes`
+
+Initialize `docs/computa-artifacts/execution-queue.md` as a short human-readable index of active queue items, dependency rules, blocked items, and safe next action.
+
+Append `queue_initialized` to `activity-log.csv` when these files are created. Do not overwrite existing queues.
+
+When a session is created, create session-local `execution-queue.csv` and `execution-queue.md` inside that session. Orchestration skills must use `computa-execution-queue` to expand child skills, campaigns, Super-Phases, phases, tasks, reviews, docs hooks, and closeout gates into these queues before executing them.
 
 ## Shared Indexes
 

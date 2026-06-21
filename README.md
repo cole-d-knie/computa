@@ -17,6 +17,7 @@ Focused sub-skills own the repeatable parts:
 - `computa-speak`: rewrites raw prompts into concise AI-ready task prompts while preserving the original request as source truth.
 - `computa-init`: initializes `docs/computa-artifacts/`, session ledgers, raw task capture, and shared artifact structure.
 - `computa-resume`: inspects `docs/computa-artifacts/activity-log.csv`, session ledgers, and nested session artifacts to identify the latest safe resume point after a crash or context loss.
+- `computa-execution-queue`: dependency-aware queue manager. Skill invocation expands the queue; execution consumes the highest-priority unblocked item instead of relying on FIFO order or chat memory.
 - `computa-secrets-needed`: records required API keys, OAuth credentials, webhook secrets, model-provider keys, deployment secrets, dashboard credentials, target env/platform paths, blocked verification, and safe `@Computer` credential handoff prompts without storing secret values.
 - `computa-md`: explicit-only helper that archives existing agent docs and writes concise task-local `AGENTS.md`, `CLAUDE.md`, `KIMI.md`, Cursor, Goose, Codex, and OpenCode guidance with artifact/resume paths.
 - `computa-docs-architecture`: creates or updates source-backed docs at `docs/architecture/`.

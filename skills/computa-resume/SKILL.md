@@ -12,6 +12,8 @@ Use this to recover work from artifacts, not chat memory. It is read-only by def
 Start at the invocation root. If inside a git repo, prefer the git top-level. Look for:
 
 - `docs/computa-artifacts/activity-log.csv`
+- `docs/computa-artifacts/execution-queue.csv`
+- `docs/computa-artifacts/execution-queue.md`
 - `docs/computa-artifacts/session-ledger.csv`
 - `docs/computa-artifacts/artifact-index.md`
 - `docs/computa-artifacts/secrets-needed/secrets-needed.csv`
@@ -46,10 +48,11 @@ Do not expect subtask rows in the root log. For subtask progress, open the task 
 1. Confirm the artifact root and read `session-ledger.csv`.
 2. Read `activity-log.csv`, sorted by timestamp as recorded.
 3. Read `secrets-needed/secrets-needed.csv` when present so missing private config, safe `@Computer` prompts, and blocked verification are visible before resuming.
-4. Identify the latest active top-level session: a session with `session_started` and no matching `session_completed` or `session_blocked`, or the most recent blocked/deferred session if nothing is active.
-5. Walk into nested children through `parent_session_id` to find the deepest active work item.
-6. Prefer unfinished rows in this order: active task, active phase, active Computa session, active Super-Phase including `SP-999-post-run-security-audit`, active nested 4D security audit, active 4D session, active campaign, active Export Control audit suite, active Export Control session.
-7. Open the referenced `artifact_path`, then read the relevant local ledger:
+4. Read root `execution-queue.csv` and the latest active session-local `execution-queue.csv` when present. Identify ready/running/blocked/review_needed queue items and their dependencies.
+5. Identify the latest active top-level session: a session with `session_started` and no matching `session_completed` or `session_blocked`, or the most recent blocked/deferred session if nothing is active.
+6. Walk into nested children through `parent_session_id` to find the deepest active work item.
+7. Prefer unfinished queue rows over chat context. Choose the highest-priority ready item whose dependencies are complete and whose non-overlap key is safe. If no item is ready, use activity-log rows in this order: active task, active phase, active Computa session, active Super-Phase including `SP-999-post-run-security-audit`, active nested 4D security audit, active 4D session, active campaign, active Export Control audit suite, active Export Control session.
+8. Open the referenced `artifact_path`, then read the relevant local ledger:
    - task: `task.md`, `task-log.md`, `subtask-ledger.csv`, task issues/blockers
    - phase: `phase.md`, `phase-task-ledger.csv`, phase issues/blockers
    - Computa session: `plan.md`, `master-task-ledger.csv`, `maps/`, `reports/`
@@ -59,8 +62,8 @@ Do not expect subtask rows in the root log. For subtask progress, open the task 
    - campaign: `campaigns/campaign-ledger.csv`, campaign prompt, child 4D link
    - Export Control audit suite: `standalone-audits/audit-suite-ledger.csv`, `standalone-audits/remediation-backlog.csv`, category audit directories, `standalone-audits/implementation-campaign-map.md`
    - Export Control session: `research-agenda.md`, `decision-matrix.md`, `campaigns/`, `reports/`
-8. Check whether the latest item is genuinely incomplete, blocked, or complete-but-unclosed by comparing local ledgers and evidence paths.
-9. Produce a concise resume report before executing anything.
+9. Check whether the latest item is genuinely incomplete, blocked, or complete-but-unclosed by comparing queue rows, local ledgers, and evidence paths.
+10. Produce a concise resume report before executing anything.
 
 ## Resume Report
 
@@ -72,6 +75,7 @@ Include:
 - latest top-level session and latest nested session
 - current layer: export-control, export-control-audit-suite, 4d-chess, final-security-super-phase, nested-security-audit, computa, phase, task, or subtask context
 - latest activity-log row
+- latest relevant execution-queue row and whether it is ready, blocked, running, review_needed, stale, or superseded
 - current secrets-needed status, including whether missing API keys/private config block runtime/deploy verification and which safe `@Computer` prompt to use
 - local ledgers opened
 - inferred current status
@@ -86,6 +90,7 @@ Include:
 - If the user only asks "what was I working on" or "where do we resume", do not execute the task. Produce the resume report and stop.
 - If the user asks to resume execution, continue from the deepest safe incomplete unit using the correct skill and artifact path.
 - If the activity log and local ledgers conflict, trust concrete evidence and local ledgers over the last log row, then append a resume note only if execution is authorized.
+- If the execution queue, activity log, and local ledgers conflict, trust concrete evidence and local ledgers first. Mark stale queue rows superseded or complete only when execution is authorized, then resume from the corrected queue.
 - If the latest state is ambiguous, ask the smallest blocking question or present the safest resume options.
 - Never mark work complete just because a log row says completed. Verify the corresponding evidence path and local ledger status.
 - Never push, deploy, publish dashboard changes, or mutate external systems as part of resume unless the resumed task explicitly permits it.

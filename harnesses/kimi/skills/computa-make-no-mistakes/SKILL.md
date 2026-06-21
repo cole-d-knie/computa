@@ -17,6 +17,7 @@ Use or trigger these when available:
 
 - `computa-init`: project-local `docs/` and `docs/computa-artifacts/` initialization.
 - `computa-speak`: prompt normalization from raw request to `normalized-task.md`.
+- `computa-execution-queue`: dependency-aware queue expansion and resume-safe child skill/phase/task orchestration.
 - `computa-resume`: recover the latest session/phase/task from `activity-log.csv` when resuming prior work.
 - `computa-secrets-needed`: safe ledger and handoff prompts for missing API keys, OAuth credentials, webhook secrets, model-provider keys, and deployment secrets.
 - `computa-make-no-mistakes-docs-update`: architecture-doc update hook after every phase and final closeout.
@@ -25,7 +26,7 @@ Use or trigger these when available:
 - `writing-plans` and `executing-plans`: plan creation and execution.
 - `test-driven-development`: fail-first implementation.
 - `systematic-debugging` or `investigate`: root-cause investigation.
-- native agent swarm/delegation: safe swarm parallelism.
+- `dispatching-parallel-agents` and `subagent-driven-development`: safe swarm parallelism.
 - `requesting-code-review`: adversarial review.
 - `verification-before-completion`: completion proof.
 - `playwright`: browser-visible runtime QA.
@@ -40,10 +41,11 @@ Load and apply every computa-swarm-verify skill in this order:
 1. `computa-swarm-verify`
 2. `computa-swarm-verify-setup`
 3. `computa-speak`
-4. `computa-swarm-verify-investigate`
-5. `computa-swarm-verify-tdd-qa`
-6. `computa-swarm-verify-swarms`
-7. `computa-swarm-verify-closeout`
+4. `computa-execution-queue`
+5. `computa-swarm-verify-investigate`
+6. `computa-swarm-verify-tdd-qa`
+7. `computa-swarm-verify-swarms`
+8. `computa-swarm-verify-closeout`
 
 Also load and apply `computa-make-no-mistakes-docs-update` at the end of every phase and during final closeout.
 
@@ -62,6 +64,7 @@ Execute the task end to end under the complete computa-swarm-verify rules:
 - If this is a standalone Computa run, place it under `docs/computa-artifacts/computa/CMN-.../`. If invoked by 4D Chess, place it under the parent 4D session at `.../computa/CMN-.../`.
 - Register the session in `docs/computa-artifacts/session-ledger.csv` with `layer=computa` and the parent session ID when applicable.
 - Maintain `docs/computa-artifacts/activity-log.csv` with the standard header. Append `session_started` as soon as the CMN session exists.
+- Immediately after `computa-speak`, run `computa-execution-queue` and expand the Computa invocation into root and session-local queue rows for the full swarm-verify suite, setup, investigation, TDD/QA, reviews, docs-update hooks, closeout, and initial phase/task placeholders. After Phase 0 creates concrete phases/tasks/subtasks, replace placeholders with explicit phase and task queue rows.
 - If `docs/computa-artifacts/` is inside a git repo, ensure it is ignored by `.gitignore`.
 - If `docs/architecture/` exists, read its `README.md`, `ARCHITECTURE.md`, `AUDIT-REPORT.md`, and relevant module docs before the Phase 1 codebase audit. Treat those docs as orientation, then verify them against source files and update stale claims.
 - Phase 0: create the artifact root, plan directory, `plan.md`, master task CSV, issue/blocker Markdown and CSV ledgers, phase directories, task directories, subtask ledgers, and reports directory.
@@ -70,6 +73,7 @@ Execute the task end to end under the complete computa-swarm-verify rules:
 - Phase 2: investigate source truth, current behavior, expected behavior, issue origin, edge cases, baseline commands, and failing evidence before implementation.
 - Split work into phases, tasks, and subtasks with explicit order and dependencies. Do not run dependent work before prerequisites are done.
 - Append to the root `activity-log.csv` every time a phase or task starts, completes, blocks, or is deferred. Example events: `phase_started`, `task_started`, `task_completed`, `phase_completed`, `phase_blocked`. Subtasks stay in task-level subtask ledgers and are not duplicated in the root activity log.
+- Keep `execution-queue.csv` current every time a child skill, phase, task, review gate, docs hook, verification gate, or closeout gate starts, completes, blocks, defers, or is superseded. Choose work from the highest-priority unblocked queue item, respecting dependencies and non-overlap keys.
 - Prefer small, modular, readable components over gigantic files. Split by responsibility, keep APIs narrow, follow existing project boundaries, and avoid dumping unrelated behavior into one file.
 - If any phase, task, or subtask needs an API key, private config, OAuth app, webhook secret, provider token, deployment secret, or dashboard credential, run `computa-secrets-needed` immediately. A missing key is not permission to stop work. Build as far as possible with named env vars, placeholders, mocks, fakes, provider adapters, fixture payloads, contract tests, dry-run modes, feature guards, and missing-secret tests; record what runtime/deploy verification remains blocked until the secret is configured.
 - For secret-dependent functionality, create a keyless verification plan before implementation. Test all behavior that can be tested without the live key, including request construction, response parsing, validation, retries, error handling, disabled/missing-secret behavior, synthetic webhook/event handling, and provider adapter contracts. Only mark live provider calls or dashboard-side verification as blocked.
@@ -81,6 +85,7 @@ Execute the task end to end under the complete computa-swarm-verify rules:
 - After every phase, run `computa-make-no-mistakes-docs-update` so `docs/architecture/` is created, updated, no-op recorded, or blocked with evidence based on the phase ledgers and code truth.
 - After every phase docs update, run one adversarial reviewer per task, then one judge/verifier per task. Do not close a phase until each task is approved complete, approved deferred, or blocked with evidence.
 - Keep ledgers, logs, and evidence current as work happens.
+- Do not treat a skill as done because it was loaded. Mark it complete only after required outputs, evidence paths, review gates, and queue rows are complete.
 - Make one descriptive commit per completed task only after verification passes and commits are allowed.
 - Do not push unless explicitly asked.
 - At closeout, append `session_completed` when the task is complete, or `session_blocked` when it cannot safely proceed. The final row must include the report path and exact `next_action` for resume.
@@ -113,5 +118,6 @@ Do not claim completion until `computa-swarm-verify-closeout` has produced conci
 - new issues found and fixed
 - new issues found and not fixed
 - exact verification commands and runtime QA evidence
+- execution queue status, including blocked/deferred queue items and the exact safe next action
 
 Golden rule: evidence before assertions. Never say "it works" without verification command output and runtime proof.

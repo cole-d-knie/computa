@@ -63,6 +63,7 @@ SUITE_SKILLS = [
     "computa-init",
     "computa-speak",
     "computa-resume",
+    "computa-execution-queue",
     "computa-secrets-needed",
     "computa-docs-architecture",
     "computa-docs-architecture-init",

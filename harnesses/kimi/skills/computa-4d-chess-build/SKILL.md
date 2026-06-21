@@ -53,6 +53,17 @@ For each Super-Phase directory `super-phases/SP-###-slug/`, create:
 
 For every created Super-Phase, append `super_phase_created` to the root `docs/computa-artifacts/activity-log.csv` with `artifact_path` pointing at the Super-Phase directory and `next_action` naming the first prerequisite or review step.
 
+For every created Super-Phase, also append or update root and 4D session-local `execution-queue.csv` rows through `computa-execution-queue`:
+
+- one row for Super-Phase review after build
+- one row for Super-Phase judge/verifier review after build
+- one row for Super-Phase execution through `computa-make-no-mistakes`
+- one row for Super-Phase post-execution adversarial review
+- one row for Super-Phase post-execution judge/verifier review
+- one row for Super-Phase closeout reconciliation
+
+Use explicit dependencies so no Super-Phase execution can start before its build reviews pass, and no dependent Super-Phase can start before prerequisite evidence exists.
+
 Also create mandatory final Super-Phase `super-phases/SP-999-post-run-security-audit/` and include it in `super-phases/super-phase-ledger.csv`.
 
 `SP-999-post-run-security-audit` requirements:
@@ -100,3 +111,5 @@ After all Super-Phases are created:
 Do not hand off to `computa-4d-chess-execute` until the overall Super-Phase plan has passed this review gate or is explicitly accepted with documented risk.
 
 After the full plan is approved, append an activity-log row with `event_type=super_phase_plan_approved`, `scope_type=super_phase_plan`, `artifact_path=super-phases/super-phase-plan.md`, and a `next_action` that tells `computa-resume` whether execution can start or remains blocked.
+
+Also mark the full-plan queue review rows complete or blocked and make the first approved, dependency-free Super-Phase execution row `ready`.

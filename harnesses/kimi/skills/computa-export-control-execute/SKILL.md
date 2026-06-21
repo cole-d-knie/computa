@@ -28,6 +28,7 @@ Verify these exist:
 - `secrets-needed-readout.md` and root `docs/computa-artifacts/secrets-needed/secrets-needed.csv` when the design found private config requirements
 - `campaigns/campaign-sequence.md`
 - `campaigns/campaign-ledger.csv`
+- root and Export Control session-local `execution-queue.csv` include campaign execution, review, reconciliation, and closeout rows
 - design review outputs
 
 If any required artifact is missing, stop and record a blocker. Do not execute from chat memory.
@@ -40,13 +41,13 @@ If campaign prompts reference standalone audit findings, verify `standalone-audi
 
 ## Execution Loop
 
-For each approved campaign in dependency order:
+For each highest-priority ready approved campaign queue item in dependency order:
 
 1. Confirm prerequisites and unresolved owner decisions.
 2. Re-read campaign instructions, research evidence, technical specs when referenced, implementation strategy when referenced, standalone audit findings/backlog when referenced, and relevant maps.
 3. Briefly justify why this campaign should start now and challenge why that might be wrong.
 4. Append `campaign_started` to `docs/computa-artifacts/activity-log.csv` with the campaign prompt or directory as `artifact_path`.
-5. Invoke `/computa-4d-chess` with the exact campaign prompt.
+5. Mark the campaign queue item `running`, append `queue_item_started`, then invoke `/computa-4d-chess` with the exact campaign prompt.
 6. Require the 4D run to create its own child session under this Export Control session at `4d-chess/4D-YYYYMMDD-HHMMSS-slug/`, create Super-Phases, reviews, nested Computa runs, include final `SP-999-post-run-security-audit`, update root `activity-log.csv`, and closeout.
 7. Link the 4D session path in `campaigns/campaign-ledger.csv` and register it in `docs/computa-artifacts/session-ledger.csv` with this Export Control session as parent.
 8. Verify the 4D closeout against export-control decisions, standalone audit backlog items, campaign acceptance criteria, and final `SP-999-post-run-security-audit` status.
@@ -56,6 +57,7 @@ For each approved campaign in dependency order:
 12. Apply or schedule only judge-approved follow-up.
 13. Update source ledgers, decision matrix, maps, campaign ledger, secrets-needed readout, and handoffs.
 14. Append `campaign_completed`, `campaign_blocked`, or `campaign_deferred` to `activity-log.csv` with the review/evidence path and exact next action.
+15. Mark the campaign queue item `complete`, `blocked`, or `deferred`, append the matching queue activity event, and update dependent campaign rows from `queued` to `ready` only when prerequisites are satisfied.
 
 ## Plan Changes
 
@@ -97,5 +99,7 @@ Produce:
 - `reports/follow-up-roadmap.md`
 
 Append `session_completed` or `session_blocked` for the Export Control session to `docs/computa-artifacts/activity-log.csv`.
+
+Before session closeout, reconcile root and session-local execution queues. Do not mark Export Control complete while required child skill, campaign, review, reconciliation, or report rows remain `queued`, `ready`, `running`, or `review_needed`.
 
 State whether the massive project is complete, partially complete, blocked, or ready for the next export-control cycle, and include the latest resume point from `activity-log.csv`.

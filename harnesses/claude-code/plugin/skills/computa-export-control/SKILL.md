@@ -23,10 +23,11 @@ Load and apply these in order:
 
 1. `computa-init`
 2. `computa-speak`
-3. `computa-resume` when recovering prior Export Control work
-4. `computa-secrets-needed`
-5. `computa-export-control-design`
-6. `computa-export-control-execute`
+3. `computa-execution-queue`
+4. `computa-resume` when recovering prior Export Control work
+5. `computa-secrets-needed`
+6. `computa-export-control-design`
+7. `computa-export-control-execute`
 
 During design, use or trigger focused research subskills as needed:
 
@@ -68,6 +69,8 @@ Run `computa-init`. Create `docs/` if missing and create or reuse `<invocation-r
 
 Immediately after raw request capture, run `computa-speak` to create `normalized-task.md` and `prompt-normalization-log.md`. Use `normalized-task.md` as the working prompt for research and campaign design, while preserving `user-task.md` as source truth.
 
+Immediately after `computa-speak`, invoke `computa-execution-queue` and expand the Export Control invocation into root and session-local queue rows before research or execution. The initial expansion must queue init/speak, architecture-docs audit when relevant, codebase audit, product requirements, tech radar, prior art, skill/MCP intake, technical spec when needed, implementation strategy when needed, audit suite for existing apps/codebases, synthesis reviews, campaign design reviews, `computa-export-control-execute`, final reports, and closeout. Add campaign-specific queue rows after campaign design is concrete.
+
 Actual architecture docs live at `docs/architecture/`, as a sibling of `docs/computa-artifacts/`. Do not create the actual architecture docs inside the Export Control session.
 
 If `docs/architecture/` exists, read it before codebase audit, product decisions, technology research, prior-art recommendations, or campaign design. Treat it as orientation and verify it against code. If it is stale or incomplete, record that in `codebase-audit/` and consider invoking `computa-docs-architecture` before final campaign design.
@@ -100,6 +103,7 @@ Inside the Export Control session, at minimum create:
 - `4d-chess/`: child 4D Chess sessions created by this Export Control session.
 - `reviews/`: adversarial and judge/verifier reviews.
 - `reports/`: final synthesis and handoff.
+- `execution-queue.csv` and `execution-queue.md`: session-local dependency-aware queue of required child skills, research tasks, reviews, campaigns, and closeout gates.
 
 Artifacts are the source of truth. Context is disposable.
 
@@ -126,6 +130,7 @@ The root activity log is not a replacement for campaign ledgers. It is the crash
 - Before 4D campaign design, run `computa-export-control-implementation-strategy` when hard engineering problems could affect architecture, sequencing, keyless testability, integration strategy, data model, migration plan, deployment order, or rollback. Do not make 4D improvise through unresolved engineering uncertainty.
 - Before 4D campaign design, run `computa-export-control-audit-suite` for existing codebases/apps unless explicitly N/A. Use its remediation backlog and implementation campaign map as source truth for audit-driven 4D work.
 - Do not execute 4D Chess campaigns until the export-control design has passed review or is explicitly accepted with documented risk.
+- Do not treat a child skill as complete because it was loaded. It is complete only when its queue item and required outputs are complete, deferred with rationale, or blocked with evidence.
 
 ## Review Gates
 
