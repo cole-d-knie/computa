@@ -54,6 +54,10 @@ The full parity prompt remains available at:
 
 `skills/computa-swarm-verify/references/master-computa-swarm-verification-prompt.md`
 
+Queue enforcement template:
+
+`templates/computa-execution-queue-enforcement-prompt.md`
+
 ## Supported Harnesses
 
 | Harness | Install path / adapter | Notes |
