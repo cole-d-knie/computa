@@ -71,6 +71,7 @@ Hook templates:
 - Goose: `harnesses/goose/plugins/computa-hooks/`
 - Kimi: `harnesses/kimi/hooks/config-hooks.toml`
 - OpenCode: `harnesses/opencode/plugins/computa-hooks.js`
+- GLM Coding Plan: `harnesses/glm/`
 - Cursor: `harnesses/cursor/hooks/hooks.json`
 - Generic fallback docs: `harnesses/*/hooks/COMPUTA_HOOKS.md`
 
@@ -82,6 +83,7 @@ Hook templates:
 | Claude Code | `~/.claude/skills` | Native Agent Skills folders. A Claude plugin-shaped copy is also in `harnesses/claude-code/plugin`. |
 | Kimi Code | `~/.kimi-code/skills` plus `~/.kimi-code/config.toml` | Kimi-specific skills, MCP config, and native `[[hooks]]` lifecycle entries. |
 | OpenCode | `~/.config/opencode/skills` plus OpenCode config/plugin files | Native Agent Skills folders, `opencode.json` instructions/MCP config, and a local plugin hook. |
+| GLM Coding Plan | Claude Code/OpenCode adapter install plus `~/.computa/glm/` docs | GLM runs through supported coding tools. Computa installs into Claude Code and OpenCode, then GLM credentials are configured with Z.ai's helper or private tool settings. |
 | Cursor | `.cursor/rules/computa-swarm-verify.mdc` plus `.cursor/hooks.json` for a project, or staged under `~/.cursor` | Cursor rules, MCP config, and native lifecycle hooks. |
 | Goose | `~/.config/goose/recipes/computa-swarm-verify.yaml` | Run as a Goose recipe. |
 | Agent Skills open standard | `~/.agents/skills` | Useful for tools that read shared Agent Skills folders. |
@@ -113,6 +115,7 @@ Dependency handling is harness-specific:
 - Claude Code installs dependency folders into `~/.claude/skills`; the plugin adapter also includes dependency skills and `.mcp.json`.
 - Kimi installs Kimi-compatible skills, updates `~/.kimi-code/config.toml`, and adds missing Context7/Playwright entries to `~/.kimi-code/mcp.json`.
 - OpenCode installs skills, then merges `~/.config/opencode/opencode.json` with instruction paths and Context7/Playwright MCP entries.
+- GLM installs Computa into the GLM-supported Claude Code and OpenCode adapters, then stages Z.ai GLM setup notes/templates without writing API keys.
 - Cursor installs a project/global `.mdc` rule and adds missing Context7/Playwright entries to project/global `mcp.json`.
 - Goose installs a recipe with developer, Context7, and Playwright extensions.
 
@@ -159,6 +162,26 @@ OpenCode:
 
 Installs skills to `~/.config/opencode/skills` and merges `~/.config/opencode/opencode.json` with `instructions` entries and MCP servers. With `--install-hooks`, it installs the local OpenCode plugin at `~/.config/opencode/plugins/computa-hooks.js` or `<project>/.opencode/plugins/computa-hooks.js`. Reference template: `harnesses/opencode/opencode.computa-swarm-verify.json`.
 
+GLM Coding Plan:
+
+```bash
+./install.sh --harness glm
+```
+
+Installs Computa into Claude Code and OpenCode because the GLM Coding Plan runs through supported coding tools. It also writes GLM setup notes/templates to `~/.computa/glm/`. Configure GLM credentials with the official helper or private tool settings:
+
+```bash
+npx @z_ai/coding-helper
+```
+
+Project-scoped hooks/docs:
+
+```bash
+./install.sh --harness glm --project /path/to/project --install-hooks
+```
+
+This writes project GLM notes and a Claude settings example with placeholders only. It never writes a Z.ai API key.
+
 Cursor for a project:
 
 ```bash
@@ -197,6 +220,8 @@ Install all supported local targets:
 ```bash
 ./install.sh --harness all --project /path/to/project
 ```
+
+Provider overlays such as GLM are opt-in; run `./install.sh --harness glm` separately when you want Z.ai GLM Coding Plan setup notes and adapter installs.
 
 Preview without writing:
 
@@ -245,13 +270,14 @@ Install Computa hooks for a harness:
 ./install.sh --harness goose --install-hooks
 ./install.sh --harness cursor --project /path/to/project --install-hooks
 ./install.sh --harness all --project /path/to/project --install-hooks
+./install.sh --harness glm --project /path/to/project --install-hooks
 ```
 
-Hooks are opt-in because they can block closeout when Computa queues are invalid. Codex and Claude Code hooks merge into their native hook config files. Goose installs a plugin under `.agents/plugins/computa-hooks`. Kimi gets native `[[hooks]]` entries in `~/.kimi-code/config.toml`; OpenCode gets a local plugin; Cursor gets native `.cursor/hooks.json` or `~/.cursor/hooks.json`. Agent-skills and generic installs receive portable hook instructions backed by the same `scripts/computa_hooks.py` validator.
+Hooks are opt-in because they can block closeout when Computa queues are invalid. Codex and Claude Code hooks merge into their native hook config files. Goose installs a plugin under `.agents/plugins/computa-hooks`. Kimi gets native `[[hooks]]` entries in `~/.kimi-code/config.toml`; OpenCode gets a local plugin; Cursor gets native `.cursor/hooks.json` or `~/.cursor/hooks.json`. GLM uses the Claude Code and OpenCode hook adapters. Agent-skills and generic installs receive portable hook instructions backed by the same `scripts/computa_hooks.py` validator.
 
 ## Use
 
-Codex, Claude Code, Kimi, OpenCode, and Agent Skills harnesses:
+Codex, Claude Code, Kimi, OpenCode, GLM-configured Claude/OpenCode, and Agent Skills harnesses:
 
 ```text
 /computa-export-control research and execute this massive project: ...

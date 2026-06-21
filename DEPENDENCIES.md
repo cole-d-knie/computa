@@ -20,6 +20,7 @@ Checked on 2026-06-19 using GitHub, npm package metadata, installed local plugin
 | Claude Code | Copy suite and dependency skills into `~/.claude/skills`; plugin adapter also contains the suite, dependency skills, and `.mcp.json`. | Claude plugin `.mcp.json` follows current Claude plugin docs for multiple MCP servers. |
 | Kimi Code | Copy Kimi-specific suite skills into `~/.kimi-code/skills`; copy compatible dependency skills; update `config.toml` `extra_skill_dirs`; add missing `context7` and `playwright` MCP servers to `~/.kimi-code/mcp.json`. | Kimi suite wording uses agent swarm/delegation and does not require `subagent-driven-development`. |
 | OpenCode | Copy suite/dependency skills into `~/.config/opencode/skills`; merge `~/.config/opencode/opencode.json` with `instructions` and MCP server entries. | OpenCode uses `instructions` and `mcp` config rather than the exact Codex/Claude skill loader. Template: `harnesses/opencode/opencode.computa-swarm-verify.json`. |
+| GLM Coding Plan | Install Computa into the GLM-supported Claude Code and OpenCode adapters; write GLM setup notes/templates under `~/.computa/glm/` or the target project. | Context7 `/websites/z_ai_devpack` shows GLM Coding Plan loads into coding tools such as Claude Code and OpenCode via `npx @z_ai/coding-helper`. The installer does not write Z.ai API keys. |
 | Cursor | Install `.cursor/rules/computa-swarm-verify.mdc`; add missing `context7` and `playwright` entries to `.cursor/mcp.json` for project installs or `~/.cursor/mcp.json` for global installs. | Cursor rules are the reliable instruction path. MCP config is project/global JSON and should be reviewed like infrastructure config. |
 | Goose | Install `~/.config/goose/recipes/computa-swarm-verify.yaml`. | Recipe includes built-in developer extension plus Context7 and Playwright stdio extensions. |
 | Agent Skills open standard | Copy suite/dependency skill folders into `~/.agents/skills`. | Useful for tools that read shared Agent Skills folders; MCP/tooling still depends on the harness. |
@@ -34,10 +35,12 @@ Checked on 2026-06-19 using GitHub, npm package metadata, installed local plugin
 | `harnesses/cursor/mcp.json` | Reference Cursor MCP config; installer merges missing entries into project/global Cursor MCP config. |
 | `harnesses/opencode/opencode.computa-swarm-verify.json` | Reference OpenCode config for instructions and MCP servers; installer merges equivalent entries into global OpenCode config. |
 | `harnesses/goose/recipes/computa-swarm-verify.yaml` | Goose recipe with task parameter, instructions, developer extension, Context7, and Playwright. |
+| `harnesses/glm/README.md` | GLM Coding Plan adapter notes, based on Context7 `/websites/z_ai_devpack`. |
+| `harnesses/glm/claude-code-settings.example.json` | Placeholder-only Claude Code GLM settings example. Real Z.ai API keys must be added only to private tool config. |
 
 ## Verification Sources
 
 - GitHub checks: `gh repo view obra/superpowers`, `gh repo view garrytan/gstack`, `gh repo view upstash/context7`, `gh repo view microsoft/playwright-mcp`, `gh repo view JuliusBrussee/caveman`.
 - npm checks: `npm view @upstash/context7-mcp ...`, `npm view @playwright/mcp ...`.
-- Context7 docs checks: Claude Code plugin MCP config, Kimi Code `extra_skill_dirs` and `mcp.json`, OpenCode `instructions` and `mcp`.
+- Context7 docs checks: Claude Code plugin MCP config, Kimi Code `extra_skill_dirs` and `mcp.json`, OpenCode `instructions` and `mcp`, GLM Coding Plan adapter docs via `/websites/z_ai_devpack`.
 - Official docs/web checks: Cursor MCP docs and Goose MCP/recipe docs.

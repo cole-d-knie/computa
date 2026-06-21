@@ -29,6 +29,9 @@ OPENCODE_HOOKS_DOC = ROOT / "harnesses" / "opencode" / "hooks" / "COMPUTA_HOOKS.
 CURSOR_HOOKS = ROOT / "harnesses" / "cursor" / "hooks" / "hooks.json"
 CURSOR_HOOKS_DOC = ROOT / "harnesses" / "cursor" / "hooks" / "COMPUTA_HOOKS.md"
 GENERIC_HOOKS_DOC = ROOT / "harnesses" / "generic" / "hooks" / "COMPUTA_HOOKS.md"
+GLM_README = ROOT / "harnesses" / "glm" / "README.md"
+GLM_PROJECT_DOC = ROOT / "harnesses" / "glm" / "GLM_COMPUTA.md"
+GLM_CLAUDE_SETTINGS_EXAMPLE = ROOT / "harnesses" / "glm" / "claude-code-settings.example.json"
 
 KIMI_MCP_SERVERS = {
     "context7": {
@@ -66,7 +69,7 @@ OPENCODE_MCP_SERVERS = {
 }
 
 SKILL_HARNESSES = {"codex", "claude-code", "kimi", "opencode", "agent-skills"}
-PROJECT_HARNESSES = {"cursor", "generic"}
+PROJECT_HARNESSES = {"cursor", "generic", "glm"}
 RECIPE_HARNESSES = {"goose"}
 
 SUITE_SKILLS = [
@@ -168,7 +171,7 @@ KIMI_DEPS = [
 
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(
-        description="Install computa-make-no-mistakes for Codex, Claude Code, Kimi, OpenCode, Cursor, Goose, and generic AGENTS.md harnesses."
+        description="Install computa-make-no-mistakes for Codex, Claude Code, Kimi, OpenCode, GLM Coding Plan adapters, Cursor, Goose, and generic AGENTS.md harnesses."
     )
     parser.add_argument(
         "--harness",
@@ -179,6 +182,7 @@ def parse_args() -> argparse.Namespace:
             "claude-code",
             "kimi",
             "opencode",
+            "glm",
             "cursor",
             "goose",
             "agent-skills",
@@ -790,6 +794,40 @@ def install_goose(args: argparse.Namespace) -> bool:
     return ok
 
 
+def install_glm(args: argparse.Namespace) -> bool:
+    log("[glm] GLM Coding Plan runs through supported coding tools; installing Computa adapters for Claude Code and OpenCode.")
+    log("[glm] Source docs checked with Context7 library ID: /websites/z_ai_devpack")
+    child_args = argparse.Namespace(**vars(args))
+    child_args.target = ""
+
+    ok = install_skill_harness(child_args, "claude-code")
+    ok = install_skill_harness(child_args, "opencode") and ok
+
+    if args.project:
+        project = Path(args.project).expanduser().resolve()
+        log(f"[glm] project notes: {project / 'GLM_COMPUTA.md'}")
+        ok = copy_rendered_file(GLM_PROJECT_DOC, project / "GLM_COMPUTA.md", args.dry_run) and ok
+        log(f"[glm] Claude example settings: {project / '.claude' / 'settings.glm.example.json'}")
+        ok = copy_rendered_file(
+            GLM_CLAUDE_SETTINGS_EXAMPLE,
+            project / ".claude" / "settings.glm.example.json",
+            args.dry_run,
+        ) and ok
+    else:
+        target = Path.home() / ".computa" / "glm"
+        log(f"[glm] docs: {target}")
+        ok = copy_rendered_file(GLM_README, target / "README.md", args.dry_run) and ok
+        ok = copy_rendered_file(
+            GLM_CLAUDE_SETTINGS_EXAMPLE,
+            target / "claude-code-settings.example.json",
+            args.dry_run,
+        ) and ok
+
+    log("[glm] To configure GLM credentials, run `npx @z_ai/coding-helper` or copy the example settings into your private tool config.")
+    log("[glm] No Z.ai API key was written by this installer.")
+    return ok
+
+
 def install_hooks(args: argparse.Namespace, harness: str) -> bool:
     home = Path.home()
     if harness == "codex":
@@ -872,6 +910,8 @@ def install_harness(args: argparse.Namespace, harness: str) -> bool:
         return install_goose(args)
     if harness == "generic":
         return install_generic(args)
+    if harness == "glm":
+        return install_glm(args)
     raise ValueError(f"unsupported harness: {harness}")
 
 
