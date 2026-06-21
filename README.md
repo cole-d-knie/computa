@@ -58,6 +58,17 @@ Queue enforcement template:
 
 `templates/computa-execution-queue-enforcement-prompt.md`
 
+Portable hook runner:
+
+`scripts/computa_hooks.py`
+
+Hook templates:
+
+- Codex: `harnesses/codex/hooks/hooks.json`
+- Claude Code: `harnesses/claude-code/hooks/settings.computa-hooks.json`
+- Goose: `harnesses/goose/plugins/computa-hooks/`
+- Kimi/OpenCode/Cursor/Generic soft-hook docs: `harnesses/*/hooks/COMPUTA_HOOKS.md`
+
 ## Supported Harnesses
 
 | Harness | Install path / adapter | Notes |
@@ -219,6 +230,18 @@ Skip Kimi `config.toml` mutation:
 ./install.sh --harness kimi --no-kimi-config
 ```
 
+Install Computa hooks for a harness:
+
+```bash
+./install.sh --harness codex --install-hooks
+./install.sh --harness claude-code --install-hooks
+./install.sh --harness goose --install-hooks
+./install.sh --harness cursor --project /path/to/project --install-hooks
+./install.sh --harness all --project /path/to/project --install-hooks
+```
+
+Hooks are opt-in because they can block closeout when Computa queues are invalid. Codex and Claude Code hooks merge into their native hook config files. Goose installs a plugin under `.agents/plugins/computa-hooks`. Kimi, OpenCode, Cursor, agent-skills, and generic installs receive portable hook instructions backed by the same `scripts/computa_hooks.py` validator.
+
 ## Use
 
 Codex, Claude Code, Kimi, OpenCode, and Agent Skills harnesses:
@@ -255,6 +278,14 @@ Resume interrupted work:
 
 ```text
 /computa-resume find the latest Computa work and tell me where to resume
+```
+
+Manual hook checks:
+
+```bash
+python3 /path/to/computa/scripts/computa_hooks.py validate --strict
+python3 /path/to/computa/scripts/computa_hooks.py next
+python3 /path/to/computa/scripts/computa_hooks.py validate --closeout --strict
 ```
 
 Advanced internal master skill:

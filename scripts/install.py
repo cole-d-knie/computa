@@ -19,6 +19,13 @@ VENDOR_DIR = ROOT / "vendor" / "skills"
 CURSOR_RULE = ROOT / "harnesses" / "cursor" / "rules" / "computa-swarm-verify.mdc"
 GOOSE_RECIPE = ROOT / "harnesses" / "goose" / "recipes" / "computa-swarm-verify.yaml"
 GENERIC_AGENTS = ROOT / "harnesses" / "generic" / "AGENTS.computa-swarm-verify.md"
+CODEX_HOOKS = ROOT / "harnesses" / "codex" / "hooks" / "hooks.json"
+CLAUDE_HOOKS = ROOT / "harnesses" / "claude-code" / "hooks" / "settings.computa-hooks.json"
+GOOSE_HOOK_PLUGIN = ROOT / "harnesses" / "goose" / "plugins" / "computa-hooks"
+KIMI_HOOKS_DOC = ROOT / "harnesses" / "kimi" / "hooks" / "COMPUTA_HOOKS.md"
+OPENCODE_HOOKS_DOC = ROOT / "harnesses" / "opencode" / "hooks" / "COMPUTA_HOOKS.md"
+CURSOR_HOOKS_DOC = ROOT / "harnesses" / "cursor" / "hooks" / "COMPUTA_HOOKS.md"
+GENERIC_HOOKS_DOC = ROOT / "harnesses" / "generic" / "hooks" / "COMPUTA_HOOKS.md"
 
 KIMI_MCP_SERVERS = {
     "context7": {
@@ -220,6 +227,11 @@ def parse_args() -> argparse.Namespace:
         "--no-mcp-config",
         action="store_true",
         help="Do not update harness MCP config files for Kimi, OpenCode, or Cursor.",
+    )
+    parser.add_argument(
+        "--install-hooks",
+        action="store_true",
+        help="Install Computa lifecycle hook configs/templates for the selected harness. Hooks can block closeout when queues are invalid.",
     )
     return parser.parse_args()
 
@@ -489,6 +501,61 @@ def write_json_config(path: Path, data: dict, dry_run: bool) -> None:
     path.write_text(json.dumps(data, indent=2) + "\n")
 
 
+def rendered_text(src: Path) -> str:
+    return src.read_text().replace("/Users/cole/Desktop/swarm-verify-skills", str(ROOT))
+
+
+def copy_rendered_file(src: Path, dst: Path, dry_run: bool, overwrite: bool = True) -> bool:
+    if not src.exists():
+        log(f"missing source: {src}")
+        return False
+    if dst.exists():
+        if not overwrite:
+            log(f"present: {dst}")
+            return True
+        backup_existing(dst, dry_run)
+    log(f"install {src} -> {dst}")
+    if not dry_run:
+        dst.parent.mkdir(parents=True, exist_ok=True)
+        dst.write_text(rendered_text(src))
+    return True
+
+
+def merge_hook_maps(existing: dict, additions: dict) -> bool:
+    changed = False
+    hooks = existing.setdefault("hooks", {})
+    if not isinstance(hooks, dict):
+        log("warning: existing hooks value is not an object")
+        return False
+    for event, groups in additions.get("hooks", {}).items():
+        current = hooks.setdefault(event, [])
+        if not isinstance(current, list):
+            log(f"warning: existing hooks.{event} is not a list")
+            continue
+        for group in groups:
+            if group not in current:
+                current.append(group)
+                changed = True
+                log(f"add: hook {event}")
+    return changed
+
+
+def merge_hooks_file(template: Path, target: Path, dry_run: bool) -> bool:
+    if not template.exists():
+        log(f"missing source: {template}")
+        return False
+    additions = json.loads(rendered_text(template))
+    existing = load_json_object(target)
+    if existing is None:
+        return False
+    changed = merge_hook_maps(existing, additions)
+    if changed or not target.exists():
+        write_json_config(target, existing, dry_run)
+    else:
+        log(f"present: hooks in {target}")
+    return True
+
+
 def add_missing_mapping_entries(existing: dict, additions: dict, label: str) -> bool:
     changed = False
     for name, spec in additions.items():
@@ -604,6 +671,8 @@ def install_skill_harness(args: argparse.Namespace, harness: str) -> bool:
             ok = ensure_kimi_mcp_config(args.dry_run) and ok
     if harness == "opencode" and not args.no_mcp_config:
         ok = ensure_opencode_config(target, args.dry_run) and ok
+    if args.install_hooks:
+        ok = install_hooks(args, harness) and ok
     return ok
 
 
@@ -620,6 +689,8 @@ def install_cursor(args: argparse.Namespace) -> bool:
 
     if not args.no_mcp_config:
         ok = ensure_cursor_mcp_config(args) and ok
+    if args.install_hooks:
+        ok = install_hooks(args, "cursor") and ok
     return ok
 
 
@@ -629,7 +700,10 @@ def install_generic(args: argparse.Namespace) -> bool:
     else:
         target = Path.home() / ".computa" / "AGENTS.computa-swarm-verify.md"
     log(f"[generic] target: {target}")
-    return copy_file(GENERIC_AGENTS, target, args.dry_run)
+    ok = copy_file(GENERIC_AGENTS, target, args.dry_run)
+    if args.install_hooks:
+        ok = install_hooks(args, "generic") and ok
+    return ok
 
 
 def install_goose(args: argparse.Namespace) -> bool:
@@ -638,7 +712,66 @@ def install_goose(args: argparse.Namespace) -> bool:
     ok = copy_file(GOOSE_RECIPE, target, args.dry_run)
     log('note: run with `goose run --recipe ~/.config/goose/recipes/computa-swarm-verify.yaml --recipe-param task="..."`.')
     log("note: add this directory to GOOSE_RECIPE_PATH if your Goose build does not discover it.")
+    if args.install_hooks:
+        ok = install_hooks(args, "goose") and ok
     return ok
+
+
+def install_hooks(args: argparse.Namespace, harness: str) -> bool:
+    home = Path.home()
+    if harness == "codex":
+        target = (
+            Path(args.project).expanduser().resolve() / ".codex" / "hooks.json"
+            if args.project
+            else Path(os.environ.get("CODEX_HOME", home / ".codex")) / "hooks.json"
+        )
+        log(f"[codex hooks] {target}")
+        return merge_hooks_file(CODEX_HOOKS, target, args.dry_run)
+    if harness == "claude-code":
+        target = (
+            Path(args.project).expanduser().resolve() / ".claude" / "settings.local.json"
+            if args.project
+            else home / ".claude" / "settings.json"
+        )
+        log(f"[claude-code hooks] {target}")
+        return merge_hooks_file(CLAUDE_HOOKS, target, args.dry_run)
+    if harness == "goose":
+        target = (
+            Path(args.project).expanduser().resolve() / ".agents" / "plugins" / "computa-hooks"
+            if args.project
+            else home / ".agents" / "plugins" / "computa-hooks"
+        )
+        log(f"[goose hooks] {target}")
+        return copy_tree(GOOSE_HOOK_PLUGIN, target, args.dry_run, overwrite=True)
+    if harness == "kimi":
+        target = home / ".kimi-code" / "COMPUTA_HOOKS.md"
+        log(f"[kimi hooks doc] {target}")
+        return copy_rendered_file(KIMI_HOOKS_DOC, target, args.dry_run)
+    if harness == "opencode":
+        target = home / ".config" / "opencode" / "COMPUTA_HOOKS.md"
+        log(f"[opencode hooks doc] {target}")
+        return copy_rendered_file(OPENCODE_HOOKS_DOC, target, args.dry_run)
+    if harness == "cursor":
+        target = (
+            Path(args.project).expanduser().resolve() / ".cursor" / "rules" / "computa-hooks.mdc"
+            if args.project
+            else home / ".cursor" / "rules" / "computa-hooks.mdc"
+        )
+        log(f"[cursor hooks doc] {target}")
+        return copy_rendered_file(CURSOR_HOOKS_DOC, target, args.dry_run)
+    if harness == "generic":
+        target = (
+            Path(args.project).expanduser().resolve() / "COMPUTA_HOOKS.md"
+            if args.project
+            else home / ".computa" / "COMPUTA_HOOKS.md"
+        )
+        log(f"[generic hooks doc] {target}")
+        return copy_rendered_file(GENERIC_HOOKS_DOC, target, args.dry_run)
+    if harness == "agent-skills":
+        target = home / ".agents" / "COMPUTA_HOOKS.md"
+        log(f"[agent-skills hooks doc] {target}")
+        return copy_rendered_file(GENERIC_HOOKS_DOC, target, args.dry_run)
+    return True
 
 
 def install_harness(args: argparse.Namespace, harness: str) -> bool:

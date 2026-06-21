@@ -1,0 +1,44 @@
+{
+  "hooks": {
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 ${COMPUTA_REPO:-/Users/cole/Desktop/swarm-verify-skills}/scripts/computa_hooks.py hook --event SessionStart"
+          }
+        ]
+      }
+    ],
+    "UserPromptSubmit": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 ${COMPUTA_REPO:-/Users/cole/Desktop/swarm-verify-skills}/scripts/computa_hooks.py hook --event UserPromptSubmit"
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 ${COMPUTA_REPO:-/Users/cole/Desktop/swarm-verify-skills}/scripts/computa_hooks.py hook --event Stop --closeout --strict"
+          }
+        ]
+      }
+    ],
+    "SubagentStop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 ${COMPUTA_REPO:-/Users/cole/Desktop/swarm-verify-skills}/scripts/computa_hooks.py hook --event SubagentStop --closeout --strict"
+          }
+        ]
+      }
+    ]
+  }
+}
