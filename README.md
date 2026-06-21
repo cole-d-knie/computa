@@ -66,7 +66,20 @@ Portable hook runner:
 
 `scripts/computa_hooks.py`
 
+Package consistency audit:
+
+`scripts/audit_computa_package.py`
+
 The hook runner now enforces recursive skill routing through the execution queue. On session/prompt/compaction hooks it can deterministically expand missing parent, child-skill, campaign, and Super-Phase queue rows without prompting. It then injects the exact next queued skill invocation into supported harness contexts and blocks final closeout when Export Control, 4D Chess, or Make No Mistakes skipped required child-skill expansion, recursive execution rows, terminal child completion, artifact shape, or safe git staging rules.
+
+Run the package audit before changing or installing skills:
+
+```bash
+python3 scripts/audit_computa_package.py
+python3 -m unittest discover -s tests
+```
+
+The audit checks skill frontmatter, installer coverage, Kimi and Claude plugin skill copies, shared hook/template copies, hook child-skill routing, and stale security-closeout language.
 
 Hook templates:
 

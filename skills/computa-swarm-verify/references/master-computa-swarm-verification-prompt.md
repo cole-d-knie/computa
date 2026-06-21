@@ -68,7 +68,7 @@ Maintain `docs/computa-artifacts/activity-log.csv` as the root crash-recovery lo
 
 `timestamp,session_id,layer,parent_session_id,event_type,scope_type,scope_id,scope_name,status,artifact_path,evidence_path,next_action,notes`
 
-Append rows as resumable units start, finish, block, defer, or materially change. Log sessions, Export Control campaigns, Export Control audit-suite tasks, 4D Super-Phases, 4D security audits, Computa phases, and Computa tasks. Do not log every subtask in this root CSV; subtask progress belongs in each task directory. Append `session_started` immediately when the session exists.
+Append rows as resumable units start, finish, block, defer, or materially change. Log sessions, Export Control campaigns, Export Control audit-suite tasks, 4D Super-Phases, 4D security/privacy checkpoints, Computa phases, and Computa tasks. Do not log every subtask in this root CSV; subtask progress belongs in each task directory. Append `session_started` immediately when the session exists.
 
 When any phase, task, subtask, Super-Phase, campaign, or research item needs an API key, OAuth credential, webhook secret, model-provider token, deployment secret, dashboard credential, or other private config, run `computa-secrets-needed` or equivalent immediately. Update `docs/computa-artifacts/secrets-needed/secrets-needed.csv`, create a per-secret Markdown file, create a safe `@Computer` handoff prompt, and append `secret_needed_added`, `secret_needed_updated`, `secret_configured`, or `secret_verification_blocked` to `activity-log.csv` as appropriate. Never store actual secret values in code, artifacts, logs, reports, screenshots, terminal output, or git.
 

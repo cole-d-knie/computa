@@ -1,0 +1,40 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  audit-and-test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repo
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - name: Audit Computa package
+        run: python3 scripts/audit_computa_package.py
+
+      - name: Run tests
+        run: python3 -m unittest discover -s tests
+
+      - name: Compile Python
+        run: |
+          python3 -m py_compile \
+            scripts/audit_computa_package.py \
+            scripts/computa_hooks.py \
+            tests/test_audit_computa_package.py \
+            tests/test_computa_hooks.py \
+            harnesses/goose/plugins/computa-hooks/scripts/computa_hooks.py
+
+      - name: Check OpenCode hook plugin syntax
+        run: node --check harnesses/opencode/plugins/computa-hooks.js
