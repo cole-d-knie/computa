@@ -2,11 +2,22 @@
   "hooks": {
     "SessionStart": [
       {
+        "matcher": "startup|resume|clear|compact",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 ${COMPUTA_REPO:-/Users/cole/Desktop/swarm-verify-skills}/scripts/computa_hooks.py hook --format codex --event SessionStart"
+          }
+        ]
+      }
+    ],
+    "SubagentStart": [
+      {
         "matcher": "*",
         "hooks": [
           {
             "type": "command",
-            "command": "python3 ${COMPUTA_REPO:-/Users/cole/Desktop/swarm-verify-skills}/scripts/computa_hooks.py hook --event SessionStart"
+            "command": "python3 ${COMPUTA_REPO:-/Users/cole/Desktop/swarm-verify-skills}/scripts/computa_hooks.py hook --format codex --event SubagentStart"
           }
         ]
       }
@@ -17,7 +28,62 @@
         "hooks": [
           {
             "type": "command",
-            "command": "python3 ${COMPUTA_REPO:-/Users/cole/Desktop/swarm-verify-skills}/scripts/computa_hooks.py hook --event UserPromptSubmit"
+            "command": "python3 ${COMPUTA_REPO:-/Users/cole/Desktop/swarm-verify-skills}/scripts/computa_hooks.py hook --format codex --event UserPromptSubmit"
+          }
+        ]
+      }
+    ],
+    "PreToolUse": [
+      {
+        "matcher": "Bash|apply_patch|Edit|Write|mcp__.*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 ${COMPUTA_REPO:-/Users/cole/Desktop/swarm-verify-skills}/scripts/computa_hooks.py hook --format codex --event PreToolUse --strict --quiet-ok"
+          }
+        ]
+      }
+    ],
+    "PermissionRequest": [
+      {
+        "matcher": "Bash|apply_patch|Edit|Write|mcp__.*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 ${COMPUTA_REPO:-/Users/cole/Desktop/swarm-verify-skills}/scripts/computa_hooks.py hook --format codex --event PermissionRequest --strict --quiet-ok"
+          }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "Bash|apply_patch|Edit|Write|mcp__.*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 ${COMPUTA_REPO:-/Users/cole/Desktop/swarm-verify-skills}/scripts/computa_hooks.py hook --format codex --event PostToolUse --quiet-ok"
+          }
+        ]
+      }
+    ],
+    "PreCompact": [
+      {
+        "matcher": "manual|auto",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 ${COMPUTA_REPO:-/Users/cole/Desktop/swarm-verify-skills}/scripts/computa_hooks.py hook --format codex --event PreCompact"
+          }
+        ]
+      }
+    ],
+    "PostCompact": [
+      {
+        "matcher": "manual|auto",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 ${COMPUTA_REPO:-/Users/cole/Desktop/swarm-verify-skills}/scripts/computa_hooks.py hook --format codex --event PostCompact"
           }
         ]
       }
@@ -28,7 +94,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "python3 ${COMPUTA_REPO:-/Users/cole/Desktop/swarm-verify-skills}/scripts/computa_hooks.py hook --event Stop --closeout --strict"
+            "command": "python3 ${COMPUTA_REPO:-/Users/cole/Desktop/swarm-verify-skills}/scripts/computa_hooks.py hook --format codex --event Stop --closeout --strict"
           }
         ]
       }
@@ -39,7 +105,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "python3 ${COMPUTA_REPO:-/Users/cole/Desktop/swarm-verify-skills}/scripts/computa_hooks.py hook --event SubagentStop --closeout --strict"
+            "command": "python3 ${COMPUTA_REPO:-/Users/cole/Desktop/swarm-verify-skills}/scripts/computa_hooks.py hook --format codex --event SubagentStop --quiet-ok"
           }
         ]
       }

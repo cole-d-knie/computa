@@ -1,0 +1,82 @@
+{
+  "version": 1,
+  "hooks": {
+    "workspaceOpen": [
+      {
+        "command": "python3 /Users/cole/Desktop/swarm-verify-skills/scripts/computa_hooks.py hook --format cursor --event SessionStart"
+      }
+    ],
+    "sessionStart": [
+      {
+        "command": "python3 /Users/cole/Desktop/swarm-verify-skills/scripts/computa_hooks.py hook --format cursor --event SessionStart"
+      }
+    ],
+    "preToolUse": [
+      {
+        "matcher": "Shell|Bash|Read|Write|Edit|MultiEdit|Agent|Task|MCP|mcp__.*",
+        "command": "python3 /Users/cole/Desktop/swarm-verify-skills/scripts/computa_hooks.py hook --format cursor --event PreToolUse --strict --quiet-ok"
+      }
+    ],
+    "postToolUse": [
+      {
+        "command": "python3 /Users/cole/Desktop/swarm-verify-skills/scripts/computa_hooks.py hook --format cursor --event PostToolUse --quiet-ok"
+      }
+    ],
+    "beforeShellExecution": [
+      {
+        "command": "python3 /Users/cole/Desktop/swarm-verify-skills/scripts/computa_hooks.py hook --format cursor --event BeforeShellExecution --strict --quiet-ok"
+      }
+    ],
+    "afterShellExecution": [
+      {
+        "command": "python3 /Users/cole/Desktop/swarm-verify-skills/scripts/computa_hooks.py hook --format cursor --event AfterShellExecution --quiet-ok"
+      }
+    ],
+    "afterMCPExecution": [
+      {
+        "command": "python3 /Users/cole/Desktop/swarm-verify-skills/scripts/computa_hooks.py hook --format cursor --event PostToolUse --quiet-ok"
+      }
+    ],
+    "beforeTabFileRead": [
+      {
+        "command": "python3 /Users/cole/Desktop/swarm-verify-skills/scripts/computa_hooks.py hook --format cursor --event BeforeReadFile --strict --quiet-ok"
+      }
+    ],
+    "afterFileEdit": [
+      {
+        "command": "python3 /Users/cole/Desktop/swarm-verify-skills/scripts/computa_hooks.py hook --format cursor --event AfterFileEdit --quiet-ok"
+      }
+    ],
+    "afterTabFileEdit": [
+      {
+        "command": "python3 /Users/cole/Desktop/swarm-verify-skills/scripts/computa_hooks.py hook --format cursor --event AfterFileEdit --quiet-ok"
+      }
+    ],
+    "subagentStart": [
+      {
+        "command": "python3 /Users/cole/Desktop/swarm-verify-skills/scripts/computa_hooks.py hook --format cursor --event SubagentStart"
+      }
+    ],
+    "subagentStop": [
+      {
+        "command": "python3 /Users/cole/Desktop/swarm-verify-skills/scripts/computa_hooks.py hook --format cursor --event SubagentStop --quiet-ok"
+      }
+    ],
+    "preCompact": [
+      {
+        "command": "python3 /Users/cole/Desktop/swarm-verify-skills/scripts/computa_hooks.py hook --format cursor --event PreCompact"
+      }
+    ],
+    "stop": [
+      {
+        "command": "python3 /Users/cole/Desktop/swarm-verify-skills/scripts/computa_hooks.py hook --format cursor --event Stop --closeout --strict",
+        "loop_limit": 10
+      }
+    ],
+    "sessionEnd": [
+      {
+        "command": "python3 /Users/cole/Desktop/swarm-verify-skills/scripts/computa_hooks.py hook --format cursor --event SessionEnd --closeout --strict"
+      }
+    ]
+  }
+}

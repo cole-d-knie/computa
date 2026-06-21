@@ -67,7 +67,10 @@ Hook templates:
 - Codex: `harnesses/codex/hooks/hooks.json`
 - Claude Code: `harnesses/claude-code/hooks/settings.computa-hooks.json`
 - Goose: `harnesses/goose/plugins/computa-hooks/`
-- Kimi/OpenCode/Cursor/Generic soft-hook docs: `harnesses/*/hooks/COMPUTA_HOOKS.md`
+- Kimi: `harnesses/kimi/hooks/config-hooks.toml`
+- OpenCode: `harnesses/opencode/plugins/computa-hooks.js`
+- Cursor: `harnesses/cursor/hooks/hooks.json`
+- Generic fallback docs: `harnesses/*/hooks/COMPUTA_HOOKS.md`
 
 ## Supported Harnesses
 
@@ -75,9 +78,9 @@ Hook templates:
 | --- | --- | --- |
 | Codex | `${CODEX_HOME:-~/.codex}/skills` | Native `SKILL.md` folders. |
 | Claude Code | `~/.claude/skills` | Native Agent Skills folders. A Claude plugin-shaped copy is also in `harnesses/claude-code/plugin`. |
-| Kimi Code | `~/.kimi-code/skills` plus `~/.kimi-code/config.toml` `extra_skill_dirs` | Kimi-specific copy uses "agent swarm/delegation" wording and does not require Codex `subagent-driven-development`. |
-| OpenCode | `~/.config/opencode/skills` | Native Agent Skills folders. |
-| Cursor | `.cursor/rules/computa-swarm-verify.mdc` for a project, or staged at `~/.cursor/rules` | Cursor project rules are the reliable path. Cursor may also import Claude skills/plugins if enabled in Cursor settings. |
+| Kimi Code | `~/.kimi-code/skills` plus `~/.kimi-code/config.toml` | Kimi-specific skills, MCP config, and native `[[hooks]]` lifecycle entries. |
+| OpenCode | `~/.config/opencode/skills` plus OpenCode config/plugin files | Native Agent Skills folders, `opencode.json` instructions/MCP config, and a local plugin hook. |
+| Cursor | `.cursor/rules/computa-swarm-verify.mdc` plus `.cursor/hooks.json` for a project, or staged under `~/.cursor` | Cursor rules, MCP config, and native lifecycle hooks. |
 | Goose | `~/.config/goose/recipes/computa-swarm-verify.yaml` | Run as a Goose recipe. |
 | Agent Skills open standard | `~/.agents/skills` | Useful for tools that read shared Agent Skills folders. |
 | Generic | `AGENTS.computa-swarm-verify.md` | Fallback instructions for harnesses without native skill support. |
@@ -144,7 +147,7 @@ Kimi Code:
 ./install.sh --harness kimi
 ```
 
-Installs Kimi-specific skills, updates `~/.kimi-code/config.toml` `extra_skill_dirs`, and adds missing Context7/Playwright MCP servers to `~/.kimi-code/mcp.json`. Kimi wording uses agent swarm/delegation and does not require `subagent-driven-development`.
+Installs Kimi-specific skills, updates `~/.kimi-code/config.toml` `extra_skill_dirs`, and adds missing Context7/Playwright MCP servers to `~/.kimi-code/mcp.json`. With `--install-hooks`, the installer also manages a `# BEGIN COMPUTA HOOKS` block of Kimi `[[hooks]]` entries in `~/.kimi-code/config.toml`. Kimi wording uses agent swarm/delegation and does not require `subagent-driven-development`.
 
 OpenCode:
 
@@ -152,7 +155,7 @@ OpenCode:
 ./install.sh --harness opencode
 ```
 
-Installs skills to `~/.config/opencode/skills` and merges `~/.config/opencode/opencode.json` with `instructions` entries and MCP servers. Reference template: `harnesses/opencode/opencode.computa-swarm-verify.json`.
+Installs skills to `~/.config/opencode/skills` and merges `~/.config/opencode/opencode.json` with `instructions` entries and MCP servers. With `--install-hooks`, it installs the local OpenCode plugin at `~/.config/opencode/plugins/computa-hooks.js` or `<project>/.opencode/plugins/computa-hooks.js`. Reference template: `harnesses/opencode/opencode.computa-swarm-verify.json`.
 
 Cursor for a project:
 
@@ -160,7 +163,7 @@ Cursor for a project:
 ./install.sh --harness cursor --project /path/to/project
 ```
 
-Installs `/path/to/project/.cursor/rules/computa-swarm-verify.mdc` and merges `/path/to/project/.cursor/mcp.json` with Context7 and Playwright. Without `--project`, the installer stages global files under `~/.cursor`.
+Installs `/path/to/project/.cursor/rules/computa-swarm-verify.mdc` and merges `/path/to/project/.cursor/mcp.json` with Context7 and Playwright. With `--install-hooks`, it merges native Cursor hooks into `/path/to/project/.cursor/hooks.json` or `~/.cursor/hooks.json`. Without `--project`, the installer stages global files under `~/.cursor`.
 
 Goose:
 
@@ -235,12 +238,14 @@ Install Computa hooks for a harness:
 ```bash
 ./install.sh --harness codex --install-hooks
 ./install.sh --harness claude-code --install-hooks
+./install.sh --harness kimi --install-hooks
+./install.sh --harness opencode --install-hooks
 ./install.sh --harness goose --install-hooks
 ./install.sh --harness cursor --project /path/to/project --install-hooks
 ./install.sh --harness all --project /path/to/project --install-hooks
 ```
 
-Hooks are opt-in because they can block closeout when Computa queues are invalid. Codex and Claude Code hooks merge into their native hook config files. Goose installs a plugin under `.agents/plugins/computa-hooks`. Kimi, OpenCode, Cursor, agent-skills, and generic installs receive portable hook instructions backed by the same `scripts/computa_hooks.py` validator.
+Hooks are opt-in because they can block closeout when Computa queues are invalid. Codex and Claude Code hooks merge into their native hook config files. Goose installs a plugin under `.agents/plugins/computa-hooks`. Kimi gets native `[[hooks]]` entries in `~/.kimi-code/config.toml`; OpenCode gets a local plugin; Cursor gets native `.cursor/hooks.json` or `~/.cursor/hooks.json`. Agent-skills and generic installs receive portable hook instructions backed by the same `scripts/computa_hooks.py` validator.
 
 ## Use
 

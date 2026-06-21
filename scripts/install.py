@@ -22,8 +22,11 @@ GENERIC_AGENTS = ROOT / "harnesses" / "generic" / "AGENTS.computa-swarm-verify.m
 CODEX_HOOKS = ROOT / "harnesses" / "codex" / "hooks" / "hooks.json"
 CLAUDE_HOOKS = ROOT / "harnesses" / "claude-code" / "hooks" / "settings.computa-hooks.json"
 GOOSE_HOOK_PLUGIN = ROOT / "harnesses" / "goose" / "plugins" / "computa-hooks"
+KIMI_HOOKS_TOML = ROOT / "harnesses" / "kimi" / "hooks" / "config-hooks.toml"
 KIMI_HOOKS_DOC = ROOT / "harnesses" / "kimi" / "hooks" / "COMPUTA_HOOKS.md"
+OPENCODE_HOOK_PLUGIN = ROOT / "harnesses" / "opencode" / "plugins" / "computa-hooks.js"
 OPENCODE_HOOKS_DOC = ROOT / "harnesses" / "opencode" / "hooks" / "COMPUTA_HOOKS.md"
+CURSOR_HOOKS = ROOT / "harnesses" / "cursor" / "hooks" / "hooks.json"
 CURSOR_HOOKS_DOC = ROOT / "harnesses" / "cursor" / "hooks" / "COMPUTA_HOOKS.md"
 GENERIC_HOOKS_DOC = ROOT / "harnesses" / "generic" / "hooks" / "COMPUTA_HOOKS.md"
 
@@ -556,6 +559,76 @@ def merge_hooks_file(template: Path, target: Path, dry_run: bool) -> bool:
     return True
 
 
+def merge_cursor_hooks_file(template: Path, target: Path, dry_run: bool) -> bool:
+    if not template.exists():
+        log(f"missing source: {template}")
+        return False
+    additions = json.loads(rendered_text(template))
+    existing = load_json_object(target)
+    if existing is None:
+        return False
+
+    changed = False
+    if existing.get("version") != additions.get("version"):
+        existing["version"] = additions.get("version", 1)
+        changed = True
+    hooks = existing.setdefault("hooks", {})
+    if not isinstance(hooks, dict):
+        log(f"warning: existing Cursor hooks value is not an object: {target}")
+        return False
+    for event, entries in additions.get("hooks", {}).items():
+        current = hooks.setdefault(event, [])
+        if not isinstance(current, list):
+            log(f"warning: existing Cursor hooks.{event} is not a list")
+            continue
+        for entry in entries:
+            if entry not in current:
+                current.append(entry)
+                changed = True
+                log(f"add: Cursor hook {event}")
+    if changed or not target.exists():
+        write_json_config(target, existing, dry_run)
+    else:
+        log(f"present: Cursor hooks in {target}")
+    return True
+
+
+def install_kimi_hooks_config(dry_run: bool) -> bool:
+    config = Path.home() / ".kimi-code" / "config.toml"
+    if not KIMI_HOOKS_TOML.exists():
+        log(f"missing source: {KIMI_HOOKS_TOML}")
+        return False
+    block = rendered_text(KIMI_HOOKS_TOML).strip() + "\n"
+    start = "# BEGIN COMPUTA HOOKS"
+    end = "# END COMPUTA HOOKS"
+
+    if config.exists():
+        text = config.read_text()
+    else:
+        text = ""
+
+    if start in text and end in text:
+        before, rest = text.split(start, 1)
+        _old, after = rest.split(end, 1)
+        updated = before.rstrip() + "\n\n" + block + after.lstrip()
+        action = "update"
+    else:
+        updated = text.rstrip() + ("\n\n" if text.strip() else "") + block
+        action = "append"
+
+    if updated == text:
+        log(f"present: Kimi Computa hooks in {config}")
+        return True
+
+    log(f"{action}: Kimi hooks in {config}")
+    if not dry_run:
+        config.parent.mkdir(parents=True, exist_ok=True)
+        if config.exists():
+            backup_existing(config, dry_run=False)
+        config.write_text(updated)
+    return True
+
+
 def add_missing_mapping_entries(existing: dict, additions: dict, label: str) -> bool:
     changed = False
     for name, spec in additions.items():
@@ -744,21 +817,37 @@ def install_hooks(args: argparse.Namespace, harness: str) -> bool:
         log(f"[goose hooks] {target}")
         return copy_tree(GOOSE_HOOK_PLUGIN, target, args.dry_run, overwrite=True)
     if harness == "kimi":
-        target = home / ".kimi-code" / "COMPUTA_HOOKS.md"
-        log(f"[kimi hooks doc] {target}")
-        return copy_rendered_file(KIMI_HOOKS_DOC, target, args.dry_run)
+        doc_target = home / ".kimi-code" / "COMPUTA_HOOKS.md"
+        log(f"[kimi hooks] {home / '.kimi-code' / 'config.toml'}")
+        ok = install_kimi_hooks_config(args.dry_run)
+        log(f"[kimi hooks doc] {doc_target}")
+        return copy_rendered_file(KIMI_HOOKS_DOC, doc_target, args.dry_run) and ok
     if harness == "opencode":
-        target = home / ".config" / "opencode" / "COMPUTA_HOOKS.md"
-        log(f"[opencode hooks doc] {target}")
-        return copy_rendered_file(OPENCODE_HOOKS_DOC, target, args.dry_run)
+        if args.project:
+            plugin_target = Path(args.project).expanduser().resolve() / ".opencode" / "plugins" / "computa-hooks.js"
+            doc_target = Path(args.project).expanduser().resolve() / ".opencode" / "COMPUTA_HOOKS.md"
+        else:
+            plugin_target = home / ".config" / "opencode" / "plugins" / "computa-hooks.js"
+            doc_target = home / ".config" / "opencode" / "COMPUTA_HOOKS.md"
+        log(f"[opencode hooks plugin] {plugin_target}")
+        ok = copy_rendered_file(OPENCODE_HOOK_PLUGIN, plugin_target, args.dry_run)
+        log(f"[opencode hooks doc] {doc_target}")
+        return copy_rendered_file(OPENCODE_HOOKS_DOC, doc_target, args.dry_run) and ok
     if harness == "cursor":
-        target = (
+        hooks_target = (
+            Path(args.project).expanduser().resolve() / ".cursor" / "hooks.json"
+            if args.project
+            else home / ".cursor" / "hooks.json"
+        )
+        doc_target = (
             Path(args.project).expanduser().resolve() / ".cursor" / "rules" / "computa-hooks.mdc"
             if args.project
             else home / ".cursor" / "rules" / "computa-hooks.mdc"
         )
-        log(f"[cursor hooks doc] {target}")
-        return copy_rendered_file(CURSOR_HOOKS_DOC, target, args.dry_run)
+        log(f"[cursor hooks] {hooks_target}")
+        ok = merge_cursor_hooks_file(CURSOR_HOOKS, hooks_target, args.dry_run)
+        log(f"[cursor hooks doc] {doc_target}")
+        return copy_rendered_file(CURSOR_HOOKS_DOC, doc_target, args.dry_run) and ok
     if harness == "generic":
         target = (
             Path(args.project).expanduser().resolve() / "COMPUTA_HOOKS.md"

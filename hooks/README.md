@@ -21,9 +21,18 @@ Use `COMPUTA_ROOT=/path/to/project` when the harness does not pass a working dir
 - `Stop` / `SessionEnd`: block completion when required queue rows are still active.
 - `resume`: use `validate` and `next` before relying on chat history.
 
-## Hard vs Soft Hooks
+## Native vs Fallback Hooks
 
-Codex, Claude Code, and Goose have native lifecycle hook support. Kimi, Cursor, OpenCode, and generic harnesses can use the same scripts through rules, wrappers, CI, or manual preflight/closeout commands.
+Codex, Claude Code, Goose, Kimi Code, OpenCode, and Cursor have native lifecycle hook integrations in this package:
+
+- Codex: `harnesses/codex/hooks/hooks.json`
+- Claude Code: `harnesses/claude-code/hooks/settings.computa-hooks.json`
+- Goose: `harnesses/goose/plugins/computa-hooks/`
+- Kimi Code: `harnesses/kimi/hooks/config-hooks.toml`
+- OpenCode: `harnesses/opencode/plugins/computa-hooks.js`
+- Cursor: `harnesses/cursor/hooks/hooks.json`
+
+Generic harnesses can use the same scripts through wrappers, CI, or manual preflight/closeout commands.
 
 The core enforcement is always the same:
 

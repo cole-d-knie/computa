@@ -47,6 +47,16 @@ QUEUE_HEADER = [
 ACTIVE_STATUSES = {"queued", "ready", "running", "review_needed"}
 DONE_STATUSES = {"complete", "deferred", "blocked", "superseded"}
 VALID_STATUSES = ACTIVE_STATUSES | DONE_STATUSES | {"failed"}
+TEXT_HOOK_FORMATS = {"text", "generic", "kimi", "cursor", "opencode", "goose"}
+JSON_HOOK_FORMATS = {"json", "codex", "claude", "claude-code"}
+CONTEXT_EVENTS = {
+    "SessionStart",
+    "SubagentStart",
+    "UserPromptSubmit",
+    "PreCompact",
+    "PostCompact",
+    "PostToolBatch",
+}
 
 
 @dataclass
@@ -242,7 +252,7 @@ def output_text(result: CheckResult) -> None:
 
 
 def hook_json(event: str, ok: bool, reason: str, additional_context: str | None = None) -> dict[str, Any]:
-    if event in {"SessionStart", "SubagentStart"} and additional_context:
+    if event in CONTEXT_EVENTS and additional_context:
         return {
             "hookSpecificOutput": {
                 "hookEventName": event,
@@ -264,6 +274,31 @@ def hook_json(event: str, ok: bool, reason: str, additional_context: str | None 
     return {"systemMessage": reason}
 
 
+def output_hook_result(
+    hook_format: str,
+    event: str,
+    ok: bool,
+    reason: str,
+    additional_context: str | None = None,
+) -> int:
+    if hook_format in TEXT_HOOK_FORMATS:
+        if ok:
+            print(additional_context or reason)
+        else:
+            print(reason, file=sys.stderr)
+        return 0 if ok else 2
+
+    if hook_format == "auto":
+        hook_format = "json"
+
+    if hook_format in JSON_HOOK_FORMATS:
+        print(json.dumps(hook_json(event, ok, reason, additional_context=additional_context)))
+        return 0 if ok else 2
+
+    print(json.dumps(hook_json(event, ok, reason, additional_context=additional_context)))
+    return 0 if ok else 2
+
+
 def run_hook(args: argparse.Namespace) -> int:
     payload = read_stdin_json()
     event = args.event or str(payload.get("event") or payload.get("hook_event_name") or "")
@@ -271,7 +306,11 @@ def run_hook(args: argparse.Namespace) -> int:
         event = "Stop" if args.closeout else "SessionStart"
 
     root = detect_root(args.root, payload)
-    result = validate(root, strict=args.strict, closeout=args.closeout or event in {"Stop", "SubagentStop"})
+    closeout = args.closeout or event in {"Stop", "SessionEnd"}
+    result = validate(root, strict=args.strict, closeout=closeout)
+
+    if args.quiet_ok and result.ok:
+        return 0
 
     next_text = ""
     if result.next_item:
@@ -287,8 +326,7 @@ def run_hook(args: argparse.Namespace) -> int:
         + " ".join(result.messages[:5])
         + next_text
     )
-    print(json.dumps(hook_json(event, result.ok, context, additional_context=context)))
-    return 0 if result.ok else 2
+    return output_hook_result(args.format, event, result.ok, context, additional_context=context)
 
 
 def main() -> int:
@@ -296,8 +334,15 @@ def main() -> int:
     parser.add_argument("command", choices=["validate", "next", "hook"])
     parser.add_argument("--root", default=None, help="Project root. Defaults to cwd/git root/hook payload cwd.")
     parser.add_argument("--event", default=None, help="Hook event name.")
+    parser.add_argument(
+        "--format",
+        default="json",
+        choices=sorted(TEXT_HOOK_FORMATS | JSON_HOOK_FORMATS | {"auto"}),
+        help="Hook output protocol for the invoking harness.",
+    )
     parser.add_argument("--strict", action="store_true", help="Fail if queue is missing or malformed.")
     parser.add_argument("--closeout", action="store_true", help="Fail if active queue rows remain.")
+    parser.add_argument("--quiet-ok", action="store_true", help="Emit no output when the hook passes.")
     parser.add_argument("--json", action="store_true", help="Print JSON for validate/next.")
     args = parser.parse_args()
 

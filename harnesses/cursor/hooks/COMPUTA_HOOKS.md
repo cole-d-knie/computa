@@ -6,7 +6,15 @@ alwaysApply: false
 
 # Cursor Computa Hooks
 
-Cursor project rules provide soft hook enforcement. Use the portable hook runner for hard checks in terminal, CI, or pre-commit wrappers.
+Cursor uses native hook JSON plus project rules.
+
+Install:
+
+```bash
+./install.sh --harness cursor --project /path/to/project --install-hooks
+```
+
+The installer merges native Cursor hooks into `<project>/.cursor/hooks.json` or `~/.cursor/hooks.json`, and keeps this rule file as readable context.
 
 Run before Computa work:
 

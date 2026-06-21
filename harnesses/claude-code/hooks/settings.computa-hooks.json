@@ -2,10 +2,22 @@
   "hooks": {
     "SessionStart": [
       {
+        "matcher": "startup|resume|clear|compact",
         "hooks": [
           {
             "type": "command",
-            "command": "python3 ${COMPUTA_REPO:-/Users/cole/Desktop/swarm-verify-skills}/scripts/computa_hooks.py hook --event SessionStart"
+            "command": "python3 ${COMPUTA_REPO:-/Users/cole/Desktop/swarm-verify-skills}/scripts/computa_hooks.py hook --format claude --event SessionStart"
+          }
+        ]
+      }
+    ],
+    "SubagentStart": [
+      {
+        "matcher": "*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 ${COMPUTA_REPO:-/Users/cole/Desktop/swarm-verify-skills}/scripts/computa_hooks.py hook --format claude --event SubagentStart"
           }
         ]
       }
@@ -15,7 +27,105 @@
         "hooks": [
           {
             "type": "command",
-            "command": "python3 ${COMPUTA_REPO:-/Users/cole/Desktop/swarm-verify-skills}/scripts/computa_hooks.py hook --event UserPromptSubmit"
+            "command": "python3 ${COMPUTA_REPO:-/Users/cole/Desktop/swarm-verify-skills}/scripts/computa_hooks.py hook --format claude --event UserPromptSubmit"
+          }
+        ]
+      }
+    ],
+    "PreToolUse": [
+      {
+        "matcher": "Bash|Write|Edit|MultiEdit|NotebookEdit|mcp__.*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 ${COMPUTA_REPO:-/Users/cole/Desktop/swarm-verify-skills}/scripts/computa_hooks.py hook --format claude --event PreToolUse --strict --quiet-ok"
+          }
+        ]
+      }
+    ],
+    "PermissionRequest": [
+      {
+        "matcher": "Bash|Write|Edit|MultiEdit|NotebookEdit|mcp__.*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 ${COMPUTA_REPO:-/Users/cole/Desktop/swarm-verify-skills}/scripts/computa_hooks.py hook --format claude --event PermissionRequest --strict --quiet-ok"
+          }
+        ]
+      }
+    ],
+    "PermissionDenied": [
+      {
+        "matcher": "Bash|Write|Edit|MultiEdit|NotebookEdit|mcp__.*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 ${COMPUTA_REPO:-/Users/cole/Desktop/swarm-verify-skills}/scripts/computa_hooks.py hook --format claude --event PermissionDenied --quiet-ok"
+          }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "Bash|Write|Edit|MultiEdit|NotebookEdit|mcp__.*|Agent",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 ${COMPUTA_REPO:-/Users/cole/Desktop/swarm-verify-skills}/scripts/computa_hooks.py hook --format claude --event PostToolUse --quiet-ok"
+          }
+        ]
+      }
+    ],
+    "PostToolUseFailure": [
+      {
+        "matcher": "Bash|Write|Edit|MultiEdit|NotebookEdit|mcp__.*|Agent",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 ${COMPUTA_REPO:-/Users/cole/Desktop/swarm-verify-skills}/scripts/computa_hooks.py hook --format claude --event PostToolUseFailure --quiet-ok"
+          }
+        ]
+      }
+    ],
+    "PostToolBatch": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 ${COMPUTA_REPO:-/Users/cole/Desktop/swarm-verify-skills}/scripts/computa_hooks.py hook --format claude --event PostToolBatch"
+          }
+        ]
+      }
+    ],
+    "PreCompact": [
+      {
+        "matcher": "manual|auto",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 ${COMPUTA_REPO:-/Users/cole/Desktop/swarm-verify-skills}/scripts/computa_hooks.py hook --format claude --event PreCompact"
+          }
+        ]
+      }
+    ],
+    "PostCompact": [
+      {
+        "matcher": "manual|auto",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 ${COMPUTA_REPO:-/Users/cole/Desktop/swarm-verify-skills}/scripts/computa_hooks.py hook --format claude --event PostCompact"
+          }
+        ]
+      }
+    ],
+    "Notification": [
+      {
+        "matcher": "permission_prompt|idle_prompt|auth_success|elicitation_dialog|elicitation_complete|elicitation_response",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 ${COMPUTA_REPO:-/Users/cole/Desktop/swarm-verify-skills}/scripts/computa_hooks.py hook --format claude --event Notification --quiet-ok"
           }
         ]
       }
@@ -25,7 +135,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "python3 ${COMPUTA_REPO:-/Users/cole/Desktop/swarm-verify-skills}/scripts/computa_hooks.py hook --event Stop --closeout --strict"
+            "command": "python3 ${COMPUTA_REPO:-/Users/cole/Desktop/swarm-verify-skills}/scripts/computa_hooks.py hook --format claude --event Stop --closeout --strict"
           }
         ]
       }
@@ -35,7 +145,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "python3 ${COMPUTA_REPO:-/Users/cole/Desktop/swarm-verify-skills}/scripts/computa_hooks.py hook --event SubagentStop --closeout --strict"
+            "command": "python3 ${COMPUTA_REPO:-/Users/cole/Desktop/swarm-verify-skills}/scripts/computa_hooks.py hook --format claude --event SubagentStop --quiet-ok"
           }
         ]
       }

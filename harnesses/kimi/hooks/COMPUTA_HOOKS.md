@@ -1,6 +1,14 @@
 # Kimi Computa Hooks
 
-Kimi hook enforcement is implemented as portable preflight/closeout commands plus skill instructions.
+Kimi hook enforcement is implemented with native `[[hooks]]` entries in `~/.kimi-code/config.toml`.
+
+Install:
+
+```bash
+./install.sh --harness kimi --install-hooks
+```
+
+The installer appends or replaces the `# BEGIN COMPUTA HOOKS` managed block from `harnesses/kimi/hooks/config-hooks.toml`. Kimi passes hook JSON on stdin, uses exit code `2` to block, and runs hook commands from the active project directory.
 
 Run before Computa work:
 
@@ -15,4 +23,4 @@ Run before claiming completion:
 python3 /path/to/computa/scripts/computa_hooks.py validate --closeout --strict
 ```
 
-Kimi agents must treat a nonzero exit code as a blocker and repair/reconcile `docs/computa-artifacts/execution-queue.csv` before continuing.
+Kimi agents must treat a hook block as a real blocker and repair/reconcile `docs/computa-artifacts/execution-queue.csv` before continuing.

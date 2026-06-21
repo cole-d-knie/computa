@@ -6,7 +6,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "python3 ${PLUGIN_ROOT}/scripts/computa_hooks.py hook --event SessionStart"
+            "command": "python3 ${PLUGIN_ROOT}/scripts/computa_hooks.py hook --format goose --event SessionStart"
           }
         ]
       }
@@ -17,7 +17,128 @@
         "hooks": [
           {
             "type": "command",
-            "command": "python3 ${PLUGIN_ROOT}/scripts/computa_hooks.py hook --event UserPromptSubmit"
+            "command": "python3 ${PLUGIN_ROOT}/scripts/computa_hooks.py hook --format goose --event UserPromptSubmit"
+          }
+        ]
+      }
+    ],
+    "PreToolUse": [
+      {
+        "matcher": "*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 ${PLUGIN_ROOT}/scripts/computa_hooks.py hook --format goose --event PreToolUse --strict --quiet-ok"
+          }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 ${PLUGIN_ROOT}/scripts/computa_hooks.py hook --format goose --event PostToolUse --quiet-ok"
+          }
+        ]
+      }
+    ],
+    "PostToolUseFailure": [
+      {
+        "matcher": "*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 ${PLUGIN_ROOT}/scripts/computa_hooks.py hook --format goose --event PostToolUseFailure --quiet-ok"
+          }
+        ]
+      }
+    ],
+    "BeforeReadFile": [
+      {
+        "matcher": "*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 ${PLUGIN_ROOT}/scripts/computa_hooks.py hook --format goose --event BeforeReadFile --strict --quiet-ok"
+          }
+        ]
+      }
+    ],
+    "AfterFileEdit": [
+      {
+        "matcher": "*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 ${PLUGIN_ROOT}/scripts/computa_hooks.py hook --format goose --event AfterFileEdit --quiet-ok"
+          }
+        ]
+      }
+    ],
+    "BeforeShellExecution": [
+      {
+        "matcher": "*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 ${PLUGIN_ROOT}/scripts/computa_hooks.py hook --format goose --event BeforeShellExecution --strict --quiet-ok"
+          }
+        ]
+      }
+    ],
+    "AfterShellExecution": [
+      {
+        "matcher": "*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 ${PLUGIN_ROOT}/scripts/computa_hooks.py hook --format goose --event AfterShellExecution --quiet-ok"
+          }
+        ]
+      }
+    ],
+    "SubagentStart": [
+      {
+        "matcher": "*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 ${PLUGIN_ROOT}/scripts/computa_hooks.py hook --format goose --event SubagentStart"
+          }
+        ]
+      }
+    ],
+    "SubagentStop": [
+      {
+        "matcher": "*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 ${PLUGIN_ROOT}/scripts/computa_hooks.py hook --format goose --event SubagentStop --quiet-ok"
+          }
+        ]
+      }
+    ],
+    "PreCompact": [
+      {
+        "matcher": "*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 ${PLUGIN_ROOT}/scripts/computa_hooks.py hook --format goose --event PreCompact"
+          }
+        ]
+      }
+    ],
+    "PostCompact": [
+      {
+        "matcher": "*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 ${PLUGIN_ROOT}/scripts/computa_hooks.py hook --format goose --event PostCompact"
           }
         ]
       }
@@ -28,7 +149,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "python3 ${PLUGIN_ROOT}/scripts/computa_hooks.py hook --event Stop --closeout --strict"
+            "command": "python3 ${PLUGIN_ROOT}/scripts/computa_hooks.py hook --format goose --event SessionEnd --closeout --strict"
           }
         ]
       }
@@ -39,7 +160,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "python3 ${PLUGIN_ROOT}/scripts/computa_hooks.py hook --event Stop --closeout --strict"
+            "command": "python3 ${PLUGIN_ROOT}/scripts/computa_hooks.py hook --format goose --event Stop --closeout --strict"
           }
         ]
       }
