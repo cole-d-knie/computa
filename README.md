@@ -62,7 +62,7 @@ Portable hook runner:
 
 `scripts/computa_hooks.py`
 
-The hook runner now enforces recursive skill routing through the execution queue. It injects the exact next queued skill invocation into supported harness contexts and blocks final closeout when Export Control, 4D Chess, or Make No Mistakes skipped required child-skill expansion or recursive execution rows.
+The hook runner now enforces recursive skill routing through the execution queue. On session/prompt/compaction hooks it can deterministically expand missing parent, child-skill, campaign, and Super-Phase queue rows without prompting. It then injects the exact next queued skill invocation into supported harness contexts and blocks final closeout when Export Control, 4D Chess, or Make No Mistakes skipped required child-skill expansion or recursive execution rows.
 
 Hook templates:
 

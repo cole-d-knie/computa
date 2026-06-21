@@ -6,6 +6,7 @@ Preflight:
 
 ```bash
 python3 /path/to/computa/scripts/computa_hooks.py validate --strict
+python3 /path/to/computa/scripts/computa_hooks.py expand
 python3 /path/to/computa/scripts/computa_hooks.py next
 ```
 

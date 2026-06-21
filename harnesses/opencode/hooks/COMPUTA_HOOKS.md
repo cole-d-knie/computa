@@ -11,6 +11,7 @@ Recommended wrapper commands:
 
 ```bash
 python3 /path/to/computa/scripts/computa_hooks.py validate --strict
+python3 /path/to/computa/scripts/computa_hooks.py expand
 python3 /path/to/computa/scripts/computa_hooks.py next
 python3 /path/to/computa/scripts/computa_hooks.py validate --closeout --strict
 ```
@@ -21,3 +22,5 @@ The plugin already wires lifecycle events to the runner. For manual checks:
 python3 /path/to/computa/scripts/computa_hooks.py hook --format opencode --event SessionStart
 python3 /path/to/computa/scripts/computa_hooks.py hook --format opencode --event Stop --closeout --strict
 ```
+
+Hook-added queue rows are real queue rows. They should be consumed or explicitly deferred with rationale.

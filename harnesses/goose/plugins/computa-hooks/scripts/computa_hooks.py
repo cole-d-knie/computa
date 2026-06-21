@@ -14,6 +14,7 @@ import os
 import subprocess
 import sys
 from dataclasses import dataclass
+from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
@@ -43,6 +44,21 @@ QUEUE_HEADER = [
     "completed_at",
     "notes",
 ]
+ACTIVITY_HEADER = [
+    "timestamp",
+    "session_id",
+    "layer",
+    "parent_session_id",
+    "event_type",
+    "scope_type",
+    "scope_id",
+    "scope_name",
+    "status",
+    "artifact_path",
+    "evidence_path",
+    "next_action",
+    "notes",
+]
 
 ACTIVE_STATUSES = {"queued", "ready", "running", "review_needed"}
 DONE_STATUSES = {"complete", "deferred", "blocked", "superseded"}
@@ -65,12 +81,18 @@ SESSION_TERMINAL_STATUSES = {
     "session_blocked",
 }
 ROUTING_EXEMPT_STATUSES = {"deferred", "blocked", "superseded"}
+EXPAND_EVENTS = {"SessionStart", "UserPromptSubmit", "PreCompact", "PostCompact"}
 LAYER_SKILL = {
     "export-control": "computa-export-control",
     "export_control": "computa-export-control",
     "4d-chess": "computa-4d-chess",
     "4d_chess": "computa-4d-chess",
     "computa": "computa-make-no-mistakes",
+}
+SKILL_LAYER = {
+    "computa-export-control": "export-control",
+    "computa-4d-chess": "4d-chess",
+    "computa-make-no-mistakes": "computa",
 }
 REQUIRED_CHILD_SKILLS = {
     "computa-export-control": [
@@ -110,6 +132,15 @@ REQUIRED_CHILD_SKILLS = {
         "computa-swarm-verify-closeout",
     ],
 }
+CHILD_REQUIRED_OUTPUTS = {
+    "computa-init": "artifact root, session ledger, activity log, execution queue",
+    "computa-speak": "user-task.md, normalized-task.md, prompt-normalization-log.md",
+    "computa-execution-queue": "root and session-local queue rows expanded",
+    "computa-export-control-execute": "4D campaign invocations and campaign closeout",
+    "computa-4d-chess-execute": "Super-Phase invocations and 4D closeout",
+    "computa-make-no-mistakes": "nested Computa session, phases/tasks/subtasks, TDD/QA, reviews, closeout",
+    "security-audit": "SP-999 security audit evidence and report",
+}
 
 
 @dataclass
@@ -120,6 +151,15 @@ class CheckResult:
     artifact_root: Path | None
     next_item: dict[str, str] | None
     routing_messages: list[str]
+
+
+@dataclass
+class ExpandResult:
+    changed: bool
+    messages: list[str]
+    root: Path
+    artifact_root: Path | None
+    added_rows: list[dict[str, str]]
 
 
 def read_stdin_json() -> dict[str, Any]:
@@ -184,6 +224,29 @@ def read_csv(path: Path) -> list[dict[str, str]]:
         return [{k: (v or "") for k, v in row.items()} for row in reader]
 
 
+def utc_now() -> str:
+    return datetime.now(timezone.utc).replace(microsecond=0).isoformat().replace("+00:00", "Z")
+
+
+def write_csv(path: Path, header: list[str], rows: list[dict[str, str]]) -> None:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    with path.open("w", newline="") as handle:
+        writer = csv.DictWriter(handle, fieldnames=header, extrasaction="ignore")
+        writer.writeheader()
+        for row in rows:
+            writer.writerow({key: row.get(key, "") for key in header})
+
+
+def append_csv_row(path: Path, header: list[str], row: dict[str, str]) -> None:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    exists = path.exists() and path.stat().st_size > 0
+    with path.open("a", newline="") as handle:
+        writer = csv.DictWriter(handle, fieldnames=header, extrasaction="ignore")
+        if not exists:
+            writer.writeheader()
+        writer.writerow({key: row.get(key, "") for key in header})
+
+
 def queue_rows(artifact_root: Path) -> tuple[list[dict[str, str]], list[str]]:
     messages: list[str] = []
     queue_path = artifact_root / "execution-queue.csv"
@@ -198,6 +261,10 @@ def queue_rows(artifact_root: Path) -> tuple[list[dict[str, str]], list[str]]:
             )
         rows = [{k: (v or "") for k, v in row.items()} for row in reader]
     return rows, messages
+
+
+def write_queue_rows(artifact_root: Path, rows: list[dict[str, str]]) -> None:
+    write_csv(artifact_root / "execution-queue.csv", QUEUE_HEADER, rows)
 
 
 def has_computa_sessions(artifact_root: Path) -> bool:
@@ -235,6 +302,77 @@ def is_done_status(value: str) -> bool:
     return value.strip().lower() in DONE_STATUSES
 
 
+def is_ready_status(value: str) -> bool:
+    return value.strip().lower() in {"ready", "queued"}
+
+
+def row_status(row: dict[str, str]) -> str:
+    return row.get("status", "").strip().lower()
+
+
+def next_queue_id(rows: list[dict[str, str]]) -> str:
+    used = {row.get("queue_id", "") for row in rows}
+    index = 1
+    while True:
+        candidate = f"QH-{index:04d}"
+        if candidate not in used:
+            return candidate
+        index += 1
+
+
+def parse_priority(value: str, fallback: int = 5000) -> int:
+    try:
+        return int(value or str(fallback))
+    except ValueError:
+        return fallback
+
+
+def queue_row(
+    *,
+    queue_id: str,
+    parent_queue_id: str = "",
+    session_id: str = "",
+    layer: str = "",
+    scope_type: str = "skill",
+    scope_id: str = "",
+    scope_name: str = "",
+    skill: str = "",
+    action: str = "invoke_skill",
+    priority: int = 5000,
+    status: str = "queued",
+    dependencies: str = "",
+    artifact_path: str = "",
+    required_outputs: str = "",
+    next_action: str = "",
+    notes: str = "",
+) -> dict[str, str]:
+    row = {key: "" for key in QUEUE_HEADER}
+    row.update(
+        {
+            "queue_id": queue_id,
+            "parent_queue_id": parent_queue_id,
+            "session_id": session_id,
+            "layer": layer,
+            "scope_type": scope_type,
+            "scope_id": scope_id,
+            "scope_name": scope_name or scope_id or skill,
+            "skill": skill,
+            "action": action,
+            "priority": str(priority),
+            "status": status,
+            "dependencies": dependencies,
+            "allowed_parallelism": "coordinator_only",
+            "required_outputs": required_outputs,
+            "review_gate": "none",
+            "artifact_path": artifact_path,
+            "next_action": next_action or (f"invoke /{skill}" if skill else action),
+            "created_at": utc_now(),
+            "notes": notes,
+        }
+    )
+    return row
+
+
 def first_ready_item(rows: list[dict[str, str]]) -> dict[str, str] | None:
     by_id = {row.get("queue_id", ""): row for row in rows}
     ready: list[dict[str, str]] = []
@@ -249,6 +387,25 @@ def first_ready_item(rows: list[dict[str, str]]) -> dict[str, str] | None:
     return sorted(ready, key=priority_value)[0]
 
 
+def child_skill_row(
+    rows: list[dict[str, str]],
+    parent: dict[str, str],
+    skill: str,
+) -> dict[str, str] | None:
+    parent_id = parent.get("queue_id", "")
+    session_id = parent.get("session_id", "")
+    for row in rows:
+        if normalize_skill(row.get("skill", "")) != skill:
+            continue
+        if row_status(row) == "superseded":
+            continue
+        if parent_id and row.get("parent_queue_id") == parent_id:
+            return row
+        if session_id and row.get("session_id") == session_id and not row.get("parent_queue_id"):
+            return row
+    return None
+
+
 def queue_has_skill(rows: list[dict[str, str]], skill: str) -> bool:
     expected = normalize_skill(skill)
     return any(
@@ -256,6 +413,13 @@ def queue_has_skill(rows: list[dict[str, str]], skill: str) -> bool:
         and row.get("status", "").strip().lower() != "superseded"
         for row in rows
     )
+
+
+def dependencies_done(rows: list[dict[str, str]], dependencies: str) -> bool:
+    if not dependencies:
+        return True
+    by_id = {row.get("queue_id", ""): row for row in rows}
+    return all(by_id.get(dep, {}).get("status") in {"complete", "deferred"} for dep in parse_dependencies(dependencies))
 
 
 def active_parent_skills(rows: list[dict[str, str]], artifact_root: Path) -> tuple[set[str], list[str]]:
@@ -282,6 +446,257 @@ def active_parent_skills(rows: list[dict[str, str]], artifact_root: Path) -> tup
             )
 
     return parents, routing
+
+
+def active_parent_rows(rows: list[dict[str, str]], artifact_root: Path) -> tuple[list[dict[str, str]], list[str]]:
+    parents: list[dict[str, str]] = []
+    messages: list[str] = []
+    seen: set[str] = set()
+
+    for row in rows:
+        skill = normalize_skill(row.get("skill", ""))
+        if skill not in REQUIRED_CHILD_SKILLS:
+            continue
+        if row_status(row) in ROUTING_EXEMPT_STATUSES:
+            continue
+        parents.append(row)
+        seen.add(row.get("queue_id", ""))
+
+    session_ledger = artifact_root / "session-ledger.csv"
+    for session in read_csv(session_ledger):
+        status = session.get("status", "").strip().lower()
+        if status in SESSION_TERMINAL_STATUSES:
+            continue
+        skill = LAYER_SKILL.get(session.get("layer", "").strip().lower())
+        if not skill:
+            continue
+
+        existing = next(
+            (
+                row
+                for row in rows
+                if normalize_skill(row.get("skill", "")) == skill
+                and row.get("session_id") == session.get("session_id", "")
+                and row_status(row) != "superseded"
+            ),
+            None,
+        )
+        if existing:
+            if existing.get("queue_id", "") not in seen:
+                parents.append(existing)
+                seen.add(existing.get("queue_id", ""))
+            continue
+
+        qid = next_queue_id(rows)
+        parent = queue_row(
+            queue_id=qid,
+            session_id=session.get("session_id", ""),
+            layer=session.get("layer", ""),
+            scope_type="session",
+            scope_id=session.get("session_id", ""),
+            scope_name=f"{session.get('layer', '')} session {session.get('session_id', '')}",
+            skill=skill,
+            priority=100,
+            status="running",
+            artifact_path=session.get("session_path", ""),
+            required_outputs="expanded child-skill queue rows and session closeout evidence",
+            next_action=f"expand and execute /{skill} child queue",
+            notes="auto-added by Computa queue expander hook from session-ledger.csv",
+        )
+        rows.append(parent)
+        parents.append(parent)
+        seen.add(qid)
+        messages.append(f"Added missing parent row {qid} for /{skill} from session {session.get('session_id', '')}.")
+
+    return parents, messages
+
+
+def add_child_skill_rows(rows: list[dict[str, str]], parent: dict[str, str]) -> list[str]:
+    parent_skill = normalize_skill(parent.get("skill", ""))
+    required = REQUIRED_CHILD_SKILLS.get(parent_skill, [])
+    if not required:
+        return []
+
+    messages: list[str] = []
+    previous_id = ""
+    parent_priority = parse_priority(parent.get("priority", ""), fallback=500)
+    for index, skill in enumerate(required, start=1):
+        existing = child_skill_row(rows, parent, skill)
+        if existing:
+            previous_id = existing.get("queue_id", "") or previous_id
+            continue
+
+        dependency = previous_id
+        status = "ready" if dependencies_done(rows, dependency) else "queued"
+        qid = next_queue_id(rows)
+        child = queue_row(
+            queue_id=qid,
+            parent_queue_id=parent.get("queue_id", ""),
+            session_id=parent.get("session_id", ""),
+            layer=parent.get("layer") or SKILL_LAYER.get(parent_skill, ""),
+            scope_type="child-skill",
+            scope_id=skill,
+            scope_name=f"{parent_skill} -> {skill}",
+            skill=skill,
+            priority=parent_priority + index,
+            status=status,
+            dependencies=dependency,
+            artifact_path=parent.get("artifact_path", ""),
+            required_outputs=CHILD_REQUIRED_OUTPUTS.get(skill, f"/{skill} required outputs and evidence"),
+            next_action=f"invoke /{skill} as required child of /{parent_skill}",
+            notes="auto-added by Computa queue expander hook",
+        )
+        rows.append(child)
+        previous_id = qid
+        messages.append(f"Added child row {qid}: /{parent_skill} -> /{skill}.")
+
+    return messages
+
+
+def add_recursive_execution_rows(rows: list[dict[str, str]]) -> list[str]:
+    messages: list[str] = []
+    for row in list(rows):
+        if row_status(row) in ROUTING_EXEMPT_STATUSES:
+            continue
+        skill = normalize_skill(row.get("skill", ""))
+        scope_type = row.get("scope_type", "").lower()
+        scope_name = row.get("scope_name", "").lower()
+        scope_id = row.get("scope_id", "")
+
+        target = ""
+        required_outputs = ""
+        next_action = ""
+        if ("campaign" in scope_type or "campaign" in scope_name) and skill != "computa-4d-chess":
+            target = "computa-4d-chess"
+            required_outputs = "4D session, Super-Phase plan, nested Computa execution, reviews, closeout"
+            next_action = "invoke /computa-4d-chess with the campaign prompt"
+        elif (
+            "super-phase" in scope_type
+            or "super_phase" in scope_type
+            or scope_id.upper().startswith("SP-")
+        ) and skill != "computa-make-no-mistakes":
+            target = "computa-make-no-mistakes"
+            required_outputs = "nested Computa session, phase/task ledgers, tests, reviews, closeout"
+            if scope_id.upper().startswith("SP-999") or "security" in scope_name:
+                next_action = "invoke /computa-make-no-mistakes with a task that invokes /security-audit"
+            else:
+                next_action = "invoke /computa-make-no-mistakes with the Super-Phase computa-invocation.md prompt"
+
+        if not target or child_skill_row(rows, row, target):
+            continue
+
+        qid = next_queue_id(rows)
+        child = queue_row(
+            queue_id=qid,
+            parent_queue_id=row.get("queue_id", ""),
+            session_id=row.get("session_id", ""),
+            layer=row.get("layer", ""),
+            scope_type="recursive-skill",
+            scope_id=target,
+            scope_name=f"{row.get('scope_name') or row.get('scope_id') or row.get('queue_id')} -> {target}",
+            skill=target,
+            priority=parse_priority(row.get("priority", ""), fallback=1000) + 1,
+            status="ready" if row_status(row) in {"ready", "running", "complete"} else "queued",
+            artifact_path=row.get("artifact_path", ""),
+            required_outputs=required_outputs,
+            next_action=next_action,
+            notes="auto-added by Computa queue expander hook for recursive skill routing",
+        )
+        rows.append(child)
+        messages.append(f"Added recursive row {qid}: {row.get('queue_id')} -> /{target}.")
+
+    return messages
+
+
+def write_queue_markdown(artifact_root: Path, rows: list[dict[str, str]], messages: list[str]) -> None:
+    path = artifact_root / "execution-queue.md"
+    next_item = first_ready_item(rows)
+    lines = [
+        "# Computa Execution Queue",
+        "",
+        f"Last hook expansion check: {utc_now()}",
+        "",
+        "## Safe Next Action",
+        "",
+        next_item_instruction(next_item),
+        "",
+        "## Recent Hook Expansion",
+        "",
+    ]
+    if messages:
+        lines.extend(f"- {message}" for message in messages)
+    else:
+        lines.append("- No missing deterministic queue rows found.")
+    lines.extend(
+        [
+            "",
+            "## Active Rows",
+            "",
+        ]
+    )
+    for row in sorted(
+        [item for item in rows if row_status(item) in ACTIVE_STATUSES],
+        key=priority_value,
+    )[:50]:
+        lines.append(
+            f"- `{row.get('queue_id')}` `{row.get('status')}` `/{normalize_skill(row.get('skill', ''))}`: "
+            f"{row.get('scope_name') or row.get('next_action')}"
+        )
+    path.write_text("\n".join(lines) + "\n")
+
+
+def append_queue_activity(artifact_root: Path, messages: list[str]) -> None:
+    if not messages:
+        return
+    append_csv_row(
+        artifact_root / "activity-log.csv",
+        ACTIVITY_HEADER,
+        {
+            "timestamp": utc_now(),
+            "event_type": "queue_expanded",
+            "scope_type": "execution-queue",
+            "scope_id": "hook-expander",
+            "scope_name": "Computa queue expander hook",
+            "status": "complete",
+            "artifact_path": str(artifact_root / "execution-queue.csv"),
+            "next_action": "consume the highest-priority ready queue item",
+            "notes": " | ".join(messages[:10]),
+        },
+    )
+
+
+def expand_queue(root: Path) -> ExpandResult:
+    artifact_root = find_artifact_root(root)
+    if artifact_root is None or not artifact_root.exists():
+        return ExpandResult(False, ["No Computa artifact root found; nothing to expand."], root, artifact_root, [])
+    if not has_computa_sessions(artifact_root):
+        return ExpandResult(False, ["No Computa sessions found; nothing to expand."], root, artifact_root, [])
+
+    rows, queue_messages = queue_rows(artifact_root)
+    if queue_messages and not rows:
+        return ExpandResult(False, queue_messages, root, artifact_root, [])
+
+    before_ids = {row.get("queue_id", "") for row in rows}
+    messages: list[str] = []
+    for _ in range(4):
+        pass_messages: list[str] = []
+        parents, parent_messages = active_parent_rows(rows, artifact_root)
+        pass_messages.extend(parent_messages)
+        for parent in parents:
+            pass_messages.extend(add_child_skill_rows(rows, parent))
+        pass_messages.extend(add_recursive_execution_rows(rows))
+        if not pass_messages:
+            break
+        messages.extend(pass_messages)
+
+    added_rows = [row for row in rows if row.get("queue_id", "") not in before_ids]
+    if not added_rows:
+        return ExpandResult(False, ["Execution queue already has deterministic recursive rows."], root, artifact_root, [])
+
+    write_queue_rows(artifact_root, rows)
+    write_queue_markdown(artifact_root, rows, messages)
+    append_queue_activity(artifact_root, messages)
+    return ExpandResult(True, messages, root, artifact_root, added_rows)
 
 
 def recursive_routing_messages(rows: list[dict[str, str]], artifact_root: Path) -> list[str]:
@@ -508,6 +923,12 @@ def run_hook(args: argparse.Namespace) -> int:
         event = "Stop" if args.closeout else "SessionStart"
 
     root = detect_root(args.root, payload)
+    expand_messages: list[str] = []
+    if args.expand_queue or event in EXPAND_EVENTS:
+        expand_result = expand_queue(root)
+        if expand_result.changed:
+            expand_messages = expand_result.messages
+
     closeout = args.closeout or event in {"Stop", "SessionEnd"}
     result = validate(root, strict=args.strict, closeout=closeout)
 
@@ -517,21 +938,49 @@ def run_hook(args: argparse.Namespace) -> int:
     routing_text = ""
     if result.routing_messages:
         routing_text = "\nRecursive routing required: " + " ".join(result.routing_messages[:5])
+    expand_text = ""
+    if expand_messages:
+        expand_text = "\nQueue expander added rows: " + " ".join(expand_messages[:5])
     next_text = "\n" + next_item_instruction(result.next_item)
     context = (
         "Computa hook check: "
         + ("passed." if result.ok else "blocked.")
         + " "
         + " ".join(result.messages[:5])
+        + expand_text
         + routing_text
         + next_text
     )
     return output_hook_result(args.format, event, result.ok, context, additional_context=context)
 
 
+def output_expand_result(result: ExpandResult, as_json: bool) -> None:
+    if as_json:
+        print(
+            json.dumps(
+                {
+                    "changed": result.changed,
+                    "root": str(result.root),
+                    "artifact_root": str(result.artifact_root) if result.artifact_root else None,
+                    "messages": result.messages,
+                    "added_rows": result.added_rows,
+                },
+                indent=2,
+                sort_keys=True,
+            )
+        )
+        return
+
+    print(f"root: {result.root}")
+    print(f"artifact_root: {result.artifact_root}")
+    print(f"changed: {result.changed}")
+    for message in result.messages:
+        print(f"- {message}")
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(description="Computa portable hook runner")
-    parser.add_argument("command", choices=["validate", "next", "hook"])
+    parser.add_argument("command", choices=["validate", "next", "hook", "expand"])
     parser.add_argument("--root", default=None, help="Project root. Defaults to cwd/git root/hook payload cwd.")
     parser.add_argument("--event", default=None, help="Hook event name.")
     parser.add_argument(
@@ -542,6 +991,7 @@ def main() -> int:
     )
     parser.add_argument("--strict", action="store_true", help="Fail if queue is missing or malformed.")
     parser.add_argument("--closeout", action="store_true", help="Fail if active queue rows remain.")
+    parser.add_argument("--expand-queue", action="store_true", help="Expand deterministic missing queue rows before validating.")
     parser.add_argument("--quiet-ok", action="store_true", help="Emit no output when the hook passes.")
     parser.add_argument("--json", action="store_true", help="Print JSON for validate/next.")
     args = parser.parse_args()
@@ -550,6 +1000,14 @@ def main() -> int:
         return run_hook(args)
 
     root = detect_root(args.root, {})
+
+    if args.command == "expand":
+        result = expand_queue(root)
+        output_expand_result(result, args.json)
+        return 0
+
+    if args.expand_queue:
+        expand_queue(root)
 
     result = validate(root, strict=args.strict, closeout=args.closeout)
     if args.command == "next":

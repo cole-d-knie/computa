@@ -6,7 +6,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "python3 ${COMPUTA_REPO:-/Users/cole/Desktop/swarm-verify-skills}/scripts/computa_hooks.py hook --format claude --event SessionStart"
+            "command": "python3 ${COMPUTA_REPO:-/Users/cole/Desktop/swarm-verify-skills}/scripts/computa_hooks.py hook --format claude --event SessionStart --expand-queue"
           }
         ]
       }
@@ -27,7 +27,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "python3 ${COMPUTA_REPO:-/Users/cole/Desktop/swarm-verify-skills}/scripts/computa_hooks.py hook --format claude --event UserPromptSubmit"
+            "command": "python3 ${COMPUTA_REPO:-/Users/cole/Desktop/swarm-verify-skills}/scripts/computa_hooks.py hook --format claude --event UserPromptSubmit --expand-queue"
           }
         ]
       }
@@ -103,7 +103,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "python3 ${COMPUTA_REPO:-/Users/cole/Desktop/swarm-verify-skills}/scripts/computa_hooks.py hook --format claude --event PreCompact"
+            "command": "python3 ${COMPUTA_REPO:-/Users/cole/Desktop/swarm-verify-skills}/scripts/computa_hooks.py hook --format claude --event PreCompact --expand-queue"
           }
         ]
       }
@@ -114,7 +114,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "python3 ${COMPUTA_REPO:-/Users/cole/Desktop/swarm-verify-skills}/scripts/computa_hooks.py hook --format claude --event PostCompact"
+            "command": "python3 ${COMPUTA_REPO:-/Users/cole/Desktop/swarm-verify-skills}/scripts/computa_hooks.py hook --format claude --event PostCompact --expand-queue"
           }
         ]
       }

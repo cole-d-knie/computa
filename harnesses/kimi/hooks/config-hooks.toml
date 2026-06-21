@@ -1,7 +1,7 @@
 # BEGIN COMPUTA HOOKS
 [[hooks]]
 event = "UserPromptSubmit"
-command = "python3 /Users/cole/Desktop/swarm-verify-skills/scripts/computa_hooks.py hook --format kimi --event UserPromptSubmit"
+command = "python3 /Users/cole/Desktop/swarm-verify-skills/scripts/computa_hooks.py hook --format kimi --event UserPromptSubmit --expand-queue"
 timeout = 10
 
 [[hooks]]
@@ -37,7 +37,7 @@ timeout = 10
 [[hooks]]
 event = "SessionStart"
 matcher = "startup|resume"
-command = "python3 /Users/cole/Desktop/swarm-verify-skills/scripts/computa_hooks.py hook --format kimi --event SessionStart"
+command = "python3 /Users/cole/Desktop/swarm-verify-skills/scripts/computa_hooks.py hook --format kimi --event SessionStart --expand-queue"
 timeout = 10
 
 [[hooks]]
@@ -74,13 +74,13 @@ timeout = 10
 [[hooks]]
 event = "PreCompact"
 matcher = "manual|auto"
-command = "python3 /Users/cole/Desktop/swarm-verify-skills/scripts/computa_hooks.py hook --format kimi --event PreCompact"
+command = "python3 /Users/cole/Desktop/swarm-verify-skills/scripts/computa_hooks.py hook --format kimi --event PreCompact --expand-queue"
 timeout = 10
 
 [[hooks]]
 event = "PostCompact"
 matcher = "manual|auto"
-command = "python3 /Users/cole/Desktop/swarm-verify-skills/scripts/computa_hooks.py hook --format kimi --event PostCompact"
+command = "python3 /Users/cole/Desktop/swarm-verify-skills/scripts/computa_hooks.py hook --format kimi --event PostCompact --expand-queue"
 timeout = 10
 
 [[hooks]]

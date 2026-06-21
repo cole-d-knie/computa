@@ -3,12 +3,12 @@
   "hooks": {
     "workspaceOpen": [
       {
-        "command": "python3 /Users/cole/Desktop/swarm-verify-skills/scripts/computa_hooks.py hook --format cursor --event SessionStart"
+        "command": "python3 /Users/cole/Desktop/swarm-verify-skills/scripts/computa_hooks.py hook --format cursor --event SessionStart --expand-queue"
       }
     ],
     "sessionStart": [
       {
-        "command": "python3 /Users/cole/Desktop/swarm-verify-skills/scripts/computa_hooks.py hook --format cursor --event SessionStart"
+        "command": "python3 /Users/cole/Desktop/swarm-verify-skills/scripts/computa_hooks.py hook --format cursor --event SessionStart --expand-queue"
       }
     ],
     "preToolUse": [
@@ -64,7 +64,7 @@
     ],
     "preCompact": [
       {
-        "command": "python3 /Users/cole/Desktop/swarm-verify-skills/scripts/computa_hooks.py hook --format cursor --event PreCompact"
+        "command": "python3 /Users/cole/Desktop/swarm-verify-skills/scripts/computa_hooks.py hook --format cursor --event PreCompact --expand-queue"
       }
     ],
     "stop": [

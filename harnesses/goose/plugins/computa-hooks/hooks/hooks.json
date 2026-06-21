@@ -6,7 +6,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "python3 ${PLUGIN_ROOT}/scripts/computa_hooks.py hook --format goose --event SessionStart"
+            "command": "python3 ${PLUGIN_ROOT}/scripts/computa_hooks.py hook --format goose --event SessionStart --expand-queue"
           }
         ]
       }
@@ -17,7 +17,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "python3 ${PLUGIN_ROOT}/scripts/computa_hooks.py hook --format goose --event UserPromptSubmit"
+            "command": "python3 ${PLUGIN_ROOT}/scripts/computa_hooks.py hook --format goose --event UserPromptSubmit --expand-queue"
           }
         ]
       }
@@ -127,7 +127,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "python3 ${PLUGIN_ROOT}/scripts/computa_hooks.py hook --format goose --event PreCompact"
+            "command": "python3 ${PLUGIN_ROOT}/scripts/computa_hooks.py hook --format goose --event PreCompact --expand-queue"
           }
         ]
       }
@@ -138,7 +138,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "python3 ${PLUGIN_ROOT}/scripts/computa_hooks.py hook --format goose --event PostCompact"
+            "command": "python3 ${PLUGIN_ROOT}/scripts/computa_hooks.py hook --format goose --event PostCompact --expand-queue"
           }
         ]
       }

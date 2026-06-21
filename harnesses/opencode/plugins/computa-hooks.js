@@ -12,6 +12,7 @@ function runHook(eventName, cwd, options = {}) {
   if (options.strict) args.push("--strict")
   if (options.closeout) args.push("--closeout")
   if (options.quietOk) args.push("--quiet-ok")
+  if (options.expandQueue) args.push("--expand-queue")
 
   const payload = JSON.stringify({
     hook_event_name: eventName,
@@ -46,7 +47,7 @@ export const ComputaHooksPlugin = async (ctx) => {
   return {
     event: async ({ event }) => {
       const type = event?.type || ""
-      if (type === "session.created") await log(runHook("SessionStart", cwd))
+      if (type === "session.created") await log(runHook("SessionStart", cwd, { expandQueue: true }))
       if (type === "session.idle") runHook("Stop", cwd, { strict: true, closeout: true })
       if (type === "session.compacted") runHook("PostCompact", cwd, { quietOk: true })
       if (type === "session.error") runHook("StopFailure", cwd, { quietOk: true })
@@ -62,7 +63,7 @@ export const ComputaHooksPlugin = async (ctx) => {
       runHook("PostToolUse", cwd, { quietOk: true })
     },
     "experimental.session.compacting": async (_input, output) => {
-      const context = runHook("PreCompact", cwd)
+      const context = runHook("PreCompact", cwd, { expandQueue: true })
       if (context && Array.isArray(output.context)) output.context.push(context)
     },
   }

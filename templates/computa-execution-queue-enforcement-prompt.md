@@ -9,6 +9,7 @@ Before executing any Export Control, 4D Chess, or Computa Make No Mistakes work,
 
 Rules:
 - Skill invocation expands the queue; execution consumes the queue.
+- Hooks may deterministically expand missing queue rows. Treat hook-added rows as real queue rows, not suggestions.
 - Create/update docs/computa-artifacts/execution-queue.csv and execution-queue.md, plus session-local queue files.
 - The queue is dependency-aware, not FIFO.
 - Add every required child skill, phase, task, Super-Phase, campaign, review gate, docs hook, verification gate, and closeout gate to the queue before executing it.

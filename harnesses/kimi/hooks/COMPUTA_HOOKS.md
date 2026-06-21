@@ -14,6 +14,7 @@ Run before Computa work:
 
 ```bash
 python3 /path/to/computa/scripts/computa_hooks.py validate --strict
+python3 /path/to/computa/scripts/computa_hooks.py expand
 python3 /path/to/computa/scripts/computa_hooks.py next
 ```
 
@@ -24,3 +25,5 @@ python3 /path/to/computa/scripts/computa_hooks.py validate --closeout --strict
 ```
 
 Kimi agents must treat a hook block as a real blocker and repair/reconcile `docs/computa-artifacts/execution-queue.csv` before continuing.
+
+Hook-added queue rows are real. Consume the highest-priority ready row instead of re-planning from chat context.

@@ -9,6 +9,7 @@ Run from a project root:
 ```bash
 python3 /path/to/computa/scripts/computa_hooks.py validate --strict
 python3 /path/to/computa/scripts/computa_hooks.py next
+python3 /path/to/computa/scripts/computa_hooks.py expand
 python3 /path/to/computa/scripts/computa_hooks.py validate --closeout --strict
 ```
 
@@ -17,6 +18,7 @@ Use `COMPUTA_ROOT=/path/to/project` when the harness does not pass a working dir
 ## Hook Modes
 
 - `SessionStart` / `UserPromptSubmit`: add context reminding the agent to use the queue.
+- `expand`: deterministically append missing queue rows for known parent skills and recursive routing.
 - `PreToolUse` / `BeforeShellExecution`: optionally block unsafe closeout attempts when the queue is invalid.
 - `Stop` / `SessionEnd`: block completion when required queue rows are still active.
 - `resume`: use `validate` and `next` before relying on chat history.
@@ -28,13 +30,17 @@ Hooks do not secretly spawn model sessions or run skills in the background. That
 Instead, the hook runner makes recursive invocation unavoidable through the queue:
 
 1. It detects active Export Control, 4D Chess, and Computa Make No Mistakes sessions.
-2. It checks that required child-skill queue rows exist or are explicitly deferred with rationale.
-3. It checks recursive execution routing:
+2. On session/prompt/compaction hooks, it expands deterministic queue structure without prompting:
+   - missing parent rows from `session-ledger.csv`
+   - required child-skill rows for Export Control, 4D Chess, and Make No Mistakes
+   - recursive campaign/Super-Phase rows that route to the next required skill
+3. It checks that required child-skill queue rows exist or are explicitly deferred with rationale.
+4. It checks recursive execution routing:
    - Export Control campaign execution must route to `/computa-4d-chess`.
    - 4D Chess Super-Phase execution must route to `/computa-make-no-mistakes`.
    - SP-999 must still run through `/computa-make-no-mistakes`, which invokes `/security-audit`.
-4. It injects the exact next queue item and required skill invocation into session/prompt/compaction context.
-5. It blocks final `Stop` / `SessionEnd` if child-skill expansion or recursive routing was skipped.
+5. It injects the exact next queue item and required skill invocation into session/prompt/compaction context.
+6. It blocks final `Stop` / `SessionEnd` if child-skill expansion or recursive routing was skipped.
 
 If a required child skill is genuinely not applicable, add a `deferred` queue row with rationale. Do not omit it.
 

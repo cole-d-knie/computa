@@ -20,6 +20,7 @@ Run before Computa work:
 
 ```bash
 python3 /path/to/computa/scripts/computa_hooks.py validate --strict
+python3 /path/to/computa/scripts/computa_hooks.py expand
 python3 /path/to/computa/scripts/computa_hooks.py next
 ```
 
@@ -30,3 +31,5 @@ python3 /path/to/computa/scripts/computa_hooks.py validate --closeout --strict
 ```
 
 If the closeout command fails, do not claim completion. Reconcile queue rows, ledgers, reviews, evidence, and docs hooks first.
+
+Hook-added rows are intentional deterministic expansions. Consume them through the queue.
