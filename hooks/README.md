@@ -21,6 +21,23 @@ Use `COMPUTA_ROOT=/path/to/project` when the harness does not pass a working dir
 - `Stop` / `SessionEnd`: block completion when required queue rows are still active.
 - `resume`: use `validate` and `next` before relying on chat history.
 
+## Recursive Skill Routing
+
+Hooks do not secretly spawn model sessions or run skills in the background. That would be unreliable across Codex, Claude Code, Kimi, OpenCode, Cursor, and Goose.
+
+Instead, the hook runner makes recursive invocation unavoidable through the queue:
+
+1. It detects active Export Control, 4D Chess, and Computa Make No Mistakes sessions.
+2. It checks that required child-skill queue rows exist or are explicitly deferred with rationale.
+3. It checks recursive execution routing:
+   - Export Control campaign execution must route to `/computa-4d-chess`.
+   - 4D Chess Super-Phase execution must route to `/computa-make-no-mistakes`.
+   - SP-999 must still run through `/computa-make-no-mistakes`, which invokes `/security-audit`.
+4. It injects the exact next queue item and required skill invocation into session/prompt/compaction context.
+5. It blocks final `Stop` / `SessionEnd` if child-skill expansion or recursive routing was skipped.
+
+If a required child skill is genuinely not applicable, add a `deferred` queue row with rationale. Do not omit it.
+
 ## Native vs Fallback Hooks
 
 Codex, Claude Code, Goose, Kimi Code, OpenCode, and Cursor have native lifecycle hook integrations in this package:

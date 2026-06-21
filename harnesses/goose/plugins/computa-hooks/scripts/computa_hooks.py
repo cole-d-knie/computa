@@ -47,6 +47,7 @@ QUEUE_HEADER = [
 ACTIVE_STATUSES = {"queued", "ready", "running", "review_needed"}
 DONE_STATUSES = {"complete", "deferred", "blocked", "superseded"}
 VALID_STATUSES = ACTIVE_STATUSES | DONE_STATUSES | {"failed"}
+BLOCKING_CLOSEOUT_STATUSES = ACTIVE_STATUSES | {"failed"}
 TEXT_HOOK_FORMATS = {"text", "generic", "kimi", "cursor", "opencode", "goose"}
 JSON_HOOK_FORMATS = {"json", "codex", "claude", "claude-code"}
 CONTEXT_EVENTS = {
@@ -57,6 +58,58 @@ CONTEXT_EVENTS = {
     "PostCompact",
     "PostToolBatch",
 }
+SESSION_TERMINAL_STATUSES = {
+    "deferred",
+    "blocked",
+    "superseded",
+    "session_blocked",
+}
+ROUTING_EXEMPT_STATUSES = {"deferred", "blocked", "superseded"}
+LAYER_SKILL = {
+    "export-control": "computa-export-control",
+    "export_control": "computa-export-control",
+    "4d-chess": "computa-4d-chess",
+    "4d_chess": "computa-4d-chess",
+    "computa": "computa-make-no-mistakes",
+}
+REQUIRED_CHILD_SKILLS = {
+    "computa-export-control": [
+        "computa-init",
+        "computa-speak",
+        "computa-execution-queue",
+        "computa-export-control-codebase-audit",
+        "computa-export-control-product-requirements",
+        "computa-export-control-tech-radar",
+        "computa-export-control-prior-art",
+        "computa-export-control-skill-mcp-intake",
+        "computa-export-control-technical-spec",
+        "computa-export-control-implementation-strategy",
+        "computa-export-control-audit-suite",
+        "computa-export-control-design",
+        "computa-export-control-execute",
+    ],
+    "computa-4d-chess": [
+        "computa-init",
+        "computa-speak",
+        "computa-execution-queue",
+        "computa-4d-chess-architect",
+        "computa-4d-chess-build",
+        "computa-4d-chess-execute",
+        "security-audit",
+    ],
+    "computa-make-no-mistakes": [
+        "computa-init",
+        "computa-swarm-verify",
+        "computa-swarm-verify-setup",
+        "computa-speak",
+        "computa-execution-queue",
+        "computa-swarm-verify-investigate",
+        "computa-swarm-verify-tdd-qa",
+        "computa-swarm-verify-swarms",
+        "computa-make-no-mistakes-docs-update",
+        "computa-swarm-verify-closeout",
+    ],
+}
 
 
 @dataclass
@@ -66,6 +119,7 @@ class CheckResult:
     root: Path
     artifact_root: Path | None
     next_item: dict[str, str] | None
+    routing_messages: list[str]
 
 
 def read_stdin_json() -> dict[str, Any]:
@@ -173,6 +227,14 @@ def priority_value(row: dict[str, str]) -> tuple[int, str]:
     return priority, row.get("queue_id", "")
 
 
+def normalize_skill(value: str) -> str:
+    return value.strip().lstrip("/")
+
+
+def is_done_status(value: str) -> bool:
+    return value.strip().lower() in DONE_STATUSES
+
+
 def first_ready_item(rows: list[dict[str, str]]) -> dict[str, str] | None:
     by_id = {row.get("queue_id", ""): row for row in rows}
     ready: list[dict[str, str]] = []
@@ -187,16 +249,143 @@ def first_ready_item(rows: list[dict[str, str]]) -> dict[str, str] | None:
     return sorted(ready, key=priority_value)[0]
 
 
+def queue_has_skill(rows: list[dict[str, str]], skill: str) -> bool:
+    expected = normalize_skill(skill)
+    return any(
+        normalize_skill(row.get("skill", "")) == expected
+        and row.get("status", "").strip().lower() != "superseded"
+        for row in rows
+    )
+
+
+def active_parent_skills(rows: list[dict[str, str]], artifact_root: Path) -> tuple[set[str], list[str]]:
+    parents: set[str] = set()
+    routing: list[str] = []
+
+    for row in rows:
+        skill = normalize_skill(row.get("skill", ""))
+        if skill in REQUIRED_CHILD_SKILLS and row.get("status", "").strip().lower() not in ROUTING_EXEMPT_STATUSES:
+            parents.add(skill)
+
+    session_ledger = artifact_root / "session-ledger.csv"
+    for session in read_csv(session_ledger):
+        status = session.get("status", "").strip().lower()
+        if status in SESSION_TERMINAL_STATUSES:
+            continue
+        skill = LAYER_SKILL.get(session.get("layer", "").strip().lower())
+        if not skill:
+            continue
+        parents.add(skill)
+        if not queue_has_skill(rows, skill):
+            routing.append(
+                f"Active {session.get('layer')} session {session.get('session_id')} has no root queue row for /{skill}."
+            )
+
+    return parents, routing
+
+
+def recursive_routing_messages(rows: list[dict[str, str]], artifact_root: Path) -> list[str]:
+    if not rows:
+        return []
+
+    routing: list[str] = []
+    parents, session_messages = active_parent_skills(rows, artifact_root)
+    routing.extend(session_messages)
+
+    for parent in sorted(parents):
+        missing = [skill for skill in REQUIRED_CHILD_SKILLS[parent] if not queue_has_skill(rows, skill)]
+        if missing:
+            preview = ", ".join(f"/{skill}" for skill in missing[:10])
+            suffix = "" if len(missing) <= 10 else f", +{len(missing) - 10} more"
+            routing.append(
+                f"/{parent} has not expanded required child-skill queue rows: {preview}{suffix}. "
+                "Invoke /computa-execution-queue now; if any child is N/A, add a deferred queue row with rationale."
+            )
+
+    export_execute_active = any(
+        normalize_skill(row.get("skill", "")) == "computa-export-control-execute"
+        and not is_done_status(row.get("status", ""))
+        for row in rows
+    )
+    campaign_rows = [
+        row
+        for row in rows
+        if "campaign" in row.get("scope_type", "").lower()
+        or "campaign" in row.get("scope_name", "").lower()
+    ]
+    if (export_execute_active or campaign_rows) and not queue_has_skill(rows, "computa-4d-chess"):
+        routing.append(
+            "Export Control execution has campaign work but no /computa-4d-chess queue row. "
+            "Campaign execution must invoke /computa-4d-chess through the queue."
+        )
+
+    chess_execute_active = any(
+        normalize_skill(row.get("skill", "")) == "computa-4d-chess-execute"
+        and not is_done_status(row.get("status", ""))
+        for row in rows
+    )
+    super_phase_rows = [
+        row
+        for row in rows
+        if "super-phase" in row.get("scope_type", "").lower()
+        or "super_phase" in row.get("scope_type", "").lower()
+        or row.get("scope_id", "").upper().startswith("SP-")
+    ]
+    if (chess_execute_active or super_phase_rows) and not queue_has_skill(rows, "computa-make-no-mistakes"):
+        routing.append(
+            "4D Chess execution has Super-Phase work but no /computa-make-no-mistakes queue row. "
+            "Every Super-Phase must execute through /computa-make-no-mistakes, including SP-999."
+        )
+
+    return routing
+
+
+def next_item_instruction(row: dict[str, str] | None) -> str:
+    if not row:
+        return "No ready Computa queue item found. Reconcile dependencies, blockers, and activity-log.csv before guessing a next action."
+
+    skill = normalize_skill(row.get("skill", ""))
+    queue_id = row.get("queue_id", "")
+    label = row.get("scope_name") or row.get("scope_id") or row.get("action") or "unnamed item"
+    next_action = row.get("next_action") or row.get("action") or "execute the queued item"
+    artifact = row.get("artifact_path", "")
+    required = row.get("required_outputs", "")
+
+    if skill:
+        instruction = (
+            f"Next required queue action: mark {queue_id} running, then invoke /{skill} for {label}. "
+            f"Use next_action='{next_action}'."
+        )
+    else:
+        instruction = (
+            f"Next required queue action: mark {queue_id} running and execute {label}. "
+            f"Use next_action='{next_action}'."
+        )
+    if artifact:
+        instruction += f" Start from artifact_path={artifact}."
+    if required:
+        instruction += f" Required outputs: {required}."
+    instruction += " Do not skip to later queue rows or rely on chat memory."
+    return instruction
+
+
 def validate(root: Path, strict: bool = False, closeout: bool = False) -> CheckResult:
     artifact_root = find_artifact_root(root)
     messages: list[str] = []
     next_item: dict[str, str] | None = None
 
     if artifact_root is None or not artifact_root.exists():
-        return CheckResult(True, ["No Computa artifact root found."], root, artifact_root, None)
+        return CheckResult(True, ["No Computa artifact root found."], root, artifact_root, None, [])
 
     if not has_computa_sessions(artifact_root):
-        return CheckResult(True, ["Computa artifact root exists but no sessions found."], root, artifact_root, None)
+        return CheckResult(
+            True,
+            ["Computa artifact root exists but no sessions found."],
+            root,
+            artifact_root,
+            None,
+            [],
+        )
 
     rows, queue_messages = queue_rows(artifact_root)
     messages.extend(queue_messages)
@@ -228,7 +417,7 @@ def validate(root: Path, strict: bool = False, closeout: bool = False) -> CheckR
                     missing_deps.append(f"{row.get('queue_id')} -> {dep}")
         if missing_deps:
             messages.append(f"Missing dependency queue IDs: {', '.join(missing_deps[:20])}")
-        active = [row for row in rows if row.get("status") in ACTIVE_STATUSES]
+        active = [row for row in rows if row.get("status") in BLOCKING_CLOSEOUT_STATUSES]
         if closeout and active:
             labels = [
                 f"{row.get('queue_id')}:{row.get('status')}:{row.get('skill') or row.get('scope_name')}"
@@ -237,8 +426,19 @@ def validate(root: Path, strict: bool = False, closeout: bool = False) -> CheckR
             messages.append("Closeout blocked; active queue rows remain: " + "; ".join(labels))
         next_item = first_ready_item(rows)
 
+    routing_messages = recursive_routing_messages(rows, artifact_root)
+    if closeout and routing_messages:
+        messages.extend("Recursive routing blocked: " + message for message in routing_messages)
+
     ok = len(messages) == 0 or (not strict and not closeout)
-    return CheckResult(ok, messages or ["Computa queue validation passed."], root, artifact_root, next_item)
+    return CheckResult(
+        ok,
+        messages or ["Computa queue validation passed."],
+        root,
+        artifact_root,
+        next_item,
+        routing_messages,
+    )
 
 
 def output_text(result: CheckResult) -> None:
@@ -249,6 +449,8 @@ def output_text(result: CheckResult) -> None:
     if result.next_item:
         print("next_item:")
         print(json.dumps(result.next_item, indent=2, sort_keys=True))
+    for message in result.routing_messages:
+        print(f"routing: {message}")
 
 
 def hook_json(event: str, ok: bool, reason: str, additional_context: str | None = None) -> dict[str, Any]:
@@ -312,18 +514,16 @@ def run_hook(args: argparse.Namespace) -> int:
     if args.quiet_ok and result.ok:
         return 0
 
-    next_text = ""
-    if result.next_item:
-        next_text = (
-            "\nNext ready Computa queue item: "
-            f"{result.next_item.get('queue_id')} / {result.next_item.get('skill')} / "
-            f"{result.next_item.get('next_action')}"
-        )
+    routing_text = ""
+    if result.routing_messages:
+        routing_text = "\nRecursive routing required: " + " ".join(result.routing_messages[:5])
+    next_text = "\n" + next_item_instruction(result.next_item)
     context = (
         "Computa hook check: "
         + ("passed." if result.ok else "blocked.")
         + " "
         + " ".join(result.messages[:5])
+        + routing_text
         + next_text
     )
     return output_hook_result(args.format, event, result.ok, context, additional_context=context)
@@ -369,6 +569,7 @@ def main() -> int:
                     "root": str(result.root),
                     "artifact_root": str(result.artifact_root) if result.artifact_root else None,
                     "messages": result.messages,
+                    "routing_messages": result.routing_messages,
                     "next_item": result.next_item,
                 },
                 indent=2,
